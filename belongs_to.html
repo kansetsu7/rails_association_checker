@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rails relation</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <h1>belongs_to relation</h1>
+          <p>
+            兩種選項：<br>
+            1. 輸入Class名稱與方法命名，剩下的留空。按下確認鍵後會依照Rails慣例提供對應的資料<br>
+            2. 輸入所有資料，按下確認鍵後會依照Rails慣例，標示出符合慣例的、需要修改的<br>
+            注：一次只能驗證一個阿～不要虐待我～
+          </p>
+          <hr>
+        </div>
+
+        <div class="col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Model內設定</h3>
+            </div>
+            <div class="panel-body">
+              <form action="">
+                Class <input type="text" id="class-name"> < ActiveRecord <br><br>
+                <textarea rows="3" class="form-control" id="relatoin-input"></textarea><br> 
+                end <br>
+              </form>
+            </div>
+          </div>
+        </div>  
+
+        <div class="col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">DB schema</h3>
+            </div>
+            <div class="panel-body">
+              <form action="">
+                自己的table name: <input type="text" id="my-table-name"><br><br>
+                自己的外鍵: <input type="text" id="fk">
+              </form>
+              <hr>
+              <form action="">
+                對方的table name: <input type="text" id="ref-table-name"><br><br>
+                對方的外鍵: <input type="text" id="pk">
+              </form>
+            </div>
+          </div>
+        </div>
+        <input type="button" value="check" onclick="check();">
+      </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+      function check (){
+        var className = document.getElementById("class-name").value
+        var relatoinInput = document.getElementById("relatoin-input").value
+        var myTableName = document.getElementById("my-table-name").value
+        var fk = document.getElementById("fk").value
+        var refTableName = document.getElementById("ref-table-name").value
+        var pk = document.getElementById("pk").value
+        if (chkClassName(className)) {
+         /* 
+        }else if (relatoinInput == "" || !relatoinInput.includes("belongs_to")) {
+          alert("你的belongs_to咧?");
+        }else{
+          var relation = relatoinInput.split(",");
+          var relation2 = [];
+          for (var i = 0; i <= relation.length-1; i++) {
+            relation2.push(relation[i].split(":"));
+          }
+          relation_log(relation2);
+          */
+        }
+
+        
+      }
+
+      function chkClassName(className) {
+        console.log("className:" + className);
+        if (className === "") {
+          alert("class名稱必填");
+          return true;
+        }else if (chkCapitalize(className)) {
+          // alert("great!");
+          console.log("great!");
+          console.log(capFirstLetter(className));
+          return false;
+        }
+          console.log("oops");
+          console.log(capFirstLetter(className));
+          return false;
+      }
+
+      function chkCapitalize(string) {
+        if (!isNaN(string.charAt(0))) {   //first latter is a number
+          return false;
+        }
+        return capFirstLetter(string) === string ? true : false;
+      }
+
+      function capFirstLetter(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
+      function relation_log(relation_array){
+        console.log("[");
+        relation_array.forEach(function(arg, index){
+          console.log("[" + arg[0] + "," + arg[1] + "]");
+        })
+
+        console.log("]");
+      }
+    </script>
+  </body>
+</html>
