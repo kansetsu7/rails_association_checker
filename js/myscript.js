@@ -15,41 +15,15 @@ function check (){
       console.log("有錯喔");
     }
 
-    var resultElements = [];
-    resultElements.push(document.createElement("p"));
-    resultElements[0].classList.add("code-white");
-    resultElements[0].innerHTML = "====your setup====<br>";
-    resultElements.push(document.createElement("span"));
-    resultElements[1].classList.add("code-red");
-    resultElements[1].innerHTML = "Class ";
-    resultElements.push(document.createElement("span"));
-    resultElements[2].classList.add("code-green");
-    resultElements[2].innerHTML = modelName;
-    resultElements.push(document.createElement("span"));
-    resultElements[3].classList.add("code-white");
-    resultElements[3].innerHTML = " < ";
-    resultElements.push(document.createElement("span"));
-    resultElements[4].classList.add("code-green");
-    resultElements[4].innerHTML = "ApplicationRecord<br>";
-    resultElements.push(document.createElement("span"));
-    resultElements[5].classList.add("code-white");
-    resultElements[5].innerHTML = "  belongs_to ";
+    
 
     if (fk === "" && pk === "" && refTableName === "") {
       console.log("all empty");
       var relation = map.get("relation");
+      resultInPan(codingPan, modelName, relation);
       
-      resultElements.push(document.createElement("span"));
-      resultElements[6].classList.add("code-purple");
-      resultElements[6].innerHTML = ":" + relation[0][1].trim();
     }
-    resultElements.push(document.createElement("span"));
-    resultElements[7].classList.add("code-red");
-    resultElements[7].innerHTML = "<br>end";
-
-    for (var i = 0; i < resultElements.length; i++) {
-      codingPan.appendChild(resultElements[i]);
-    }   
+       
 
   }
 
@@ -191,6 +165,61 @@ function relation_log(relation_array){
   })
 
   console.log("]");
+}
+
+/*
+* 
+* 
+* 
+*/
+function resultInPan(codingPan, modelName, relation) {
+  var index = 6;
+  var index2;
+  var resultElements = [];
+  resultElements.push(document.createElement("p"));
+  resultElements[0].classList.add("code-white");
+  resultElements[0].innerHTML = "====your setup====<br>";
+  resultElements.push(document.createElement("span"));
+  resultElements[1].classList.add("code-red");
+  resultElements[1].innerHTML = "Class ";
+  resultElements.push(document.createElement("span"));
+  resultElements[2].classList.add("code-green");
+  resultElements[2].innerHTML = modelName;
+  resultElements.push(document.createElement("span"));
+  resultElements[3].classList.add("code-white");
+  resultElements[3].innerHTML = " < ";
+  resultElements.push(document.createElement("span"));
+  resultElements[4].classList.add("code-green");
+  resultElements[4].innerHTML = "ApplicationRecord<br>";
+  resultElements.push(document.createElement("span"));
+  resultElements[5].classList.add("code-white");
+  resultElements[5].innerHTML = "&nbsp;&nbsp;belongs_to ";
+  resultElements.push(document.createElement("span"));
+  resultElements[6].classList.add("code-purple");
+  resultElements[6].innerHTML = ":" + relation[0][1].trim();
+
+  for (var i = 1; i < relation.length; i++) {
+    index2 = index + 3 * ( i - 1 );
+    resultElements.push(document.createElement("span"));
+    resultElements[index2+1].innerHTML = ", ";
+    resultElements[index2+1].classList.add("code-white");
+
+    resultElements.push(document.createElement("span"));
+    resultElements[index2+2].innerHTML = relation[i][0].trim() + ": ";
+    resultElements[index2+2].classList.add("code-purple");
+
+    resultElements.push(document.createElement("span"));
+    resultElements[index2+3].innerHTML = relation[i][1].trim();
+    resultElements[index2+3].classList.add("code-yellow");
+  }
+  index2 = index + 3 * ( relation.length - 1 );
+  console.log(index2);
+  resultElements.push(document.createElement("span"));
+  resultElements[index2+1].classList.add("code-red");
+  resultElements[index2+1].innerHTML = "<br>end";
+  for (var i = 0; i < resultElements.length; i++) {
+    codingPan.appendChild(resultElements[i]);
+  }
 }
 
 /*
