@@ -16,14 +16,15 @@
           <h1>belongs_to relation</h1>
           <p>
             兩種選項：<br>
-            1. 輸入Class名稱與方法命名，剩下的留空。按下確認鍵後會依照Rails慣例提供對應的資料<br>
+            1. 輸入Model名稱與方法命名，剩下的留空。按下確認鍵後會依照Rails慣例提供對應的資料<br>
             2. 輸入所有資料，按下確認鍵後會依照Rails慣例，標示出符合慣例的、需要修改的<br>
             注：一次只能驗證一個阿～不要虐待我～
           </p>
           <hr>
         </div>
-
-        <div class="col-xs-12">
+      </div>
+      <div class="row">
+        <div class="col-xs-6">
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">Model內設定</h3>
@@ -36,9 +37,7 @@
               </form>
             </div>
           </div>
-        </div>  
 
-        <div class="col-xs-12">
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">DB schema</h3>
@@ -56,78 +55,25 @@
             </div>
           </div>
         </div>
-        <input type="button" value="check" onclick="check();">
+
+        <div class="col-xs-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">結果</h3>
+            </div>
+            <div class="panel-body coding-pan">
+
+            </div>
+          </div>
+        </div>
       </div>
+
+      <input type="button" value="check" onclick="check();">
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
-    <script>
-      function check (){
-        var modelName = document.getElementById("model-name").value
-        var relatoinInput = document.getElementById("relatoin-input").value
-        var myTableName = document.getElementById("my-table-name").value
-        var fk = document.getElementById("fk").value
-        var refTableName = document.getElementById("ref-table-name").value
-        var pk = document.getElementById("pk").value
-        if (chkModelName(modelName)) {
-         /* 
-        }else if (relatoinInput == "" || !relatoinInput.includes("belongs_to")) {
-          alert("你的belongs_to咧?");
-        }else{
-          var relation = relatoinInput.split(",");
-          var relation2 = [];
-          for (var i = 0; i <= relation.length-1; i++) {
-            relation2.push(relation[i].split(":"));
-          }
-          relation_log(relation2);
-          */
-        }
-
-        
-      }
-
-      function chkModelName(modelName) {
-        console.log("Checking model name...");
-        if (modelName === "") {
-          alert("Model名稱必填");
-          return true;
-        }else if (chkCapitalize(modelName)) {
-          // alert("great!");
-          console.log("great!");
-          console.log(capFirstLetter(modelName));
-          return false;
-        }
-          console.log("oops");
-          console.log(capFirstLetter(modelName));
-          return false;
-      }
-
-      function chkCapitalize(string) {
-        if (!isNaN(string.charAt(0))) {   //first latter is a number
-          console.log("Model名開頭不能為數字！");
-          return false;
-        }else if (capFirstLetter(string) === string) {
-          return true;
-        }else{
-          console.log("Model名開頭需大寫");
-          return false;
-        }
-      }
-
-      function capFirstLetter(string) {
-          return string.charAt(0).toUpperCase() + string.slice(1);
-      }
-
-      function relation_log(relation_array){
-        console.log("[");
-        relation_array.forEach(function(arg, index){
-          console.log("[" + arg[0] + "," + arg[1] + "]");
-        })
-
-        console.log("]");
-      }
-    </script>
+    <script src="js/myscript.js"></script>
   </body>
 </html>
