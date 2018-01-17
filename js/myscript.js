@@ -1,4 +1,5 @@
 function check (){
+  var inputs = [];
   var modelName = document.getElementById("model-name").value
   var relatoinInput = document.getElementById("relatoin-input").value
   var myTableName = document.getElementById("my-table-name").value
@@ -13,9 +14,43 @@ function check (){
       // alert("有錯喔");
       console.log("有錯喔");
     }
+
+    var resultElements = [];
+    resultElements.push(document.createElement("p"));
+    resultElements[0].classList.add("code-white");
+    resultElements[0].innerHTML = "====your setup====<br>";
+    resultElements.push(document.createElement("span"));
+    resultElements[1].classList.add("code-red");
+    resultElements[1].innerHTML = "Class ";
+    resultElements.push(document.createElement("span"));
+    resultElements[2].classList.add("code-green");
+    resultElements[2].innerHTML = modelName;
+    resultElements.push(document.createElement("span"));
+    resultElements[3].classList.add("code-white");
+    resultElements[3].innerHTML = " < ";
+    resultElements.push(document.createElement("span"));
+    resultElements[4].classList.add("code-green");
+    resultElements[4].innerHTML = "ApplicationRecord<br>";
+    resultElements.push(document.createElement("span"));
+    resultElements[5].classList.add("code-white");
+    resultElements[5].innerHTML = "  belongs_to ";
+
     if (fk === "" && pk === "" && refTableName === "") {
       console.log("all empty");
+      var relation = map.get("relation");
+      
+      resultElements.push(document.createElement("span"));
+      resultElements[6].classList.add("code-purple");
+      resultElements[6].innerHTML = ":" + relation[0][1].trim();
     }
+    resultElements.push(document.createElement("span"));
+    resultElements[7].classList.add("code-red");
+    resultElements[7].innerHTML = "<br>end";
+
+    for (var i = 0; i < resultElements.length; i++) {
+      codingPan.appendChild(resultElements[i]);
+    }   
+
   }
 
   console.log("yooo");
@@ -79,7 +114,7 @@ function chkCapitalize(string, codingPan) {
 
 /*
 * checking relation input
-* return map {("chk", true), ("relation2", relation2)} if pass
+* return map {("chk", true), ("relation", relation2)} if pass
 * return map {("chk", false)} if pass
 */
 function chkRelationInput(relatoinInput, codingPan) {
@@ -111,7 +146,7 @@ function chkRelationInput(relatoinInput, codingPan) {
     return map;
   }
   map.set("chk", true);
-  map.set("relation2", relation2);
+  map.set("relation", relation2);
   return map;
 }
 
