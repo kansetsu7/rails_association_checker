@@ -297,15 +297,15 @@ function chkConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = belongs_to + "_id";
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
-          msg = "foreign_key: 符合慣例，可省略!";
+          msg = "(OK)foreign_key: 符合慣例，可省略!";
         } else {
-          msg = "foreign_key: 不符慣例，不可省略!";
+          msg = "(Ok)foreign_key: 不符慣例，不可省略!";
         }
       } else if (chkVal === convention) {
-        msg = "foreign_key: 符合慣例，可省略!";
+        msg = "(OK)foreign_key: 符合慣例，可省略!";
       } else {
         hasError = true;
-        msg = "foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        msg = "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
       }
       break;
     case 3:
@@ -318,15 +318,15 @@ function chkConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = upFirstLetter(belongs_to);
       if (class_name === chkVal) {
         if (class_name === convention) {
-          msg = "class_name: 符合慣例，可省略!";
+          msg = "(OK)class_name: 符合慣例，可省略!";
         } else {
-          msg = "class_name: 不符慣例，不可省略!";
+          msg = "(OK)class_name: 不符慣例，不可省略!";
         }
       } else if (chkVal === convention) {
-        msg = "class_name: 符合慣例，可省略!";
+        msg = "(OK)class_name: 符合慣例，可省略!";
       } else {
         hasError = true;
-        msg = "class_name: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        msg = "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"";
       }
       break;
     case 4:
@@ -339,15 +339,15 @@ function chkConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = "id";
       if (primary_key === chkVal) {
         if (primary_key === convention) {
-          msg = "primary_key: 符合慣例，可省略!";
+          msg = "(OK)primary_key: 符合慣例，可省略!";
         } else {
-          msg = "primary_key: 不符慣例，不可省略!";
+          msg = "(OK)primary_key: 不符慣例，不可省略!";
         }
       } else if (chkVal === convention) {
-        msg = "primary_key: 符合慣例，可省略!";
+        msg = "(OK)primary_key: 符合慣例，可省略!";
       } else {
         hasError = true;
-        msg = "primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        msg = "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
       }
       break;
     default:
