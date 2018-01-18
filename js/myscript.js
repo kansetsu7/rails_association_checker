@@ -1,15 +1,15 @@
 function check (){
   var inputs = [];
-  inputs.push(document.getElementById("model-name").value);  // [0] modelName
-  inputs.push(document.getElementById("relatoin-input").value);  // [1] relatoinInput
-  inputs.push(document.getElementById("fk").value);  // [2] fk
-  inputs.push(document.getElementById("ref-table-name").value);  // [3] refTableName
-  inputs.push(document.getElementById("pk").value);  // [4] pk
+  inputs.push(document.getElementById("my-model-name").value.trim());  // [0] myModelName
+  inputs.push(document.getElementById("relatoin-input").value.trim());  // [1] relatoinInput
+  inputs.push(document.getElementById("fk").value.trim());  // [2] fk
+  inputs.push(document.getElementById("ref-model-name").value.trim());  // [3] refModelName
+  inputs.push(document.getElementById("pk").value.trim());  // [4] pk
 
   var codingPan = document.getElementById("coding-pan");
-  console.log(chk_letter("_id"));
+  // console.log("fk: "+chkLetterBoth(inputs[2]));
 
-  if (chkModelName(inputs[0], codingPan) && false) {
+  if (chkMyModelName(inputs[0], codingPan) && true) {
     var map = chkRelationInput(inputs[1], codingPan);
     if (!map.get("chk")) {
       // alert("有錯喔");
@@ -17,10 +17,10 @@ function check (){
       return;
     }
 
-    var relation = map.get("relation");
-    resultInPan(codingPan, inputs[0], relation);
-    showRailsDefault(codingPan, inputs[0], relation);
-
+    var relation = getRelationMap(map.get("relation"));
+    resultInPan(codingPan, inputs[0], map.get("relation"));
+    showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"));
+    chkDbSchemaInput(codingPan, inputs, relation);
 
        
 
@@ -34,19 +34,19 @@ function check (){
 * return false if model name didn't pass
 * return true if passed 
 */
-function chkModelName(modelName, codingPan) {
+function chkMyModelName(myModelName, codingPan) {
   cleanPan(codingPan);
 
   // console.log("Checking model name...");
   var errMsg = document.createElement("p");
   errMsg.style.color = "red";
 
-  if (modelName === "") {
+  if (myModelName === "") {
     errMsg.innerHTML = "錯誤：Model名稱必填";
     codingPan.appendChild(errMsg);
     return false;
   }else {
-    return chkCapitalize(modelName, codingPan);
+    return chkCapitalize(myModelName, codingPan);
   }
 }
 
@@ -158,7 +158,7 @@ function chkRelationSymbol(relation2, codingPan) {
 /*
 * write Rails convention setup on code panel
 */
-function showRailsDefault(codingPan, modelName, relation) {
+function showRailsDefault(codingPan, modelName, methodName) {
   console.log("showRailsDefault");
   var resultElements = [];
   resultElements.push(document.createElement("p"));
@@ -181,7 +181,7 @@ function showRailsDefault(codingPan, modelName, relation) {
   resultElements[5].innerHTML = "&nbsp;&nbsp;belongs_to ";  //belongs_to
   resultElements.push(document.createElement("span"));
   resultElements[6].classList.add("code-purple");
-  resultElements[6].innerHTML = ":" + relation[0][1];
+  resultElements[6].innerHTML = ":" + methodName;
   resultElements.push(document.createElement("span"));
   resultElements[7].innerHTML = ", ";
   resultElements[7].classList.add("code-white");
@@ -189,7 +189,7 @@ function showRailsDefault(codingPan, modelName, relation) {
   resultElements[8].innerHTML = "class_name: ";
   resultElements[8].classList.add("code-purple");
   resultElements.push(document.createElement("span"));
-  resultElements[9].innerHTML = "\"" + upFirstLetter(relation[0][1]) + "\"";
+  resultElements[9].innerHTML = "\"" + upFirstLetter(methodName) + "\"";
   resultElements[9].classList.add("code-yellow");
   resultElements.push(document.createElement("span"));
   resultElements[10].innerHTML = ", ";
@@ -198,7 +198,7 @@ function showRailsDefault(codingPan, modelName, relation) {
   resultElements[11].innerHTML = "foreign_key: ";
   resultElements[11].classList.add("code-purple");
   resultElements.push(document.createElement("span"));
-  resultElements[12].innerHTML = "\"" + relation[0][1] + "_id\"";
+  resultElements[12].innerHTML = "\"" + methodName + "_id\"";
   resultElements[12].classList.add("code-yellow");
   resultElements.push(document.createElement("span"));
   resultElements[13].innerHTML = ", ";
@@ -236,29 +236,96 @@ function showRailsDefault(codingPan, modelName, relation) {
   // }
 }
 
+/*
+* check given string start/end with letters
+*/
+function chkDbSchemaInput(codingPan, inputs, relation) {
+  // inputs[2] fk
+  // inputs[3] refTableName
+  // inputs[4] pk
+  var errMsgs = [];
+  var index = 0;
+  
+  for (var i = 2; i < inputs.length; i++) {
+    if (chkLetterBoth(inputs[i])) {
+      chkConvention(codingPan, inputs[i], relation, i);
+    } else {
+      errMsgs.push(document.createElement("p"));
+      errMsgsIndex = errMsgs.length - 1;
+      errMsgs[errMsgsIndex].style.color = "red";
+      errMsgs[errMsgsIndex].innerHTML = "錯誤：DB schema欄位" + (i-1) + "輸入有誤。";
+    }
+  }
+
+  // append error messages
+  for (var i = 0; i < errMsgs.length; i++) {
+    codingPan.appendChild(errMsgs[i]);
+  }
+}
 
 /*
 * check if given input follows Rails convention or not
 */
-function chkConvention(codingPan, input, relation) {
-  // [0] modelName
-  // [1] relatoinInput
-  // [2] fk
-  // [3] refTableName
-  // [4] pk
-  for (var i = 2; i < input.length; i++) {
-    if (chk_letter(input[i])) {
-
-    }
+function chkConvention(codingPan, chkVal, relation, inputIndex) {
+  console.log("chkConvention:"+inputIndex+" => "+chkVal);
+  var hasError = false;
+  switch (inputIndex) {
+    case 2:
+      console.log(relation.get("foreign_key")+", "+chkVal);
+      if (lowFirstLetter(chkVal) !== chkVal) {
+        hasError = true;
+        break;
+      }
+      if (relation.get("foreign_key") === chkVal) { //("\"" + chkVal + "\"")
+        console.log("foreign_key Good!");
+      } else {
+        console.log("foreign_key NG!");
+      }
+      break;
+    case 3:
+      console.log(relation.get("class_name")+", "+chkVal);
+      if (upFirstLetter(chkVal) !== chkVal) {
+        hasError = true;
+        break;
+      }
+      if (relation.get("class_name") === chkVal) {
+        console.log("class_name Good!");
+      } else {
+        console.log("class_name NG!");
+      }
+      break;
+    case 4:
+      console.log(relation.get("primary_key")+", "+chkVal);
+      if (lowFirstLetter(chkVal) !== chkVal) {
+        hasError = true;
+        break;
+      }
+      if (relation.get("primary_key") === chkVal) {
+        console.log("primary_key Good!");
+      } else {
+        console.log("primary_key NG!");
+      }
+      break;
+    default:
+      console.log("WTF!");
+      break;
   }
+
+  if (hasError) {
+    errMsg = document.createElement("p")
+    errMsg.style.color = "red";
+    errMsg.innerHTML = "錯誤：DB schema欄位" + (inputIndex-1) + "大小寫有誤。";
+    codingPan.appendChild(errMsg);
+  }
+  
 }
 
 /*
 * check given string start/end with letters
 */
-function chk_letter(str) {
-  console.log("checking "+str);
-  var letters = /^[A-Za-z]([A-Za-z])$/;
+function chkLetterBoth(str) {
+  console.log("checking \'"+str+"\'");
+  var letters = /^[A-Za-z](.*[A-Za-z])?$/;
   return str.match(letters) ? true : false;
 }
 
@@ -267,6 +334,18 @@ function chk_letter(str) {
 */
 function chkDoubleQuotes(str) {
   return str === ("\"" + trimDQ(str) + "\"") ? true : false;
+}
+
+/*
+* turn array into map
+*/
+function getRelationMap(relation) {
+  var map = new Map();
+  for (var i = 0; i < relation.length; i++) {
+    map.set(relation[i][0], trimDQ(relation[i][1]));
+  }
+
+  return map;
 }
 
 
@@ -309,7 +388,7 @@ function trimSymbol(str) {
 /*
 * write user input relation setup in code panel
 */
-function resultInPan(codingPan, modelName, relation) {
+function resultInPan(codingPan, myModelName, relation) {
   var index = 6;
   var index2;
   var resultElements = [];
@@ -321,7 +400,7 @@ function resultInPan(codingPan, modelName, relation) {
   resultElements[1].innerHTML = "Class ";
   resultElements.push(document.createElement("span"));
   resultElements[2].classList.add("code-green");
-  resultElements[2].innerHTML = modelName;
+  resultElements[2].innerHTML = myModelName;
   resultElements.push(document.createElement("span"));
   resultElements[3].classList.add("code-white");
   resultElements[3].innerHTML = " < ";
