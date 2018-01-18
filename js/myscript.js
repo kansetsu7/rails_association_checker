@@ -138,21 +138,25 @@ function chkRelationSymbol(relation2, codingPan) {
   // console.log("Checking symbol...");
   var errMsg = document.createElement("p");
   errMsg.style.color = "red";
-
+  var result = false;
   // console.log(relation2[0].length);
   for (var i = 0; i <= relation2.length - 1; i++) {
     if (relation2[i].length != 2) {
-      errMsg.innerHTML = "錯誤："+"關聯設定符號有問題，可能少了或多了冒號！";
+      var place = relation2[i][0] === "" ? " [痾...這不好說] " : relation2[i][0];
+      console.log("=====\'"+relation2[i][0]+"\'");
+      errMsg.innerHTML = "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。";
       codingPan.appendChild(errMsg);
       return false;
     }else if (relation2[i][0] === "" || relation2[i][1] === "") {
-      errMsg.innerHTML = "錯誤："+"關聯設定符號有問題，冒號位置錯誤！";
+      var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : "relation2[i-1][0]";
+      errMsg.innerHTML = "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。";
       codingPan.appendChild(errMsg);
       return false;
     }else{
-      return true;
+      result = true;
     }
   }
+  return result;
 }
 
 /*
