@@ -237,15 +237,25 @@ function showRailsDefault(codingPan, modelName, methodName) {
 }
 
 /*
-* check given string start/end with letters
+* check given DB schema follows Rails convention or not
+* return null and skip checking if DB schema not been set.  
+* return true if passed
 */
 function chkDbSchemaInput(codingPan, inputs, relation) {
   // inputs[2] fk
   // inputs[3] refTableName
   // inputs[4] pk
+  if (inputs[2] === "" && inputs[3] === "" && inputs[4] === "") {
+    return null;
+  }
+
+  var title = document.createElement("p");
+  title.classList.add("code-white");
+  title.innerHTML = "<br>==== your setup ====<br>";
+  codingPan.appendChild(title);
+
   var errMsgs = [];
   var index = 0;
-  
   for (var i = 2; i < inputs.length; i++) {
     if (chkLetterBoth(inputs[i])) {
       chkConvention(codingPan, inputs[i], relation, i);
@@ -269,6 +279,9 @@ function chkDbSchemaInput(codingPan, inputs, relation) {
 function chkConvention(codingPan, chkVal, relation, inputIndex) {
   console.log("chkConvention:"+inputIndex+" => "+chkVal);
   var hasError = false;
+  var msg;
+  var belongs_to = relation.get("belongs_to");
+
   switch (inputIndex) {
     case 2:
       console.log(relation.get("foreign_key")+", "+chkVal);
@@ -276,10 +289,19 @@ function chkConvention(codingPan, chkVal, relation, inputIndex) {
         hasError = true;
         break;
       }
-      if (relation.get("foreign_key") === chkVal) { //("\"" + chkVal + "\"")
-        console.log("foreign_key Good!");
+      var foreign_key = relation.get("foreign_key");
+      var convention = belongs_to + "_id";
+      if (foreign_key === chkVal) {
+        if (foreign_key === convention) {
+          msg = "foreign_key: 符合慣例，可省略!";
+        } else {
+          msg = "foreign_key: 不符慣例，不可省略!";
+        }
+      } else if (chkVal === convention) {
+        msg = "foreign_key: 符合慣例，可省略!";
       } else {
-        console.log("foreign_key NG!");
+        hasError = true;
+        msg = "foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
       }
       break;
     case 3:
@@ -288,10 +310,19 @@ function chkConvention(codingPan, chkVal, relation, inputIndex) {
         hasError = true;
         break;
       }
-      if (relation.get("class_name") === chkVal) {
-        console.log("class_name Good!");
+      var class_name = relation.get("class_name");
+      var convention = upFirstLetter(belongs_to);
+      if (class_name === chkVal) {
+        if (class_name === convention) {
+          msg = "class_name: 符合慣例，可省略!";
+        } else {
+          msg = "class_name: 不符慣例，不可省略!";
+        }
+      } else if (chkVal === convention) {
+        msg = "class_name: 符合慣例，可省略!";
       } else {
-        console.log("class_name NG!");
+        hasError = true;
+        msg = "class_name: 關聯設定錯誤，應為\"" + chkVal + "\"";
       }
       break;
     case 4:
@@ -300,22 +331,37 @@ function chkConvention(codingPan, chkVal, relation, inputIndex) {
         hasError = true;
         break;
       }
-      if (relation.get("primary_key") === chkVal) {
-        console.log("primary_key Good!");
+      var primary_key = relation.get("primary_key");
+      var convention = "id";
+      if (primary_key === chkVal) {
+        if (primary_key === convention) {
+          msg = "primary_key: 符合慣例，可省略!";
+        } else {
+          msg = "primary_key: 不符慣例，不可省略!";
+        }
+      } else if (chkVal === convention) {
+        msg = "primary_key: 符合慣例，可省略!";
       } else {
-        console.log("primary_key NG!");
+        hasError = true;
+        msg = "primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
       }
       break;
     default:
-      console.log("WTF!");
+      hasError = true;
       break;
   }
 
   if (hasError) {
-    errMsg = document.createElement("p")
+    if (msg === undefined) msg = "錯誤：DB schema欄位" + (inputIndex-1) + "大小寫有誤。"; 
+    errMsg = document.createElement("p");
     errMsg.style.color = "red";
-    errMsg.innerHTML = "錯誤：DB schema欄位" + (inputIndex-1) + "大小寫有誤。";
+    errMsg.innerHTML = msg;
     codingPan.appendChild(errMsg);
+  }else{
+    var judgement =  document.createElement("p");
+    judgement.classList.add("code-white");
+    judgement.innerHTML = msg;
+    codingPan.appendChild(judgement);
   }
   
 }
@@ -324,7 +370,7 @@ function chkConvention(codingPan, chkVal, relation, inputIndex) {
 * check given string start/end with letters
 */
 function chkLetterBoth(str) {
-  console.log("checking \'"+str+"\'");
+  // console.log("checking \'"+str+"\'");
   var letters = /^[A-Za-z](.*[A-Za-z])?$/;
   return str.match(letters) ? true : false;
 }
@@ -346,6 +392,10 @@ function getRelationMap(relation) {
   }
 
   return map;
+}
+
+function getConventions(relation) {
+  // body...
 }
 
 

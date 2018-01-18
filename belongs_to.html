@@ -31,8 +31,8 @@
             </div>
             <div class="panel-body">
               <form action="">
-                Class <input type="text" id="my-model-name" placeholder="Model名稱" value="Favorite"> < ActiveRecord <br><br>
-                <textarea rows="3" class="form-control" id="relatoin-input" va >belongs_to :user, class_name: "User", foreign_key: "user_id", primary_key: "id"</textarea><br> 
+                Class <input type="text" id="my-model-name" placeholder="Model名稱" value="Followship"> < ActiveRecord <br><br>
+                <textarea rows="3" class="form-control" id="relatoin-input" va >belongs_to :following, class_name: "User", foreign_key: "following_id", primary_key: "id"</textarea><br> 
                 end <br>
               </form>
             </div>
@@ -45,7 +45,7 @@
             <div class="panel-body">
               <form action="">
                 <!-- 自己的table name: <input type="text" id="my-table-name"><br><br> -->
-                自己的外鍵: <input type="text" id="fk" value="user_id">
+                自己的外鍵: <input type="text" id="fk" value="following_id">
               </form>
               <hr>
               <form action="">
