@@ -1,5 +1,3 @@
-// belongs_to :following, class_name: "User", foreign_key: "user_id", primary_key: "id"
-
 function check (){
   var inputs = [];
   inputs.push(document.getElementById("model-name").value);  // [0] modelName
@@ -9,23 +7,21 @@ function check (){
   inputs.push(document.getElementById("pk").value);  // [4] pk
 
   var codingPan = document.getElementById("coding-pan");
-  if (chkModelName(inputs[0], codingPan)) {
+  console.log(chk_letter("_id"));
+
+  if (chkModelName(inputs[0], codingPan) && false) {
     var map = chkRelationInput(inputs[1], codingPan);
     if (!map.get("chk")) {
       // alert("有錯喔");
       console.log("有錯喔");
+      return;
     }
 
-    
+    var relation = map.get("relation");
+    resultInPan(codingPan, inputs[0], relation);
+    showRailsDefault(codingPan, inputs[0], relation);
 
-    if (inputs[2] === "" && inputs[3] === "" && inputs[4] === "") {
-      // console.log("all empty");
-      var relation = map.get("relation");
-      resultInPan(codingPan, inputs[0], relation);
-      showRailsDefault(codingPan, inputs, relation);
-      console.log("yoooo");
-      
-    }
+
        
 
   }
@@ -160,22 +156,20 @@ function chkRelationSymbol(relation2, codingPan) {
 }
 
 /*
-* 
-* 
-* 
+* write Rails convention setup on code panel
 */
-function showRailsDefault(codingPan, inputs, relation) {
+function showRailsDefault(codingPan, modelName, relation) {
   console.log("showRailsDefault");
   var resultElements = [];
   resultElements.push(document.createElement("p"));
   resultElements[0].classList.add("code-white");
-  resultElements[0].innerHTML = "====Rails convention====<br>";
+  resultElements[0].innerHTML = "<br>==== Rails convention ====<br>";
   resultElements.push(document.createElement("span"));
   resultElements[1].classList.add("code-red");
   resultElements[1].innerHTML = "Class ";
   resultElements.push(document.createElement("span"));
   resultElements[2].classList.add("code-green");
-  resultElements[2].innerHTML = inputs[0];
+  resultElements[2].innerHTML = modelName;
   resultElements.push(document.createElement("span"));
   resultElements[3].classList.add("code-white");
   resultElements[3].innerHTML = " < ";
@@ -242,6 +236,32 @@ function showRailsDefault(codingPan, inputs, relation) {
   // }
 }
 
+
+/*
+* check if given input follows Rails convention or not
+*/
+function chkConvention(codingPan, input, relation) {
+  // [0] modelName
+  // [1] relatoinInput
+  // [2] fk
+  // [3] refTableName
+  // [4] pk
+  for (var i = 2; i < input.length; i++) {
+    if (chk_letter(input[i])) {
+
+    }
+  }
+}
+
+/*
+* check given string start/end with letters
+*/
+function chk_letter(str) {
+  console.log("checking "+str);
+  var letters = /^[A-Za-z]([A-Za-z])$/;
+  return str.match(letters) ? true : false;
+}
+
 /*
 * check if the string have double quotes on both side
 */
@@ -279,6 +299,12 @@ function relation_log(relation_array){
 function trimDQ(str) {
   return str.replace(/\"/gm, "");
 }
+/*
+* trim the symbols in string  
+*/
+function trimSymbol(str) {
+  return str.replace(/\"/gm, "");
+}
 
 /*
 * write user input relation setup in code panel
@@ -289,7 +315,7 @@ function resultInPan(codingPan, modelName, relation) {
   var resultElements = [];
   resultElements.push(document.createElement("p"));
   resultElements[0].classList.add("code-white");
-  resultElements[0].innerHTML = "====your setup====<br>";
+  resultElements[0].innerHTML = "==== your setup ====<br>";
   resultElements.push(document.createElement("span"));
   resultElements[1].classList.add("code-red");
   resultElements[1].innerHTML = "Class ";
