@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rails relation</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <h1>has_many relation</h1>
+          <p>
+            兩種選項：<br>
+            1. 輸入Model名稱與方法命名，剩下的留空。按下確認鍵後會依照Rails慣例提供對應的資料<br>
+            2. 輸入所有資料，按下確認鍵後會依照Rails慣例，標示出符合慣例的、需要修改的<br>
+            注：一次只能驗證一個阿～不要虐待我～
+          </p>
+          <hr>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Model內設定</h3>
+            </div>
+            <div class="panel-body">
+              <form action="">
+                Class <input type="text" id="my-model-name" placeholder="Model名稱" value="User"> < ActiveRecord <br><br>
+                <textarea rows="3" class="form-control" id="relatoin-input" va >has_many :followships, class_name: "Followship", foreign_key: "user_id", primary_key: "id"</textarea><br> 
+                end <br>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">DB schema</h3>
+            </div>
+            <div class="panel-body">
+              <form action="">
+                自己的主鍵: <input type="text" id="pk" value="id">
+              </form>
+              <hr>
+              <form action="">
+                對方的model name: <input type="text" id="ref-model-name" value="Followship"><br><br>
+                對方的外鍵: <input type="text" id="fk" value="user_id">
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">結果</h3>
+            </div>
+            <div class="panel-body" id="coding-pan">
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <input type="button" value="check" onclick="check();">
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/myscript.js"></script>
+  </body>
+</html>

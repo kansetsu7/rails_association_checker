@@ -193,28 +193,6 @@ function showRailsDefault(codingPan, modelName, methodName) {
   for (var i = 0; i < resultElements.length; i++) {
     codingPan.appendChild(resultElements[i]);
   }
-
-
-
-
-  // for (var i = 1; i < relation.length; i++) {
-  //   switch (relation[i][0]) {
-  //     case "class_name":
-  //       console.log("class_name");
-
-  //       break;
-  //     case "foreign_key":
-  //       console.log("foreign_key");
-  //       break;
-  //     case "primary_key":
-  //       console.log("primary_key");
-  //       break;
-  //     default:
-  //       errMsg.innerHTML = "參數" + (i+1) + "不符格式，應為class_name、foreign_key或primary_key其中之一。"
-  //       codingPan.appendChild(errMsg);
-  //       break;
-  //   }
-  // }
 }
 
 /*
