@@ -1,4 +1,11 @@
 function check (){
+  var mode = document.getElementById("mode").innerHTML;
+  if (mode !== "b" && mode !== "m") {
+    console.log("WTF have you done?");
+    alert("WTF have you done?");
+    return;
+  }
+
   var inputs = [];
   inputs.push(document.getElementById("my-model-name").value.trim());  // [0] myModelName
   inputs.push(document.getElementById("relatoin-input").value.trim());  // [1] relatoinInput
@@ -7,22 +14,22 @@ function check (){
   inputs.push(document.getElementById("pk").value.trim());  // [4] pk
 
   var codingPan = document.getElementById("coding-pan");
-  // console.log("fk: "+chkLetterBoth(inputs[2]));
 
-  if (chkMyModelName(inputs[0], codingPan) && true) {
-    var map = chkRelationInput(inputs[1], codingPan);
-    if (!map.get("chk")) {
-      // alert("有錯喔");
-      console.log("有錯喔");
-      return;
-    }
+  // return if model name is not correct
+  if (!chkMyModelName(inputs[0], codingPan) && true) return;
 
-    var relation = getRelationMap(map.get("relation"));
-    resultInPan(codingPan, inputs[0], map.get("relation"));
-    showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"));
-    chkDbSchemaInput(codingPan, inputs, relation);
-
+  var map = chkRelationInput(inputs[1], codingPan);
+  if (!map.get("chk")) {
+    // alert("有錯喔");
+    console.log("有錯喔");
+    return;
   }
+
+  var relation = getRelationMap(map.get("relation"));
+  resultInPan(codingPan, inputs[0], map.get("relation"));
+  showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"));
+  chkDbSchemaInput(codingPan, inputs, relation);
+
 
   // console.log("yooo");
 }
@@ -46,17 +53,6 @@ function chkMyModelName(myModelName, codingPan) {
   }else {
     return chkCapitalize(myModelName, codingPan);
   }
-}
-
-/*
-* clean coding pan
-* remove all child inside it
-*/
-function cleanPan(codingPan) {
-  while (codingPan.lastChild != null) {
-    codingPan.removeChild(codingPan.lastChild);
-  }
-  // console.log("Cleared!");
 }
 
 /*
@@ -450,6 +446,17 @@ function resultInPan(codingPan, myModelName, relation) {
   for (var i = 0; i < resultElements.length; i++) {
     codingPan.appendChild(resultElements[i]);
   }
+}
+
+/*
+* clean coding pan
+* remove all child inside it
+*/
+function cleanPan(codingPan) {
+  while (codingPan.lastChild != null) {
+    codingPan.removeChild(codingPan.lastChild);
+  }
+  // console.log("Cleared!");
 }
 
 /*
