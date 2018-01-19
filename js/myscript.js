@@ -22,8 +22,6 @@ function check (){
     showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"));
     chkDbSchemaInput(codingPan, inputs, relation);
 
-       
-
   }
 
   // console.log("yooo");
@@ -164,28 +162,7 @@ function chkRelationSymbol(relation2, codingPan) {
 */
 function showRailsDefault(codingPan, modelName, methodName) {
   console.log("showRailsDefault");
-  var resultElements = [];
-  resultElements.push(document.createElement("p"));
-  resultElements[0].classList.add("code-white");
-  resultElements[0].innerHTML = "<br>==== Rails convention ====<br>";
-  resultElements.push(document.createElement("span"));
-  resultElements[1].classList.add("code-red");
-  resultElements[1].innerHTML = "Class ";
-  resultElements.push(document.createElement("span"));
-  resultElements[2].classList.add("code-green");
-  resultElements[2].innerHTML = modelName;
-  resultElements.push(document.createElement("span"));
-  resultElements[3].classList.add("code-white");
-  resultElements[3].innerHTML = " < ";
-  resultElements.push(document.createElement("span"));
-  resultElements[4].classList.add("code-green");
-  resultElements[4].innerHTML = "ApplicationRecord<br>";
-  resultElements.push(document.createElement("span"));
-  resultElements[5].classList.add("code-white");
-  resultElements[5].innerHTML = "&nbsp;&nbsp;belongs_to ";  //belongs_to
-  resultElements.push(document.createElement("span"));
-  resultElements[6].classList.add("code-purple");
-  resultElements[6].innerHTML = ":" + methodName;
+  var resultElements = setResultElements("Rails convention", modelName, methodName);
   resultElements.push(document.createElement("span"));
   resultElements[7].innerHTML = ", ";
   resultElements[7].classList.add("code-white");
@@ -439,22 +416,17 @@ function trimSymbol(str) {
   return str.replace(/\"/gm, "");
 }
 
-/*
-* write user input relation setup in code panel
-*/
-function resultInPan(codingPan, myModelName, relation) {
-  var index = 6;
-  var index2;
+function setResultElements(title, modelName, methodName) {
   var resultElements = [];
   resultElements.push(document.createElement("p"));
   resultElements[0].classList.add("code-white");
-  resultElements[0].innerHTML = "==== your setup ====<br>";
+  resultElements[0].innerHTML = "==== " + title + " ====<br>";
   resultElements.push(document.createElement("span"));
   resultElements[1].classList.add("code-red");
   resultElements[1].innerHTML = "Class ";
   resultElements.push(document.createElement("span"));
   resultElements[2].classList.add("code-green");
-  resultElements[2].innerHTML = myModelName;
+  resultElements[2].innerHTML = modelName;
   resultElements.push(document.createElement("span"));
   resultElements[3].classList.add("code-white");
   resultElements[3].innerHTML = " < ";
@@ -466,7 +438,17 @@ function resultInPan(codingPan, myModelName, relation) {
   resultElements[5].innerHTML = "&nbsp;&nbsp;belongs_to ";
   resultElements.push(document.createElement("span"));
   resultElements[6].classList.add("code-purple");
-  resultElements[6].innerHTML = ":" + relation[0][1];
+  resultElements[6].innerHTML = ":" + methodName;
+  return resultElements;
+}
+
+/*
+* write user input relation setup in code panel
+*/
+function resultInPan(codingPan, myModelName, relation) {
+  var index = 6;
+  var index2;
+  var resultElements = setResultElements("your setup", myModelName, relation[0][1]);
 
   for (var i = 1; i < relation.length; i++) {
     index2 = index + 3 * ( i - 1 );
