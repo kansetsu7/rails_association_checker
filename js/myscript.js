@@ -5,7 +5,7 @@ function check (){
     alert("WTF have you done?");
     return;
   }
-
+  
   var inputs = [];
   inputs.push(document.getElementById("my-model-name").value.trim());  // [0] myModelName
   inputs.push(document.getElementById("relatoin-input").value.trim());  // [1] relatoinInput
@@ -16,9 +16,9 @@ function check (){
   var codingPan = document.getElementById("coding-pan");
 
   // return if model name is not correct
-  if (!chkMyModelName(inputs[0], codingPan) && true) return;
+  if (!chkMyModelName(inputs[0], codingPan) || true) return;
 
-  var map = chkRelationInput(inputs[1], codingPan);
+  var map = chkRelationInput(inputs[1], codingPan, mode);
   if (!map.get("chk")) {
     // alert("有錯喔");
     console.log("有錯喔");
@@ -32,6 +32,13 @@ function check (){
 
 
   // console.log("yooo");
+}
+
+function test() {
+  var relatoinInput = document.getElementById("relatoin-input").value.trim();
+  var str = relatoinInput.split("\n");
+  console.log(str[0]);
+  console.log(str[1]);
 }
 
 /*
@@ -84,18 +91,15 @@ function chkCapitalize(string, codingPan) {
 * return map {("chk", true), ("relation", relation2)} if pass
 * return map {("chk", false)} if pass
 */
-function chkRelationInput(relatoinInput, codingPan) {
+function chkRelationInput(relatoinInput, codingPan, mode) {
   // console.log("Checking relatoin...");
-  // set up msg 
-  var errMsg = document.createElement("p");
-  errMsg.style.color = "red";
+  
   // set up map
   var map = new Map();
 
   // check input has belongs_to or not
-  if (relatoinInput == "" || !relatoinInput.includes("belongs_to")) {
-    errMsg.innerHTML = "錯誤："+"你的belongs_to咧?";
-    codingPan.appendChild(errMsg);
+  mode = chkRelationType(mode, relatoinInput, codingPan);
+  if (mode === "") {
     map.set("chk", false);
     return map;
   }
@@ -121,6 +125,44 @@ function chkRelationInput(relatoinInput, codingPan) {
   map.set("chk", true);
   map.set("relation", relation2);
   return map;
+}
+
+/*
+* checking relation type
+* return "t" if it's [has_many :through]
+* return mode if it's [has_many] or [belongs_to]
+* else return ""
+*/
+function chkRelationType(mode, relatoinInput, codingPan) {
+  if (relatoinInput.includes("has_many")) {
+    if (relatoinInput.includes(":through")) {
+      return "t";
+    }
+    return mode;
+  }
+  if (relatoinInput.includes("belongs_to")) {
+    return mode;
+  }
+  // set up msg 
+  var errMsg = document.createElement("p");
+  errMsg.style.color = "red";
+  errMsg.innerHTML = "錯誤：你的" + getType(mode) + "咧?";
+  codingPan.appendChild(errMsg);
+  return "";
+}
+
+function getType(mode) {
+  switch (mode) {
+    case "b":
+      return "belongs_to";
+      break;
+    case "m":
+      return "has_many";
+      break;
+    default:
+      return "You found a bug!";
+      break;
+  }
 }
 
 /*
