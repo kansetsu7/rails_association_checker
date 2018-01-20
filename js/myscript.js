@@ -16,7 +16,7 @@ function check (){
   var codingPan = document.getElementById("coding-pan");
 
   // return if model name is not correct
-  if (!chkMyModelName(inputs[0], codingPan) || true) return;
+  if (!chkMyModelName(inputs[0], codingPan) && true) return;
 
   var map = chkRelationInput(inputs[1], codingPan, mode);
   if (!map.get("chk")) {
@@ -24,12 +24,28 @@ function check (){
     console.log("有錯喔");
     return;
   }
-
+  
   var relation = getRelationMap(map.get("relation"));
+  var line2;  // only for mode === "t"
   resultInPan(codingPan, inputs[0], map.get("relation"));
-  showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"));
+  switch (map.get("mode")) {
+    case "b":
+      showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"));
+      break;
+    case "m":
+      showRailsDefault(codingPan, inputs[0], relation.get("has_many"));
+      break;
+    case "t":
+      showRailsDefault(codingPan, inputs[0], relation.get("has_many"));
+      line2 = map.get("line2");
+      break;
+    default:
+      console.log("有錯喔");
+      break;
+  }
+  
   chkDbSchemaInput(codingPan, inputs, relation);
-
+  
 
   // console.log("yooo");
 }
@@ -88,9 +104,10 @@ function chkCapitalize(string, codingPan) {
 
 /*
 * checking relation input
-* return map {("chk", true), ("relation", relation2)} if pass
-* return map {("chk", false)} if pass
-*/
+* return map {("chk", false)} if not pass
+* return map {("chk", true), ("relation", relation2), ("mode", mode)} if pass ([has_many] or [belongs_to])
+* return map {("chk", true), ("relation", relation2), ("mode", mode), ("line2", twoLine[1])} if pass ([has_many :through])
+*/ 
 function chkRelationInput(relatoinInput, codingPan, mode) {
   // console.log("Checking relatoin...");
   
@@ -104,19 +121,26 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
     return map;
   }
 
-  // check if input has right symbol
-  var relation = relatoinInput.split(",");
-  var relation2 = [];
-  for (var i = 0; i <= relation.length-1; i++) {
-    relation2.push(relation[i].split(":"));
+  var twoLine = [];
+  var relation;
+  if (mode === "t") { // [has_many :through] have two line
+    twoLine = relatoinInput.split("\n");
+    relation = twoLine[0].split(",");
+  } else {
+    relation = relatoinInput.split(",");
   }
-  if (!chkRelationSymbol(relation2, codingPan)) {
+
+
+  // check if input has right symbol
+  var map2 = chkRelationSymbol(relation, codingPan);
+  if (!map2.get("chk")) {
     map.set("chk", false);
     relation_log(relation2);
     return map;
   }
 
   // trim space of relation arguments
+  var relation2 = map2.get("relation");
   for (var i = 0; i < relation2.length; i++) {
     relation2[i][0] = relation2[i][0].trim();
     relation2[i][1] = relation2[i][1].trim();
@@ -124,6 +148,10 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
   relation_log(relation2);
   map.set("chk", true);
   map.set("relation", relation2);
+  map.set("mode", mode);
+  if (mode === "t") {
+    map.set("line2", twoLine[1]);
+  }
   return map;
 }
 
@@ -134,15 +162,20 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
 * else return ""
 */
 function chkRelationType(mode, relatoinInput, codingPan) {
+  console.log(" chkRelationType...");
+  if (relatoinInput.includes("belongs_to")) {
+    return mode;
+  }
   if (relatoinInput.includes("has_many")) {
     if (relatoinInput.includes(":through")) {
       return "t";
     }
-    return mode;
+    if (relatoinInput.includes("through")) { //symbol error, lack of ":"
+      mode = "t";
+    }
   }
-  if (relatoinInput.includes("belongs_to")) {
-    return mode;
-  }
+  if (mode !== "t") return mode; // [has_many] but no [through]
+
   // set up msg 
   var errMsg = document.createElement("p");
   errMsg.style.color = "red";
@@ -159,6 +192,9 @@ function getType(mode) {
     case "m":
       return "has_many";
       break;
+    case "t":
+      return "through前面的冒號";
+      break;
     default:
       return "You found a bug!";
       break;
@@ -167,14 +203,19 @@ function getType(mode) {
 
 /*
 * checking relation symbol
-* return true if pass
-* return false if not pass
+* return map {("chk", true), ("relation", relation2)} if pass
+* return map {("chk", false)} if not pass
 */
-function chkRelationSymbol(relation2, codingPan) {
+function chkRelationSymbol(relation, codingPan) {
   // console.log("Checking symbol...");
+  var relation2 = [];
+  for (var i = 0; i <= relation.length-1; i++) {
+    relation2.push(relation[i].split(":"));
+  }
   var errMsg = document.createElement("p");
   errMsg.style.color = "red";
-  var result = false;
+  var map = new Map();
+  map.set("chk", false);
   // console.log(relation2[0].length);
   for (var i = 0; i <= relation2.length - 1; i++) {
     if (relation2[i].length != 2) {
@@ -182,17 +223,18 @@ function chkRelationSymbol(relation2, codingPan) {
       console.log("=====\'"+relation2[i][0]+"\'");
       errMsg.innerHTML = "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。";
       codingPan.appendChild(errMsg);
-      return false;
+      return map;
     }else if (relation2[i][0] === "" || relation2[i][1] === "") {
       var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : "relation2[i-1][0]";
       errMsg.innerHTML = "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。";
       codingPan.appendChild(errMsg);
-      return false;
+      return map;
     }else{
-      result = true;
+      map.set("relation", relation2);
+      map.set("chk", true);
     }
   }
-  return result;
+  return map;
 }
 
 /*
