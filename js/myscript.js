@@ -45,7 +45,7 @@ function check (){
       break;
   }
   
-  chkDbSchemaInput(codingPan, inputs, relation, mode);
+  console.log(chkDbSchemaInput(codingPan, inputs, relation, mode));
   
 
   // console.log("yooo");
@@ -214,18 +214,15 @@ function chkRelationSymbol(relation, codingPan) {
   for (var i = 0; i <= relation2.length - 1; i++) {
       // console.log("=====\'"+relation2[i][1]+"\'");
     if (relation2[i].length < 2) {
-      console.log("1");
       var place = relation2[i][0] === "" ? " [痾...這不好說] " : relation2[i][0];
       printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
       return map;
     }
     if (relation2[i].length > 2) {
-      console.log("1.5");
       printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+relation2[i][1]+"附近。","red");
       return map;
     }
     if (relation2[i][0] === "" || relation2[i][1] === "") {
-      console.log("2");
       var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : relation2[i-1][0];
       printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
       return map;
@@ -240,7 +237,6 @@ function chkRelationSymbol(relation, codingPan) {
         return map;
       }
       if (!chkDoubleQuotes(relation2[i][1].trim())) {
-      console.log("3");
         // var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : relation2[i-1][0];
         printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+relation2[i][1]+"附近。","red");
         return map;
@@ -271,39 +267,7 @@ function chkRelationKeyword(str) {
 * write Rails convention setup on code panel
 */
 function showRailsDefault(codingPan, modelName, methodName, mode) {
-  console.log("showRailsDefault");/*
-  var resultElements = setResultElements("Rails convention", modelName, methodName);
-  resultElements.push(document.createElement("span"));
-  resultElements[7].innerHTML = ", ";
-  resultElements[7].classList.add("code-white");
-  resultElements.push(document.createElement("span"));  //class_name
-  resultElements[8].innerHTML = "class_name: ";
-  resultElements[8].classList.add("code-purple");
-  resultElements.push(document.createElement("span"));
-  resultElements[9].innerHTML = "\"" + upFirstLetter(methodName) + "\"";
-  resultElements[9].classList.add("code-yellow");
-  resultElements.push(document.createElement("span"));
-  resultElements[10].innerHTML = ", ";
-  resultElements[10].classList.add("code-white");
-  resultElements.push(document.createElement("span"));  //foreign_key
-  resultElements[11].innerHTML = "foreign_key: ";
-  resultElements[11].classList.add("code-purple");
-  resultElements.push(document.createElement("span"));
-  resultElements[12].innerHTML = "\"" + methodName + "_id\"";
-  resultElements[12].classList.add("code-yellow");
-  resultElements.push(document.createElement("span"));
-  resultElements[13].innerHTML = ", ";
-  resultElements[13].classList.add("code-white");
-  resultElements.push(document.createElement("span"));  //primary_key
-  resultElements[14].innerHTML = "primary_key: ";
-  resultElements[14].classList.add("code-purple");
-  resultElements.push(document.createElement("span"));
-  resultElements[15].innerHTML = "\"id\"";
-  resultElements[15].classList.add("code-yellow");
-  for (var i = 0; i < resultElements.length; i++) {
-    codingPan.appendChild(resultElements[i]);
-  }*/
-
+  console.log("showRailsDefault");
   setResultElements(codingPan, "Rails convention", modelName, methodName, mode);
   printMsgSpan(codingPan, ", ", "code-white");
   printMsgSpan(codingPan, "class_name: ", "code-purple");
@@ -314,12 +278,14 @@ function showRailsDefault(codingPan, modelName, methodName, mode) {
   printMsgSpan(codingPan, ", ", "code-white");
   printMsgSpan(codingPan, "primary_key: ", "code-purple");
   printMsgSpan(codingPan, "\"id\"", "code-yellow");
+  printMsgLine(codingPan, "end", "code-red");
 }
 
 /*
 * check given DB schema follows Rails convention or not
 * return null and skip checking if DB schema not been set.  
 * return true if passed
+* return false if not
 */
 function chkDbSchemaInput(codingPan, inputs, relation, mode) {
   // inputs[0] myModelName
@@ -329,30 +295,30 @@ function chkDbSchemaInput(codingPan, inputs, relation, mode) {
   if (inputs[2] === "" && inputs[3] === "" && inputs[4] === "") {
     return null;
   }
-
-  var title = document.createElement("p");
-  title.classList.add("code-white");
-  title.innerHTML = "<br>==== checking result ====<br>";
-  codingPan.appendChild(title);
+  var result = true;
+  printMsgLine(codingPan, "==== checking result ====<br>","code-white");
 
   if (mode === "m" || mode === "t") {
     for (var i = 2; i < inputs.length; i++) {
       if (chkLetterBoth(inputs[i])) {
-        chkHasManyConvention(codingPan, inputs[i], relation, i, inputs[0]);
-        console.log("has_many ok");
+        if (!chkHasManyConvention(codingPan, inputs[i], relation, i, inputs[0])) result = false;
       } else {
         printMsgLine(codingPan, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
+        result = false;
       }
     }
-  } else { // mode === "t"
+  } else { // mode === "b"
     for (var i = 2; i < inputs.length; i++) {
       if (chkLetterBoth(inputs[i])) {
-        chkBelongsToConvention(codingPan, inputs[i], relation, i);
+        if (!chkBelongsToConvention(codingPan, inputs[i], relation, i)) result = false;
       } else {
         printMsgLine(codingPan, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
+        result = false;
       }
     }
   }
+
+  return result;
 }
 
 /*
@@ -381,7 +347,6 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
       } else if (chkVal === convention) {
           printMsgLine(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
       } else {
-        hasError = true;
         printMsgLine(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
       }
@@ -626,31 +591,7 @@ function trimSymbol(str) {
   return str.replace(/\"/gm, "");
 }
 
-function setResultElements(codingPan, title, modelName, methodName, mode) {/*
-  var resultElements = [];
-  resultElements.push(document.createElement("p"));
-  resultElements[0].classList.add("code-white");
-  resultElements[0].innerHTML = "==== " + title + " ====<br>";
-  resultElements.push(document.createElement("span"));
-  resultElements[1].classList.add("code-red");
-  resultElements[1].innerHTML = "Class ";
-  resultElements.push(document.createElement("span"));
-  resultElements[2].classList.add("code-green");
-  resultElements[2].innerHTML = modelName;
-  resultElements.push(document.createElement("span"));
-  resultElements[3].classList.add("code-white");
-  resultElements[3].innerHTML = " < ";
-  resultElements.push(document.createElement("span"));
-  resultElements[4].classList.add("code-green");
-  resultElements[4].innerHTML = "ApplicationRecord<br>";
-  resultElements.push(document.createElement("span"));
-  resultElements[5].classList.add("code-white");
-  resultElements[5].innerHTML = "&nbsp;&nbsp;belongs_to ";
-  resultElements.push(document.createElement("span"));
-  resultElements[6].classList.add("code-purple");
-  resultElements[6].innerHTML = ":" + methodName;
-  return resultElements;*/
-
+function setResultElements(codingPan, title, modelName, methodName, mode) {
   printMsgLine(codingPan, "==== " + title + " ====<br>", "code-white");
   printMsgSpan(codingPan, "Class ", "code-red");
   printMsgSpan(codingPan, modelName, "code-green");
@@ -663,33 +604,7 @@ function setResultElements(codingPan, title, modelName, methodName, mode) {/*
 /*
 * write user input relation setup in code panel
 */
-function resultInPan(codingPan, myModelName, relation, mode) {/*
-  var index = 6;
-  var index2;
-  var resultElements = setResultElements("your setup", myModelName, relation[0][1]);
-
-  for (var i = 1; i < relation.length; i++) {
-    index2 = index + 3 * ( i - 1 );
-    resultElements.push(document.createElement("span"));
-    resultElements[index2+1].innerHTML = ", ";
-    resultElements[index2+1].classList.add("code-white");
-
-    resultElements.push(document.createElement("span"));
-    resultElements[index2+2].innerHTML = relation[i][0]+ ": ";
-    resultElements[index2+2].classList.add("code-purple");
-
-    resultElements.push(document.createElement("span"));
-    resultElements[index2+3].innerHTML = relation[i][1];
-    resultElements[index2+3].classList.add("code-yellow");
-  }
-  index2 = index + 3 * ( relation.length - 1 );
-  // console.log(index2);
-  resultElements.push(document.createElement("span"));
-  resultElements[index2+1].classList.add("code-red");
-  resultElements[index2+1].innerHTML = "<br>end";
-  for (var i = 0; i < resultElements.length; i++) {
-    codingPan.appendChild(resultElements[i]);
-  }*/
+function resultInPan(codingPan, myModelName, relation, mode) {
   setResultElements(codingPan, "your setup", myModelName, relation[0][1], mode);
   for (var i = 1; i < relation.length; i++) {
     printMsgSpan(codingPan, ", ", "code-white")
