@@ -349,8 +349,7 @@ function chkDbSchemaInput(codingPan, inputs, relation, mode) {
 * check if given input follows Rails convention or not
 */
 function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelName) {
-  console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
-  var msg;
+  console.log("chkHasManyConvention:"+inputIndex+" => "+chkVal);
   var has_many = relation.get("has_many");
 
   switch (inputIndex) {
@@ -364,12 +363,12 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
       var convention = lowFirstLetter(myModelName) + "_id"; //different
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
-          msg = "(OK)foreign_key: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
         } else {
-          msg = "(Ok)foreign_key: 不符慣例，不可省略!";
+          printMsg(codingPan, "(Ok)foreign_key: 不符慣例，不可省略!","white");
         }
       } else if (chkVal === convention) {
-        msg = "(OK)foreign_key: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
       } else {
         hasError = true;
         printMsg(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
@@ -387,12 +386,12 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
       if (class_name === chkVal) {
         if (class_name === convention) {
           console.log("[\'"+class_name+"\', \'"+chkVal+"\', \'"+convention+"\']");
-          msg = "(OK)class_name: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)class_name: 符合慣例，可省略!","white");
         } else {
-          msg = "(OK)class_name: 不符慣例，不可省略!";
+          printMsg(codingPan, "(OK)class_name: 不符慣例，不可省略!","white");
         }
       } else if (class_name === undefined && chkVal === convention) {
-        msg = "(OK)class_name: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)class_name: 符合慣例，可省略!","white");
       } else {
         printMsg(codingPan, "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -410,12 +409,12 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
         console.log(primary_key+" === "+chkVal);
         if (primary_key === convention) {
           console.log(primary_key+" === "+convention);
-          msg = "(OK)primary_key: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)primary_key: 符合慣例，可省略!","white");
         } else {
-          msg = "(OK)primary_key: 不符慣例，不可省略!";
+          printMsg(codingPan, "(OK)primary_key: 不符慣例，不可省略!","white");
         }
-      } else if (primary_key === undefined && chkVal === convention) { // old: chkVal === convention
-        msg = "(OK)primary_key: 符合慣例，可省略!";
+      } else if (primary_key === undefined && chkVal === convention) {
+          printMsg(codingPan, "(OK)primary_key: 符合慣例，可省略!","white");
       } else {
         printMsg(codingPan, "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -426,10 +425,6 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
       return false;
   }
 
-  var judgement =  document.createElement("p");
-  judgement.classList.add("code-white");
-  judgement.innerHTML = msg;
-  codingPan.appendChild(judgement);
   return true;
   
 
@@ -440,9 +435,6 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
 * check if given input follows Rails convention or not
 */
 function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
-  // console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
-  // var hasError = false;
-  var msg;
   var belongs_to = relation.get("belongs_to");
 
   switch (inputIndex) {
@@ -456,12 +448,12 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = belongs_to + "_id";
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
-          msg = "(OK)foreign_key: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
         } else {
-          msg = "(Ok)foreign_key: 不符慣例，不可省略!";
+          printMsg(codingPan, "(Ok)foreign_key: 不符慣例，不可省略!","white");
         }
       } else if (chkVal === convention) {
-        msg = "(OK)foreign_key: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
       } else {
         printMsg(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -477,12 +469,12 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = upFirstLetter(belongs_to);
       if (class_name === chkVal) {
         if (class_name === convention) {
-          msg = "(OK)class_name: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)class_name: 符合慣例，可省略!","white");
         } else {
-          msg = "(OK)class_name: 不符慣例，不可省略!";
+          printMsg(codingPan, "(OK)class_name: 不符慣例，不可省略!","white");
         }
       } else if (class_name === undefined && chkVal === convention) {
-        msg = "(OK)class_name: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)class_name: 符合慣例，可省略!","white");
       } else {
         printMsg(codingPan, "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -498,12 +490,12 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = "id";
       if (primary_key === chkVal) {
         if (primary_key === convention) {
-          msg = "(OK)primary_key: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)primary_key: 符合慣例，可省略!","white");
         } else {
-          msg = "(OK)primary_key: 不符慣例，不可省略!";
+          printMsg(codingPan, "(OK)primary_key: 不符慣例，不可省略!","white");
         }
       } else if (chkVal === convention) {
-        msg = "(OK)primary_key: 符合慣例，可省略!";
+          printMsg(codingPan, "(OK)primary_key: 符合慣例，可省略!","white");
       } else {
         printMsg(codingPan, "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -514,11 +506,7 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       return false;
   }
 
-  var judgement =  document.createElement("p");
-  judgement.classList.add("code-white");
-  judgement.innerHTML = msg;
-  codingPan.appendChild(judgement);
-  
+  return true;
 }
 
 /*
@@ -688,7 +676,11 @@ function cleanPan(codingPan) {
 */
 function printMsg(codingPan, str, color) {
   var msg = document.createElement("p");
-  msg.style.color = color;
+  if (color.includes("code")) {
+    msg.classList.add(color);
+  } else {
+    msg.style.color = color;
+  }
   msg.innerHTML = str;
   codingPan.appendChild(msg);
 }
