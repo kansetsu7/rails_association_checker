@@ -44,8 +44,8 @@ function check (){
       console.log("有錯喔");
       break;
   }
-  if (mode === "t" && chkDbSchemaInput(codingPan, inputs, relation, mode)) {
-
+  if (chkDbSchemaInput(codingPan, inputs, relation, mode) && mode === "t") {
+    // chkSecondLine();
   }
   
 
@@ -106,7 +106,7 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
   
   // set up map
   var map = new Map();
-
+/*
   // check input has belongs_to or not
   mode = chkRelationType(mode, relatoinInput, codingPan);
   if (mode === "") {
@@ -114,18 +114,28 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
     return map;
   }
 
-  var twoLine = [];
+  var lines = [];
   var relation;
   if (mode === "t") { // [has_many :through] have two line
-    twoLine = relatoinInput.split("\n");
-    relation = twoLine[0].split(",");
+    lines = relatoinInput.split("\n");
+    relation = lines[0].split(",");
+    if (!chkSecondHM(lines, codingPan)) return map;
   } else {
     relation = relatoinInput.split(",");
+  }*/
+
+  var lines = relatoinInput.split("\n");
+  // check input has belongs_to or not
+  mode = chkRelationType(mode, lines, codingPan);
+  if (mode === "") {
+    map.set("chk", false);
+    return map;
   }
+  var relation = lines[0].split(",");
 
 
   // check if input has right symbol
-  var map2 = chkRelationSymbol(relation, codingPan);
+  var map2 = chkRelationSymbol(relation, codingPan, mode);
   if (!map2.get("chk")) {
     map.set("chk", false);
     return map;
@@ -142,7 +152,7 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
   map.set("relation", relation2);
   map.set("mode", mode);
   if (mode === "t") {
-    map.set("line2", twoLine[1]);
+    map.set("line2", lines[1]);
   }
   return map;
 }
@@ -157,60 +167,43 @@ function chkRelationType(mode, relatoinInput, codingPan) {
   console.log(" chkRelationType...");
   switch (mode) {
     case "b":
-      if (relatoinInput.includes("belongs_to")) {
-        if (chkNewLine(relatoinInput, codingPan)) return "";
-        return mode;
-      }
-      break;
-    case "m":
-      if (relatoinInput.includes("has_many")) {
-        if (relatoinInput.includes(":through")) {
-          return "t";
-        }
-        if (relatoinInput.includes("through")) { //symbol error, lack of ":"
-          mode = "t";
-        } else {  // has_many only
-          if (chkNewLine(relatoinInput, codingPan)) return "";
+      if (relatoinInput[0].includes("belongs_to")) {
+        if (relatoinInput.length == 1) {
           return mode;
         }
+        printMsgLine(codingPan, "錯誤：輸入超過一行","red");
+        return "";
       }
-      break;
-    default:
-      break;
-  }
-  //
-  printMsgLine(codingPan, "錯誤：你的" + getTypeForErrMsg(mode) + "咧?","red");
-  return "";
-}
+      printMsgLine(codingPan, "錯誤：你的belongs_to咧?","red");
+      return "";
 
-function getTypeForErrMsg(mode) {
-  switch (mode) {
-    case "b":
-      return "belongs_to";
-      break;
     case "m":
-      return "has_many";
-      break;
-    case "t":
-      return "through前面的冒號";
-      break;
-    default:
-      return "You found a bug!";
-      break;
-  }
-}
+      if (relatoinInput[0].includes("has_many")) {
+        if (relatoinInput.length === 1) return mode;
+        if (relatoinInput.length === 2) {
+          if (relatoinInput[1].includes("has_many")) {
+            if (relatoinInput.includes(":through")) {
+              return "t";
+            }
+            if (relatoinInput.includes("through")) { //symbol error, lack of ":"
+              printMsgLine(codingPan, "錯誤：你第二行through前面的冒號咧?","red");
+              return "";
+            }
+            return mode;
+          }
+          printMsgLine(codingPan, "錯誤：你第二行的has_many咧?","red");
+          return "";
+        }
+        printMsgLine(codingPan, "錯誤：你輸入行數應為兩行內","red");
+        return "";
+      }
+      printMsgLine(codingPan, "錯誤：你第二行的has_many咧?","red");
+      return "";
 
-/*
-* checking if string has new line symbol
-* return true and print error message if has
-* else return false
-*/
-function chkNewLine(str, codingPan) {
-  if (str.includes("\n")) {
-    printMsgLine(codingPan, "錯誤：多換了一行","red");
-    return true;
-  } 
-  return false;
+    default:
+      printMsgLine(codingPan, "錯誤：chkRelationType有奇怪的Bug啊啊啊啊！","red");
+      return "";
+  }
 }
 
 /*
@@ -218,7 +211,7 @@ function chkNewLine(str, codingPan) {
 * return map {("chk", true), ("relation", relation2)} if pass
 * return map {("chk", false)} if not pass
 */
-function chkRelationSymbol(relation, codingPan) {
+function chkRelationSymbol(relation, codingPan, mode) {
   // console.log("Checking symbol...");
   var relation2 = [];
   for (var i = 0; i <= relation.length-1; i++) {
@@ -226,7 +219,7 @@ function chkRelationSymbol(relation, codingPan) {
   }
   var map = new Map();
   map.set("chk", false);
-  // console.log(relation2[0].length);
+  if (!chkRelationKeyword(relation2[0][0].trim(), mode, codingPan)) return map;
   for (var i = 0; i <= relation2.length - 1; i++) {
       // console.log("=====\'"+relation2[i][1]+"\'");
     if (relation2[i].length < 2) {
@@ -244,7 +237,7 @@ function chkRelationSymbol(relation, codingPan) {
       return map;
     }
     if (i > 0) {
-      if (!chkRelationKeyword(relation2[i][0].trim())) { 
+      if (!chkRelationArg(relation2[i][0].trim())) { 
         printMsgLine(codingPan, "錯誤：關鍵字應為\'class_name\', \'foreign_key\', \'primary_key\'其中之一。<br>位於"+relation2[i][0],"red");
         return map;
       }
@@ -270,12 +263,31 @@ function chkRelationSymbol(relation, codingPan) {
 }
 
 /*
-* write Rails convention setup on code panel
+* check relation arguments
 */
-function chkRelationKeyword(str) {
+function chkRelationArg(str) {
   if (str === "class_name" || str === "foreign_key" || str === "primary_key") {
     return true;
   }
+  return false;
+}
+
+function chkRelationKeyword(keyword, mode, codingPan) {
+  if (mode === "b") {
+    if (keyword !== "belongs_to") {
+      printMsgLine(codingPan, "錯誤：你的"+keyword+"應為belongs_to","red");
+      return false;
+    }
+    return true;
+  }
+  if (mode === "m" || mode === "t") {
+    if (keyword !== "has_many") {
+      printMsgLine(codingPan, "錯誤：你的"+keyword+"應為has_many","red");
+      return false;
+    }
+    return true;
+  }
+  printMsgLine(codingPan, "錯誤：chkRelationSymbol有奇怪的Bug啊啊啊啊！","red");
   return false;
 }
 
@@ -360,7 +372,7 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
         } else {
           printMsgLine(codingPan, "(Ok)foreign_key: 不符慣例，不可省略!","white");
         }
-      } else if (chkVal === convention) {
+      } else if (chkVal === undefined && chkVal === convention) {
           printMsgLine(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
       } else {
         printMsgLine(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
@@ -413,7 +425,7 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
       }
       break;
     default:
-      printMsgLine(codingPan, "錯誤：DB schema欄位有誤，怎麼會有奇怪的東西混進來？。","red");
+      printMsgLine(codingPan, "錯誤：chkHasManyConvention有奇怪的Bug啊啊啊啊！","red");
       return false;
   }
 
@@ -444,7 +456,7 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
         } else {
           printMsgLine(codingPan, "(Ok)foreign_key: 不符慣例，不可省略!","white");
         }
-      } else if (chkVal === convention) {
+      } else if (chkVal === undefined && chkVal === convention) {
           printMsgLine(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
       } else {
         printMsgLine(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
@@ -494,7 +506,7 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       }
       break;
     default:
-      printMsgLine(codingPan, "錯誤：DB schema欄位有誤，怎麼會有奇怪的東西混進來？","red");
+      printMsgLine(codingPan, "錯誤：chkBelongsToConvention有奇怪的Bug啊啊啊啊！","red");
       return false;
   }
 
@@ -566,10 +578,27 @@ function getTypeName(mode) {
     case "t":
       return "has_many";
     default:
-      return "You found a bug!";
+      return "getTypeName有奇怪的Bug啊啊啊啊！";
   }
 }
 
+
+function getTypeForErrMsg(mode) {
+  switch (mode) {
+    case "b":
+      return "belongs_to";
+      break;
+    case "m":
+      return "has_many";
+      break;
+    case "t":
+      return "through前面的冒號";
+      break;
+    default:
+      return "getTypeForErrMsg有奇怪的Bug啊啊啊啊！";
+      break;
+  }
+}
 
 /*
 * capitalize first letter of the given string
