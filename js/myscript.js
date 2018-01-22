@@ -44,8 +44,9 @@ function check (){
       console.log("有錯喔");
       break;
   }
-  
-  console.log(chkDbSchemaInput(codingPan, inputs, relation, mode));
+  if (mode === "t" && chkDbSchemaInput(codingPan, inputs, relation, mode)) {
+
+  }
   
 
   // console.log("yooo");
@@ -157,6 +158,7 @@ function chkRelationType(mode, relatoinInput, codingPan) {
   switch (mode) {
     case "b":
       if (relatoinInput.includes("belongs_to")) {
+        if (chkNewLine(relatoinInput, codingPan)) return "";
         return mode;
       }
       break;
@@ -167,7 +169,8 @@ function chkRelationType(mode, relatoinInput, codingPan) {
         }
         if (relatoinInput.includes("through")) { //symbol error, lack of ":"
           mode = "t";
-        } else {
+        } else {  // has_many only
+          if (chkNewLine(relatoinInput, codingPan)) return "";
           return mode;
         }
       }
@@ -175,7 +178,7 @@ function chkRelationType(mode, relatoinInput, codingPan) {
     default:
       break;
   }
-  // set up msg 
+  //
   printMsgLine(codingPan, "錯誤：你的" + getTypeForErrMsg(mode) + "咧?","red");
   return "";
 }
@@ -195,6 +198,19 @@ function getTypeForErrMsg(mode) {
       return "You found a bug!";
       break;
   }
+}
+
+/*
+* checking if string has new line symbol
+* return true and print error message if has
+* else return false
+*/
+function chkNewLine(str, codingPan) {
+  if (str.includes("\n")) {
+    printMsgLine(codingPan, "錯誤：多換了一行","red");
+    return true;
+  } 
+  return false;
 }
 
 /*
