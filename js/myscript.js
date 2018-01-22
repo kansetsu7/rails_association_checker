@@ -27,8 +27,9 @@ function check (){
   
   var relation = getRelationMap(map.get("relation"));
   var line2;  // only for mode === "t"
+  mode = map.get("mode");
   resultInPan(codingPan, inputs[0], map.get("relation"));
-  switch (map.get("mode")) {
+  switch (mode) {
     case "b":
       showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"));
       break;
@@ -39,12 +40,12 @@ function check (){
       showRailsDefault(codingPan, inputs[0], relation.get("has_many"));
       line2 = map.get("line2");
       break;
-    default:
+    default: // 可能不需要default，以後可以拿掉
       console.log("有錯喔");
       break;
   }
   
-  chkDbSchemaInput(codingPan, inputs, relation);
+  chkDbSchemaInput(codingPan, inputs, relation, mode);
   
 
   // console.log("yooo");
@@ -83,17 +84,17 @@ function chkMyModelName(myModelName, codingPan) {
 * return false if model name didn't pass
 * return true if passed 
 */
-function chkCapitalize(string, codingPan) {
+function chkCapitalize(str, codingPan) {
   // console.log("Checking first letter...");
 
   var errMsg = document.createElement("p");
   errMsg.style.color = "red";
 
-  if (!isNaN(string.charAt(0))) {   //first latter is a number
+  if (!isNaN(str.charAt(0))) {   //first latter is a number
     errMsg.innerHTML = "錯誤：Model名開頭不能為數字！";
     codingPan.appendChild(errMsg);
     return false;
-  }else if (upFirstLetter(string) === string) {
+  }else if (upFirstLetter(str) === str) {
     return true;
   }else{
     errMsg.innerHTML = "錯誤：Model名開頭需大寫！";
@@ -105,8 +106,8 @@ function chkCapitalize(string, codingPan) {
 /*
 * checking relation input
 * return map {("chk", false)} if not pass
-* return map {("chk", true), ("relation", relation2), ("mode", mode)} if pass ([has_many] or [belongs_to])
-* return map {("chk", true), ("relation", relation2), ("mode", mode), ("line2", twoLine[1])} if pass ([has_many :through])
+* return map {("chk", true), ("relation", relation2), ("mode", mode = "b" or "m")} if pass ([has_many] or [belongs_to])
+* return map {("chk", true), ("relation", relation2), ("mode", "t"), ("line2", twoLine[1])} if pass ([has_many :through])
 */ 
 function chkRelationInput(relatoinInput, codingPan, mode) {
   // console.log("Checking relatoin...");
@@ -135,7 +136,6 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
   var map2 = chkRelationSymbol(relation, codingPan);
   if (!map2.get("chk")) {
     map.set("chk", false);
-    relation_log(relation2);
     return map;
   }
 
@@ -212,29 +212,39 @@ function chkRelationSymbol(relation, codingPan) {
   for (var i = 0; i <= relation.length-1; i++) {
     relation2.push(relation[i].split(":"));
   }
-  var errMsg = document.createElement("p");
-  errMsg.style.color = "red";
   var map = new Map();
   map.set("chk", false);
   // console.log(relation2[0].length);
   for (var i = 0; i <= relation2.length - 1; i++) {
+      console.log("=====\'"+relation2[i][1]+"\'");
     if (relation2[i].length != 2) {
       var place = relation2[i][0] === "" ? " [痾...這不好說] " : relation2[i][0];
-      console.log("=====\'"+relation2[i][0]+"\'");
-      errMsg.innerHTML = "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。";
-      codingPan.appendChild(errMsg);
+      printErrMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。");
       return map;
-    }else if (relation2[i][0] === "" || relation2[i][1] === "") {
-      var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : "relation2[i-1][0]";
-      errMsg.innerHTML = "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。";
-      codingPan.appendChild(errMsg);
+    }
+    if (relation2[i][0] === "" || relation2[i][1] === "") {
+      var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : relation2[i-1][0];
+      printErrMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。");
       return map;
-    }else{
-      map.set("relation", relation2);
-      map.set("chk", true);
+    }
+    if (i > 0) {
+      if (!chkDoubleQuotes(relation2[i][1].trim())) {
+        // var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : relation2[i-1][0];
+        printErrMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+relation2[i][1]+"附近。");
+        return map;
+      }
     }
   }
+  map.set("relation", relation2);
+  map.set("chk", true);
   return map;
+}
+
+/*
+* write Rails convention setup on code panel
+*/
+function chk(argument) {
+  // body...
 }
 
 /*
@@ -280,7 +290,8 @@ function showRailsDefault(codingPan, modelName, methodName) {
 * return null and skip checking if DB schema not been set.  
 * return true if passed
 */
-function chkDbSchemaInput(codingPan, inputs, relation) {
+function chkDbSchemaInput(codingPan, inputs, relation, mode) {
+  // inputs[0] myModelName
   // inputs[2] fk
   // inputs[3] refTableName
   // inputs[4] pk
@@ -290,33 +301,132 @@ function chkDbSchemaInput(codingPan, inputs, relation) {
 
   var title = document.createElement("p");
   title.classList.add("code-white");
-  title.innerHTML = "<br>==== your setup ====<br>";
+  title.innerHTML = "<br>==== checking result ====<br>";
   codingPan.appendChild(title);
 
-  var errMsgs = [];
-  var index = 0;
-  for (var i = 2; i < inputs.length; i++) {
-    if (chkLetterBoth(inputs[i])) {
-      chkConvention(codingPan, inputs[i], relation, i);
-    } else {
-      errMsgs.push(document.createElement("p"));
-      errMsgsIndex = errMsgs.length - 1;
-      errMsgs[errMsgsIndex].style.color = "red";
-      errMsgs[errMsgsIndex].innerHTML = "錯誤：DB schema欄位" + (i-1) + "輸入有誤。";
+  if (mode === "m" || mode === "t") {
+    for (var i = 2; i < inputs.length; i++) {
+      if (chkLetterBoth(inputs[i])) {
+        // chkBelongsToConvention(codingPan, inputs[i], relation, i);
+        chkHasManyConvention(codingPan, inputs[i], relation, i, inputs[0]);
+        console.log("has_many ok");
+      } else {
+        printErrMsg(codingPan, "錯誤：DB schema欄位" + (i-1) + "輸入有誤。");
+      }
     }
-  }
-
-  // append error messages
-  for (var i = 0; i < errMsgs.length; i++) {
-    codingPan.appendChild(errMsgs[i]);
+  } else { // mode === "t"
+    for (var i = 2; i < inputs.length; i++) {
+      if (chkLetterBoth(inputs[i])) {
+        chkBelongsToConvention(codingPan, inputs[i], relation, i);
+      } else {
+        printErrMsg(codingPan, "錯誤：DB schema欄位" + (i-1) + "輸入有誤。");
+      }
+    }
   }
 }
 
 /*
+* ONLY FOR [has_many]
 * check if given input follows Rails convention or not
 */
-function chkConvention(codingPan, chkVal, relation, inputIndex) {
-  console.log("chkConvention:"+inputIndex+" => "+chkVal);
+function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelName) {
+  console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
+  var hasError = false;
+  var msg;
+  var has_many = relation.get("has_many");
+
+  switch (inputIndex) {
+    case 2:
+      console.log(relation.get("foreign_key")+", "+chkVal);
+      if (lowFirstLetter(chkVal) !== chkVal) {
+        hasError = true;
+        break;
+      }
+      var foreign_key = relation.get("foreign_key");
+      var convention = lowFirstLetter(myModelName) + "_id"; //different
+      if (foreign_key === chkVal) {
+        if (foreign_key === convention) {
+          msg = "(OK)foreign_key: 符合慣例，可省略!";
+        } else {
+          msg = "(Ok)foreign_key: 不符慣例，不可省略!";
+        }
+      } else if (chkVal === convention) {
+        msg = "(OK)foreign_key: 符合慣例，可省略!";
+      } else {
+        hasError = true;
+        msg = "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
+      }
+      break;
+    case 3:
+      console.log(relation.get("class_name")+", "+chkVal);
+      if (upFirstLetter(chkVal) !== chkVal) {
+        hasError = true;
+        break;
+      }
+      var class_name = relation.get("class_name");
+      var convention = upFirstLetter(has_many.plural(true)); //different
+      if (class_name === chkVal) {
+        if (class_name === convention) {
+          msg = "(OK)class_name: 符合慣例，可省略!";
+        } else {
+          msg = "(OK)class_name: 不符慣例，不可省略!";
+        }
+      } else if (chkVal === convention) {
+        msg = "(OK)class_name: 符合慣例，可省略!";
+      } else {
+        hasError = true;
+        msg = "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"";
+      }
+      break;
+    case 4:
+      console.log(relation.get("primary_key")+", "+chkVal);
+      if (lowFirstLetter(chkVal) !== chkVal) {
+        hasError = true;
+        break;
+      }
+      var primary_key = relation.get("primary_key");
+      var convention = "id";
+      if (primary_key === chkVal) {
+        console.log(primary_key+" === "+chkVal);
+        if (primary_key === convention) {
+          console.log(primary_key+" === "+convention);
+          msg = "(OK)primary_key: 符合慣例，可省略!";
+        } else {
+          msg = "(OK)primary_key: 不符慣例，不可省略!";
+        }
+      } else if (primary_key === undefined && chkVal === convention) { // old: chkVal === convention
+        msg = "(OK)primary_key: 符合慣例，可省略!";
+      } else {
+        hasError = true;
+        msg = "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
+      }
+      break;
+    default:
+      hasError = true;
+      break;
+  }
+
+  if (hasError) {
+    if (msg === undefined) msg = "錯誤：DB schema欄位" + (inputIndex-1) + "大小寫有誤。"; 
+    errMsg = document.createElement("p");
+    errMsg.style.color = "red";
+    errMsg.innerHTML = msg;
+    codingPan.appendChild(errMsg);
+  }else{
+    var judgement =  document.createElement("p");
+    judgement.classList.add("code-white");
+    judgement.innerHTML = msg;
+    codingPan.appendChild(judgement);
+  }
+
+}
+
+/*
+* ONLY FOR [belongs_to]
+* check if given input follows Rails convention or not
+*/
+function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
+  console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
   var hasError = false;
   var msg;
   var belongs_to = relation.get("belongs_to");
@@ -415,10 +525,10 @@ function chkLetterBoth(str) {
 }
 
 /*
-* check if the string have double quotes on both side
+* check if the string have double quotes on both side and not just double quotes only
 */
 function chkDoubleQuotes(str) {
-  return str === ("\"" + trimDQ(str) + "\"") ? true : false;
+  return (trimDQ(str) !== "" && (str === "\"" + trimDQ(str) + "\"")) ? true : false;
 }
 
 /*
@@ -441,15 +551,15 @@ function getConventions(relation) {
 /*
 * capitalize first letter of the given string
 */
-function upFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+function upFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /*
 * turn first letter of the given string to lowercase
 */
-function lowFirstLetter(string) {
-    return string.charAt(0).toLowerCase() + string.slice(1);
+function lowFirstLetter(str) {
+    return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
 function relation_log(relation_array){
@@ -462,7 +572,7 @@ function relation_log(relation_array){
 }
 
 /*
-* trim the double quotes in string  
+* trim the double quotes on both side in string 
 */
 function trimDQ(str) {
   return str.replace(/\"/gm, "");
@@ -544,10 +654,20 @@ function cleanPan(codingPan) {
 }
 
 /*
+* print error messages
+*/
+function printErrMsg(codingPan, str) {
+  var errMsg = document.createElement("p");
+  errMsg.style.color = "red";
+  errMsg.innerHTML = str;
+  codingPan.appendChild(errMsg);
+}
+
+/*
 * pluralize a string
 * usage: pluralize => singularString.plural();
 *        singularize => pluralString.plural(true);
-* ref: https://stackoverflow.com/questions/27194359/javascript-pluralize-a-string
+* reference: https://stackoverflow.com/questions/27194359/javascript-pluralize-a-string
 */
 String.prototype.plural = function(revert){
 
