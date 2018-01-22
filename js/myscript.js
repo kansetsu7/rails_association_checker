@@ -67,12 +67,8 @@ function chkMyModelName(myModelName, codingPan) {
   cleanPan(codingPan);
 
   // console.log("Checking model name...");
-  var errMsg = document.createElement("p");
-  errMsg.style.color = "red";
-
   if (myModelName === "") {
-    errMsg.innerHTML = "錯誤：Model名稱必填";
-    codingPan.appendChild(errMsg);
+    printMsg(codingPan, "錯誤：Model名稱必填","red");
     return false;
   }else {
     return chkCapitalize(myModelName, codingPan);
@@ -87,18 +83,13 @@ function chkMyModelName(myModelName, codingPan) {
 function chkCapitalize(str, codingPan) {
   // console.log("Checking first letter...");
 
-  var errMsg = document.createElement("p");
-  errMsg.style.color = "red";
-
   if (!isNaN(str.charAt(0))) {   //first latter is a number
-    errMsg.innerHTML = "錯誤：Model名開頭不能為數字！";
-    codingPan.appendChild(errMsg);
+    printMsg(codingPan, "錯誤：Model名開頭不能為數字！","red");
     return false;
   }else if (upFirstLetter(str) === str) {
     return true;
   }else{
-    errMsg.innerHTML = "錯誤：Model名開頭需大寫！";
-    codingPan.appendChild(errMsg);
+    printMsg(codingPan, "錯誤：Model名開頭需大寫！","red");    
     return false;
   }
 }
@@ -163,24 +154,29 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
 */
 function chkRelationType(mode, relatoinInput, codingPan) {
   console.log(" chkRelationType...");
-  if (relatoinInput.includes("belongs_to")) {
-    return mode;
+  switch (mode) {
+    case "b":
+      if (relatoinInput.includes("belongs_to")) {
+        return mode;
+      }
+      break;
+    case "m":
+      if (relatoinInput.includes("has_many")) {
+        if (relatoinInput.includes(":through")) {
+          return "t";
+        }
+        if (relatoinInput.includes("through")) { //symbol error, lack of ":"
+          mode = "t";
+        } else {
+          return mode;
+        }
+      }
+      break;
+    default:
+      break;
   }
-  if (relatoinInput.includes("has_many")) {
-    if (relatoinInput.includes(":through")) {
-      return "t";
-    }
-    if (relatoinInput.includes("through")) { //symbol error, lack of ":"
-      mode = "t";
-    }
-  }
-  if (mode !== "t") return mode; // [has_many] but no [through]
-
   // set up msg 
-  var errMsg = document.createElement("p");
-  errMsg.style.color = "red";
-  errMsg.innerHTML = "錯誤：你的" + getType(mode) + "咧?";
-  codingPan.appendChild(errMsg);
+  printMsg(codingPan, "錯誤：你的" + getType(mode) + "咧?","red");
   return "";
 }
 
@@ -216,21 +212,42 @@ function chkRelationSymbol(relation, codingPan) {
   map.set("chk", false);
   // console.log(relation2[0].length);
   for (var i = 0; i <= relation2.length - 1; i++) {
-      console.log("=====\'"+relation2[i][1]+"\'");
-    if (relation2[i].length != 2) {
+      // console.log("=====\'"+relation2[i][1]+"\'");
+    if (relation2[i].length < 2) {
+      console.log("1");
       var place = relation2[i][0] === "" ? " [痾...這不好說] " : relation2[i][0];
-      printErrMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。");
+      printMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
+      return map;
+    }
+    if (relation2[i].length > 2) {
+      console.log("1.5");
+      printMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+relation2[i][1]+"附近。","red");
       return map;
     }
     if (relation2[i][0] === "" || relation2[i][1] === "") {
+      console.log("2");
       var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : relation2[i-1][0];
-      printErrMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。");
+      printMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
       return map;
     }
     if (i > 0) {
+      if (!chkRelationKeyword(relation2[i][0].trim())) { 
+        printMsg(codingPan, "錯誤：關鍵字應為\'class_name\', \'foreign_key\', \'primary_key\'其中之一。<br>位於"+relation2[i][0],"red");
+        return map;
+      }
+      if (chkRightSpace(relation2[i][0])) {
+        printMsg(codingPan, "錯誤：你的冒號要靠緊"+relation2[i][0],"red");
+        return map;
+      }
       if (!chkDoubleQuotes(relation2[i][1].trim())) {
+      console.log("3");
         // var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : relation2[i-1][0];
-        printErrMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+relation2[i][1]+"附近。");
+        printMsg(codingPan, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+relation2[i][1]+"附近。","red");
+        return map;
+      }
+    } else {
+      if (chkLeftSpace(relation2[0][1])) {
+        printMsg(codingPan, "錯誤：你的冒號要靠緊"+relation2[0][1],"red");
         return map;
       }
     }
@@ -243,8 +260,11 @@ function chkRelationSymbol(relation, codingPan) {
 /*
 * write Rails convention setup on code panel
 */
-function chk(argument) {
-  // body...
+function chkRelationKeyword(str) {
+  if (str === "class_name" || str === "foreign_key" || str === "primary_key") {
+    return true;
+  }
+  return false;
 }
 
 /*
@@ -307,11 +327,10 @@ function chkDbSchemaInput(codingPan, inputs, relation, mode) {
   if (mode === "m" || mode === "t") {
     for (var i = 2; i < inputs.length; i++) {
       if (chkLetterBoth(inputs[i])) {
-        // chkBelongsToConvention(codingPan, inputs[i], relation, i);
         chkHasManyConvention(codingPan, inputs[i], relation, i, inputs[0]);
         console.log("has_many ok");
       } else {
-        printErrMsg(codingPan, "錯誤：DB schema欄位" + (i-1) + "輸入有誤。");
+        printMsg(codingPan, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
       }
     }
   } else { // mode === "t"
@@ -319,7 +338,7 @@ function chkDbSchemaInput(codingPan, inputs, relation, mode) {
       if (chkLetterBoth(inputs[i])) {
         chkBelongsToConvention(codingPan, inputs[i], relation, i);
       } else {
-        printErrMsg(codingPan, "錯誤：DB schema欄位" + (i-1) + "輸入有誤。");
+        printMsg(codingPan, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
       }
     }
   }
@@ -331,7 +350,6 @@ function chkDbSchemaInput(codingPan, inputs, relation, mode) {
 */
 function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelName) {
   console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
-  var hasError = false;
   var msg;
   var has_many = relation.get("has_many");
 
@@ -339,8 +357,8 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
     case 2:
       console.log(relation.get("foreign_key")+", "+chkVal);
       if (lowFirstLetter(chkVal) !== chkVal) {
-        hasError = true;
-        break;
+        printMsg(codingPan, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+        return false;
       }
       var foreign_key = relation.get("foreign_key");
       var convention = lowFirstLetter(myModelName) + "_id"; //different
@@ -354,35 +372,37 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
         msg = "(OK)foreign_key: 符合慣例，可省略!";
       } else {
         hasError = true;
-        msg = "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        printMsg(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        return false;
       }
       break;
     case 3:
       console.log(relation.get("class_name")+", "+chkVal);
       if (upFirstLetter(chkVal) !== chkVal) {
-        hasError = true;
-        break;
+        printMsg(codingPan, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+        return false;
       }
       var class_name = relation.get("class_name");
       var convention = upFirstLetter(has_many.plural(true)); //different
       if (class_name === chkVal) {
         if (class_name === convention) {
+          console.log("[\'"+class_name+"\', \'"+chkVal+"\', \'"+convention+"\']");
           msg = "(OK)class_name: 符合慣例，可省略!";
         } else {
           msg = "(OK)class_name: 不符慣例，不可省略!";
         }
-      } else if (chkVal === convention) {
+      } else if (class_name === undefined && chkVal === convention) {
         msg = "(OK)class_name: 符合慣例，可省略!";
       } else {
-        hasError = true;
-        msg = "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        printMsg(codingPan, "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        return false;
       }
       break;
     case 4:
       console.log(relation.get("primary_key")+", "+chkVal);
       if (lowFirstLetter(chkVal) !== chkVal) {
-        hasError = true;
-        break;
+        printMsg(codingPan, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+        return false;
       }
       var primary_key = relation.get("primary_key");
       var convention = "id";
@@ -397,27 +417,21 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
       } else if (primary_key === undefined && chkVal === convention) { // old: chkVal === convention
         msg = "(OK)primary_key: 符合慣例，可省略!";
       } else {
-        hasError = true;
-        msg = "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        printMsg(codingPan, "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        return false;
       }
       break;
     default:
-      hasError = true;
-      break;
+      printMsg(codingPan, "錯誤：DB schema欄位有誤，怎麼會有奇怪的東西混進來？。","red");
+      return false;
   }
 
-  if (hasError) {
-    if (msg === undefined) msg = "錯誤：DB schema欄位" + (inputIndex-1) + "大小寫有誤。"; 
-    errMsg = document.createElement("p");
-    errMsg.style.color = "red";
-    errMsg.innerHTML = msg;
-    codingPan.appendChild(errMsg);
-  }else{
-    var judgement =  document.createElement("p");
-    judgement.classList.add("code-white");
-    judgement.innerHTML = msg;
-    codingPan.appendChild(judgement);
-  }
+  var judgement =  document.createElement("p");
+  judgement.classList.add("code-white");
+  judgement.innerHTML = msg;
+  codingPan.appendChild(judgement);
+  return true;
+  
 
 }
 
@@ -426,8 +440,8 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
 * check if given input follows Rails convention or not
 */
 function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
-  console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
-  var hasError = false;
+  // console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
+  // var hasError = false;
   var msg;
   var belongs_to = relation.get("belongs_to");
 
@@ -435,8 +449,8 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
     case 2:
       console.log(relation.get("foreign_key")+", "+chkVal);
       if (lowFirstLetter(chkVal) !== chkVal) {
-        hasError = true;
-        break;
+        printMsg(codingPan, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+        return false;
       }
       var foreign_key = relation.get("foreign_key");
       var convention = belongs_to + "_id";
@@ -449,15 +463,15 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       } else if (chkVal === convention) {
         msg = "(OK)foreign_key: 符合慣例，可省略!";
       } else {
-        hasError = true;
-        msg = "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        printMsg(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        return false;
       }
       break;
     case 3:
       console.log(relation.get("class_name")+", "+chkVal);
       if (upFirstLetter(chkVal) !== chkVal) {
-        hasError = true;
-        break;
+        printMsg(codingPan, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+        return false;
       }
       var class_name = relation.get("class_name");
       var convention = upFirstLetter(belongs_to);
@@ -467,18 +481,18 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
         } else {
           msg = "(OK)class_name: 不符慣例，不可省略!";
         }
-      } else if (chkVal === convention) {
+      } else if (class_name === undefined && chkVal === convention) {
         msg = "(OK)class_name: 符合慣例，可省略!";
       } else {
-        hasError = true;
-        msg = "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        printMsg(codingPan, "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        return false;
       }
       break;
     case 4:
       console.log(relation.get("primary_key")+", "+chkVal);
       if (lowFirstLetter(chkVal) !== chkVal) {
-        hasError = true;
-        break;
+        printMsg(codingPan, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+        return false;
       }
       var primary_key = relation.get("primary_key");
       var convention = "id";
@@ -491,27 +505,19 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       } else if (chkVal === convention) {
         msg = "(OK)primary_key: 符合慣例，可省略!";
       } else {
-        hasError = true;
-        msg = "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"";
+        printMsg(codingPan, "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        return false;
       }
       break;
     default:
-      hasError = true;
-      break;
+      printMsg(codingPan, "錯誤：DB schema欄位有誤，怎麼會有奇怪的東西混進來？","red");
+      return false;
   }
 
-  if (hasError) {
-    if (msg === undefined) msg = "錯誤：DB schema欄位" + (inputIndex-1) + "大小寫有誤。"; 
-    errMsg = document.createElement("p");
-    errMsg.style.color = "red";
-    errMsg.innerHTML = msg;
-    codingPan.appendChild(errMsg);
-  }else{
-    var judgement =  document.createElement("p");
-    judgement.classList.add("code-white");
-    judgement.innerHTML = msg;
-    codingPan.appendChild(judgement);
-  }
+  var judgement =  document.createElement("p");
+  judgement.classList.add("code-white");
+  judgement.innerHTML = msg;
+  codingPan.appendChild(judgement);
   
 }
 
@@ -522,6 +528,20 @@ function chkLetterBoth(str) {
   // console.log("checking \'"+str+"\'");
   var letters = /^[A-Za-z](.*[A-Za-z])?$/;
   return str.match(letters) ? true : false;
+}
+
+/*
+* check if the string have white space on right side
+*/
+function chkRightSpace(str) {
+  return str.charAt(str.length - 1) === " " ? true : false;
+}
+
+/*
+* check if the string have white space on left side
+*/
+function chkLeftSpace(str) {
+  return str.charAt(0) === " " ? true : false;
 }
 
 /*
@@ -543,8 +563,18 @@ function getRelationMap(relation) {
   return map;
 }
 
-function getConventions(relation) {
-  // body...
+/*
+* get DB schema input column name
+*/
+function getInputName(index) {
+  switch (index) {
+    case 2:
+      return "外鍵";
+    case 3:
+      return "model name";
+    case 4:
+      return "主鍵";
+  }
 }
 
 
@@ -654,13 +684,13 @@ function cleanPan(codingPan) {
 }
 
 /*
-* print error messages
+* print messages in particular color on coding panel
 */
-function printErrMsg(codingPan, str) {
-  var errMsg = document.createElement("p");
-  errMsg.style.color = "red";
-  errMsg.innerHTML = str;
-  codingPan.appendChild(errMsg);
+function printMsg(codingPan, str, color) {
+  var msg = document.createElement("p");
+  msg.style.color = color;
+  msg.innerHTML = str;
+  codingPan.appendChild(msg);
 }
 
 /*
