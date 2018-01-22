@@ -28,16 +28,16 @@ function check (){
   var relation = getRelationMap(map.get("relation"));
   var line2;  // only for mode === "t"
   mode = map.get("mode");
-  resultInPan(codingPan, inputs[0], map.get("relation"));
+  resultInPan(codingPan, inputs[0], map.get("relation"), mode);
   switch (mode) {
     case "b":
-      showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"));
+      showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"), mode);
       break;
     case "m":
-      showRailsDefault(codingPan, inputs[0], relation.get("has_many"));
+      showRailsDefault(codingPan, inputs[0], relation.get("has_many"), mode);
       break;
     case "t":
-      showRailsDefault(codingPan, inputs[0], relation.get("has_many"));
+      showRailsDefault(codingPan, inputs[0], relation.get("has_many"), mode);
       line2 = map.get("line2");
       break;
     default: // 可能不需要default，以後可以拿掉
@@ -176,11 +176,11 @@ function chkRelationType(mode, relatoinInput, codingPan) {
       break;
   }
   // set up msg 
-  printMsgLine(codingPan, "錯誤：你的" + getType(mode) + "咧?","red");
+  printMsgLine(codingPan, "錯誤：你的" + getTypeForErrMsg(mode) + "咧?","red");
   return "";
 }
 
-function getType(mode) {
+function getTypeForErrMsg(mode) {
   switch (mode) {
     case "b":
       return "belongs_to";
@@ -270,8 +270,8 @@ function chkRelationKeyword(str) {
 /*
 * write Rails convention setup on code panel
 */
-function showRailsDefault(codingPan, modelName, methodName) {
-  console.log("showRailsDefault");
+function showRailsDefault(codingPan, modelName, methodName, mode) {
+  console.log("showRailsDefault");/*
   var resultElements = setResultElements("Rails convention", modelName, methodName);
   resultElements.push(document.createElement("span"));
   resultElements[7].innerHTML = ", ";
@@ -295,14 +295,25 @@ function showRailsDefault(codingPan, modelName, methodName) {
   resultElements[13].innerHTML = ", ";
   resultElements[13].classList.add("code-white");
   resultElements.push(document.createElement("span"));  //primary_key
-  resultElements[14].innerHTML = "foreign_key: ";
+  resultElements[14].innerHTML = "primary_key: ";
   resultElements[14].classList.add("code-purple");
   resultElements.push(document.createElement("span"));
   resultElements[15].innerHTML = "\"id\"";
   resultElements[15].classList.add("code-yellow");
   for (var i = 0; i < resultElements.length; i++) {
     codingPan.appendChild(resultElements[i]);
-  }
+  }*/
+
+  setResultElements(codingPan, "Rails convention", modelName, methodName, mode);
+  printMsgSpan(codingPan, ", ", "code-white");
+  printMsgSpan(codingPan, "class_name: ", "code-purple");
+  printMsgSpan(codingPan, "\"" + upFirstLetter(methodName) + "\"", "code-yellow");
+  printMsgSpan(codingPan, ", ", "code-white");
+  printMsgSpan(codingPan, "foreign_key: ", "code-purple");
+  printMsgSpan(codingPan, "\"" + methodName + "_id\"", "code-yellow");
+  printMsgSpan(codingPan, ", ", "code-white");
+  printMsgSpan(codingPan, "primary_key: ", "code-purple");
+  printMsgSpan(codingPan, "\"id\"", "code-yellow");
 }
 
 /*
@@ -565,6 +576,19 @@ function getInputName(index) {
   }
 }
 
+function getTypeName(mode) {
+  switch (mode) {
+    case "b":
+      return "belongs_to";
+    case "m":
+      return "has_many";
+    case "t":
+      return "has_many";
+    default:
+      return "You found a bug!";
+  }
+}
+
 
 /*
 * capitalize first letter of the given string
@@ -602,7 +626,7 @@ function trimSymbol(str) {
   return str.replace(/\"/gm, "");
 }
 
-function setResultElements(title, modelName, methodName) {
+function setResultElements(codingPan, title, modelName, methodName, mode) {/*
   var resultElements = [];
   resultElements.push(document.createElement("p"));
   resultElements[0].classList.add("code-white");
@@ -625,14 +649,21 @@ function setResultElements(title, modelName, methodName) {
   resultElements.push(document.createElement("span"));
   resultElements[6].classList.add("code-purple");
   resultElements[6].innerHTML = ":" + methodName;
-  return resultElements;
-  
+  return resultElements;*/
+
+  printMsgLine(codingPan, "==== " + title + " ====<br>", "code-white");
+  printMsgSpan(codingPan, "Class ", "code-red");
+  printMsgSpan(codingPan, modelName, "code-green");
+  printMsgSpan(codingPan, " < ", "code-white");
+  printMsgSpan(codingPan, "ApplicationRecord<br>", "code-green");
+  printMsgSpan(codingPan, "&nbsp;&nbsp;" + getTypeName(mode) + " ", "code-white");
+  printMsgSpan(codingPan, ":" + methodName, "code-purple");
 }
 
 /*
 * write user input relation setup in code panel
 */
-function resultInPan(codingPan, myModelName, relation) {
+function resultInPan(codingPan, myModelName, relation, mode) {/*
   var index = 6;
   var index2;
   var resultElements = setResultElements("your setup", myModelName, relation[0][1]);
@@ -658,7 +689,14 @@ function resultInPan(codingPan, myModelName, relation) {
   resultElements[index2+1].innerHTML = "<br>end";
   for (var i = 0; i < resultElements.length; i++) {
     codingPan.appendChild(resultElements[i]);
+  }*/
+  setResultElements(codingPan, "your setup", myModelName, relation[0][1], mode);
+  for (var i = 1; i < relation.length; i++) {
+    printMsgSpan(codingPan, ", ", "code-white")
+    printMsgSpan(codingPan, relation[i][0]+ ": ", "code-purple")
+    printMsgSpan(codingPan, relation[i][1], "code-yellow")
   }
+  printMsgLine(codingPan, "end", "code-red");
 }
 
 /*
@@ -673,7 +711,7 @@ function cleanPan(codingPan) {
 }
 
 /*
-* print messages in particular color on coding panel
+* print message <p> in particular color on coding panel
 */
 function printMsgLine(codingPan, str, color) {
   var msg = document.createElement("p");
@@ -685,6 +723,17 @@ function printMsgLine(codingPan, str, color) {
   msg.innerHTML = str;
   codingPan.appendChild(msg);
 }
+
+/*
+* print messages <span> in particular color on coding panel
+*/
+function printMsgSpan(codingPan, str, color) {
+  var msg = document.createElement("span");
+  msg.classList.add(color);
+  msg.innerHTML = str;
+  codingPan.appendChild(msg);
+}
+
 
 /*
 * pluralize a string
