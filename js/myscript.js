@@ -1,4 +1,4 @@
-function check (){
+function check123 (){
   var mode = getMode();
   if (mode === "") {
     console.log("WTF have you done?");
@@ -24,7 +24,7 @@ function check (){
 
   // return if model name is not correct
   if (!chkMyModelName(inputs[0], codingPan) && true) return;
-/*
+  /*
   var map = chkRelationInput(inputs[1], codingPan, mode);
   if (!map.get("chk")) {
     // alert("有錯喔");
@@ -69,42 +69,36 @@ function check (){
   }
 }
 
-function chkBtHm() {
-  var mode = getMode();
-  if (mode === "") {
-    console.log("WTF have you done?");
-    alert("WTF have you done?");
-    return;
-  }
+function checkBase(mode, inputs, codingPan) {
+  /**************************
+  * inputs[0] myModelName
+  * inputs[1] relatoinInput
+  * inputs[2] fk
+  * inputs[3] refModelName
+  * inputs[4] pk
+  **************************/
+
   
-  var inputs = getInputs(mode);
-  /*******************************
-  * [0] myModelName
-  * [1] relatoinInput
-  * [2] fk
-  * [3] refModelName
-  * [4] pk
-  *******************************/
-
-  var codingPan = document.getElementById("coding-pan");
-
+  var result = [false];
   // return if model name is not correct
-  if (!chkMyModelName(inputs[0], codingPan) && true) return;
-  if (!chkRelationLines(mode, inputs[1].split("\n"), codingPan)) return;
+  if (!chkMyModelName(inputs[0], codingPan) && true) return result;
+  if (!chkRelationLines(mode, inputs[1].split("\n"), codingPan)) return result;
   var relationArray = inputs[1].split(",");
   var map = chkRelationSymbol(relationArray, codingPan, mode);
   if (!map.get("chk")) {
     // alert("有錯喔");
     console.log("有錯喔");
-    return;
+    return result;
   }
   var relationMap = getRelationMap(map.get("relation"));
-  chkDbSchemaInput(codingPan, inputs, relationMap, mode);
   resultInPan(codingPan, inputs[0], map.get("relation"), mode);
   showRailsDefault(codingPan, inputs[0], relationMap.get(getTypeName(mode)), mode);
+  chkDbSchemaInput(codingPan, inputs, relationMap, mode);
 }
 
-function chkHmTh() {
+function chkBtHm() {
+  var codingPan = document.getElementById("coding-pan");
+  cleanPan(codingPan);
   var mode = getMode();
   if (mode === "") {
     console.log("WTF have you done?");
@@ -113,42 +107,30 @@ function chkHmTh() {
   }
   
   var inputs = getInputs(mode);
-  /*******************************
+  checkBase(mode, inputs, codingPan);
+}
+
+function chkHmTh() {
+  var codingPan = document.getElementById("coding-pan");
+  cleanPan(codingPan);
+  var mode = getMode();
+  if (mode === "") {
+    console.log("WTF have you done?");
+    alert("WTF have you done?");
+    return;
+  }
+
+  /**************************
   * [0] myModelName
   * [1] relatoinInput
-  * [2] bl-fk
-  * [3] bl-refModelName
-  * [4] bl-pk
-  * [5] hm-fk
-  * [6] hm-refModelName
-  * [7] hm-pk
-  *******************************/
-
-  var codingPan = document.getElementById("coding-pan");
-
-  // return if model name is not correct
-  if (!chkMyModelName(inputs[0], codingPan) && true) return;
-  var lines = inputs[1].split("\n");
-  if (!chkRelationLines(mode, lines, codingPan)) return;
-  var relationArrays = [];
-  for (var i = 0; i < lines.length; i++) {
-    relationArrays.push(lines[0].split(","));
-  } 
-  var arrForMap = [];
-  var arrForRelationMap = [];
-  // line1 belongs_to
-  arrForMap.push(chkRelationSymbol(relationArrays[0], codingPan, "b"));
-  arrForRelationMap.push(getRelationMap(arrForMap[0].get("relation")));
-  chkDbSchemaInput(codingPan, inputs, arrForRelationMap[0], "b");
-  // line2 has_many
-  arrForMap.push(chkRelationSymbol(relationArrays[1], codingPan, "m"));
-  arrForRelationMap.push(getRelationMap(arrForMap[1].get("relation")));
-  chkDbSchemaInput(codingPan, inputs, arrForRelationMap[1], "m");
-
-  
-  resultInPan(codingPan, inputs[0], map.get("relation"), mode);
-  showRailsDefault(codingPan, inputs[0], relationMap.get("belongs_to"), mode);
-
+  * [2] fk
+  * [3] refModelName
+  * [4] pk
+  **************************/
+  var inputsBl = getInputs("b");
+  checkBase("b", inputsBl, codingPan);
+  var inputsHm = getInputs("m");
+  checkBase("m", inputsHm, codingPan);
 }
 
 /*
@@ -157,8 +139,6 @@ function chkHmTh() {
 * return true if passed 
 */
 function chkMyModelName(myModelName, codingPan) {
-  cleanPan(codingPan);
-
   // console.log("Checking model name...");
   if (myModelName === "") {
     printMsgLine(codingPan, "錯誤：Model名稱必填","red");
@@ -673,24 +653,17 @@ function getInputs(mode) {
       prefixStr = ["hm"]
       break;
 
-    case "t":
-      prefixStr = ["bl", "hm"]
-      break;
     default:
       alert("getInputs ERROR!");
-      break;
+      return;
   } 
   var inputs = [];
-  inputs.push(document.getElementById("my-model-name").value.trim());  // [0] myModelName
-  inputs.push(document.getElementById("relatoin-input").value.trim());  // [1] relatoinInput
-  for (var i = 0; i < prefixStr.length; i++) {
-    // [2] fk
-    inputs.push(document.getElementById(prefixStr[i] + "-fk").value.trim());  
-    // [3] refModelName
-    inputs.push(document.getElementById(prefixStr[i] + "-ref-model-name").value.trim());  
-    // [4] pk
-    inputs.push(document.getElementById(prefixStr[i] + "-pk").value.trim());  
-  }
+  inputs.push(document.getElementById(prefixStr + "-my-model-name").value.trim());  // [0] myModelName
+  inputs.push(document.getElementById(prefixStr + "-relatoin-input").value.trim());  // [1] relatoinInput
+  inputs.push(document.getElementById(prefixStr + "-fk").value.trim());  // [2] fk
+  inputs.push(document.getElementById(prefixStr + "-ref-model-name").value.trim());  // [3] refModelName
+  inputs.push(document.getElementById(prefixStr + "-pk").value.trim()); // [4] pk
+
   return inputs;
 }
 
@@ -755,26 +728,32 @@ function setDbPanel(mode) {
   var bl_pk = document.getElementById("bl-pk");
   var bl_ref_model_name = document.getElementById("bl-ref-model-name");
   var bl_fk = document.getElementById("bl-fk");
+  var bl_row = document.getElementById("bl-row");
   var hm_pk = document.getElementById("hm-pk");
   var hm_ref_model_name = document.getElementById("hm-ref-model-name");
   var hm_fk = document.getElementById("hm-fk");
+  var hm_row = document.getElementById("hm-row");
   var chk_btn = document.getElementById("chk-btn");
   var disabled;
+  var display;
   var color;
   switch (mode) {
     case "b":
       disabled = [false, true];
       color = ["white", "gray"];
+      display = ["block", "none"];
       chk_btn.onclick = function() {chkBtHm();};
       break;
     case "m":
       disabled = [true, false];
       color = ["gray", "white"];
+      display = ["none", "block"];
       chk_btn.onclick = function() {chkBtHm();};
       break;
     case "t":
       disabled = [false, false];
       color = ["white", "white"];
+      display = ["block", "block"];
       chk_btn.onclick = function() {chkHmTh();};
       break;
     default:
@@ -788,12 +767,14 @@ function setDbPanel(mode) {
   bl_ref_model_name.style.backgroundColor = color[0];
   bl_fk.disabled = disabled[0];
   bl_fk.style.backgroundColor = color[0];
+  bl_row.style.display = display[0];
   hm_pk.disabled = disabled[1];
   hm_pk.style.backgroundColor = color[1];
   hm_ref_model_name.disabled = disabled[1];
   hm_ref_model_name.style.backgroundColor = color[1];
   hm_fk.disabled = disabled[1];
   hm_fk.style.backgroundColor = color[1];
+  hm_row.style.display = display[1];
 }
 
 /*
