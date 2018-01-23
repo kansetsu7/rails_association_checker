@@ -58,7 +58,7 @@
             <div class="panel-body">
               <form action="">
                 Class <input type="text" id="bl-my-model-name" placeholder="Model名稱" value="Followship"> < ActiveRecord <br><br>
-                <textarea rows="3" class="form-control" id="bl-relatoin-input" va >belongs_to :following, class_name: "User", foreign_key: "following_id", primary_key: "id"</textarea><br> 
+                <textarea rows="2" class="form-control" id="bl-relatoin-input"  placeholder="belongs_to" >belongs_to :following, class_name: "User", foreign_key: "following_id", primary_key: "id"</textarea><br> 
                 end <br>
               </form>
             </div>
@@ -74,7 +74,8 @@
             <div class="panel-body">
               <form action="">
                 Class <input type="text" id="hm-my-model-name" placeholder="Model名稱" value="User"> < ActiveRecord <br><br>
-                <textarea rows="3" class="form-control" id="hm-relatoin-input" va >has_many :followships, class_name: "Followship", foreign_key: "user_id", primary_key: "id"</textarea><br> 
+                <textarea rows="2" class="form-control" id="hm-relatoin-input" placeholder="has_many">has_many :followships, class_name: "Followship", foreign_key: "user_id", primary_key: "id"</textarea> 
+                <textarea rows="2" class="form-control" id="hmth-relatoin-input" placeholder="has_many :through">has_many :followings, through: :followships</textarea><br> 
                 end <br>
               </form>
             </div>

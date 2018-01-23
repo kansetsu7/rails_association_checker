@@ -1,74 +1,3 @@
-function check123 (){
-  var mode = getMode();
-  if (mode === "") {
-    console.log("WTF have you done?");
-    alert("WTF have you done?");
-    return;
-  }
-  
-  var inputs = getInputs(mode);
-  /*******************************
-  *     b / h / t
-  * size 5 / 5 / 8
-  * [0] myModelName
-  * [1] relatoinInput
-  * [2] fk (b / m / b)
-  * [3] refModelName (b / m / b)
-  * [4] pk (b / m / b)
-  * [5] fk (- / - / b)
-  * [6] refModelName (- / - / b)
-  * [7] pk (- / - / m)
-  *******************************/
-
-  var codingPan = document.getElementById("coding-pan");
-
-  // return if model name is not correct
-  if (!chkMyModelName(inputs[0], codingPan) && true) return;
-  /*
-  var map = chkRelationInput(inputs[1], codingPan, mode);
-  if (!map.get("chk")) {
-    // alert("有錯喔");
-    console.log("有錯喔");
-    return;
-  }*/
-  var lines = relatoinInput.split("\n");
-  if (!chkRelationLines(mode, lines, codingPan)) return;
-  var relationArray = [];
-  for (var i = 0; i < lines.length; i++) {
-    relationArray.push(lines[0].split(","));
-  } 
-  var arrForMap = [];
-  if (mode === "t") {
-    arrForMap.push(chkRelationSymbol(relationArray[0], codingPan, "b"));
-    arrForMap.push(chkRelationSymbol(relationArray[1], codingPan, "m"));
-  } else {
-    arrForMap.push(chkRelationSymbol(relationArray[0], codingPan, mode));
-  }
-  
-  var relation = getRelationMap(map.get("relation"));
-  var line2;  // only for mode === "t"
-  mode = map.get("mode");
-  resultInPan(codingPan, inputs[0], map.get("relation"), mode);
-  switch (mode) {
-    case "b":
-      showRailsDefault(codingPan, inputs[0], relation.get("belongs_to"), mode);
-      break;
-    case "m":
-      showRailsDefault(codingPan, inputs[0], relation.get("has_many"), mode);
-      break;
-    case "t":
-      showRailsDefault(codingPan, inputs[0], relation.get("has_many"), mode);
-      line2 = map.get("line2");
-      break;
-    default: // 可能不需要default，以後可以拿掉
-      console.log("有錯喔");
-      break;
-  }
-  if (chkDbSchemaInput(codingPan, inputs, relation, mode) && mode === "t") {
-    chkSecondLineInput();
-  }
-}
-
 function checkBase(mode, inputs, codingPan) {
   /**************************
   * inputs[0] myModelName
@@ -78,7 +7,7 @@ function checkBase(mode, inputs, codingPan) {
   * inputs[4] pk
   **************************/
 
-  
+  printMsgH2(codingPan, "************* " + getTypeName(mode) + " *************<br>","aqua");
   var result = [false];
   // return if model name is not correct
   if (!chkMyModelName(inputs[0], codingPan) && true) return result;
@@ -105,7 +34,6 @@ function chkBtHm() {
     alert("WTF have you done?");
     return;
   }
-  
   var inputs = getInputs(mode);
   checkBase(mode, inputs, codingPan);
 }
@@ -215,14 +143,7 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
 function chkRelationLines(mode, relatoinInput, codingPan) {
   console.log(" chkRelationLines...");
 
-  if (mode === "b" || mode === "m") {
-    if (relatoinInput.length == 1) {
-      return true;
-    }
-    printMsgLine(codingPan, "錯誤：輸入超過一行","red");
-    return false;
-  }
-  if (mode === "t") {
+  if (mode === "b" || mode === "m" || mode === "t") {
     if (relatoinInput.length == 1) {
       return true;
     }
@@ -734,6 +655,7 @@ function setDbPanel(mode) {
   var hm_fk = document.getElementById("hm-fk");
   var hm_row = document.getElementById("hm-row");
   var chk_btn = document.getElementById("chk-btn");
+  var hmth_relatoin_input = document.getElementById("hmth-relatoin-input");
   var disabled;
   var display;
   var color;
@@ -741,19 +663,19 @@ function setDbPanel(mode) {
     case "b":
       disabled = [false, true];
       color = ["white", "gray"];
-      display = ["block", "none"];
+      display = ["block", "none", "none"];
       chk_btn.onclick = function() {chkBtHm();};
       break;
     case "m":
       disabled = [true, false];
       color = ["gray", "white"];
-      display = ["none", "block"];
+      display = ["none", "block", "none"];
       chk_btn.onclick = function() {chkBtHm();};
       break;
     case "t":
       disabled = [false, false];
       color = ["white", "white"];
-      display = ["block", "block"];
+      display = ["block", "block", "block"];
       chk_btn.onclick = function() {chkHmTh();};
       break;
     default:
@@ -775,6 +697,7 @@ function setDbPanel(mode) {
   hm_fk.disabled = disabled[1];
   hm_fk.style.backgroundColor = color[1];
   hm_row.style.display = display[1];
+  hmth_relatoin_input.style.display = display[2];
 }
 
 /*
@@ -852,6 +775,20 @@ function cleanPan(codingPan) {
 */
 function printMsgLine(codingPan, str, color) {
   var msg = document.createElement("p");
+  if (color.includes("code")) {
+    msg.classList.add(color);
+  } else {
+    msg.style.color = color;
+  }
+  msg.innerHTML = str;
+  codingPan.appendChild(msg);
+}
+
+/*
+* print message <h2> in particular color on coding panel
+*/
+function printMsgH2(codingPan, str, color) {
+  var msg = document.createElement("h2");
   if (color.includes("code")) {
     msg.classList.add(color);
   } else {
