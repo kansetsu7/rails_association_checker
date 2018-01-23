@@ -64,6 +64,17 @@ textarea{
   /*color: rgb(230, 119, 216);*/
   color: #ffe792;
 }
+
+#db-bt{
+  border-width: 0 1px 0 0;
+  /*border-width: 1px;*/
+  border-color: black;
+  border-style: solid;
+}
+
+#hm-pk, #hm-ref-model-name, #hm-fk{
+  background-color: gray;
+}
 /*
 red: 248, 34, 114;
 green: 157,214,45

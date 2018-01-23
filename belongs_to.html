@@ -27,6 +27,32 @@
         <div class="col-xs-12">
           <div class="panel panel-default">
             <div class="panel-heading">
+              <h3 class="panel-title">請選擇關聯類型</h3>
+            </div>
+            <div class="panel-body">
+              <div class="radio">
+                <label>
+                  <input type="radio" name="optionsRadios" id="radio1" value="option1" onclick="setDbPanel('b');" checked>
+                  belongs_to&nbsp;&nbsp;&nbsp;
+                </label>
+                <label>
+                  <input type="radio" name="optionsRadios" id="radio2" value="option2" onclick="setDbPanel('m');">
+                  has_many&nbsp;&nbsp;&nbsp;
+                </label>
+                <label>
+                  <input type="radio" name="optionsRadios" id="radio3" value="option3" onclick="setDbPanel('t');">
+                  has_many :through
+                </label>
+              </div>
+            </div>
+          </div>
+          <hr>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
               <h3 class="panel-title">Model內設定</h3>
             </div>
             <div class="panel-body">
@@ -37,21 +63,31 @@
               </form>
             </div>
           </div>
-
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">DB schema</h3>
             </div>
             <div class="panel-body">
-              <form action="">
-                <!-- 自己的table name: <input type="text" id="my-table-name"><br><br> -->
-                自己的外鍵: <input type="text" id="fk" value="following_id">
-              </form>
-              <hr>
-              <form action="">
-                對方的model name: <input type="text" id="ref-model-name" value="User"><br><br>
-                對方的主鍵: <input type="text" id="pk" value="id">
-              </form>
+              <div class="col-xs-6" id="db-bt">
+                <h4>belongs_to設定</h4>
+                <form action="">
+                  自己的外鍵: <input type="text" id="bl-fk" value="following_id"><br><br>
+                  對方的model name: <input type="text" id="bl-ref-model-name" value="User"><br><br>
+                  對方的主鍵: <input type="text" id="bl-pk" value="id">
+                </form>
+              </div>
+              <div class="col-xs-6" id="db-hm">
+                <h4>has_many / has_many :through設定</h4>
+                <form action="">
+                  自己的主鍵: <input type="text" id="hm-pk" value="id" disabled><br><br>
+                  對方的model name: <input type="text" id="hm-ref-model-name" value="Followship" disabled><br><br>
+                  對方的外鍵: <input type="text" id="hm-fk" value="user_id" disabled>
+                </form>
+              </div>
             </div>
           </div>
         </div>
@@ -70,8 +106,7 @@
         </div>
       </div>
 
-      <input type="button" value="check" onclick="check();">
-      <p id="mode" style="display: none">b</p>
+      <input type="button" value="check" onclick="chkBtHm();">
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

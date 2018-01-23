@@ -1,28 +1,48 @@
 function check (){
-  var mode = document.getElementById("mode").innerHTML;
-  if (mode !== "b" && mode !== "m") {
+  var mode = getMode();
+  if (mode === "") {
     console.log("WTF have you done?");
     alert("WTF have you done?");
     return;
   }
   
-  var inputs = [];
-  inputs.push(document.getElementById("my-model-name").value.trim());  // [0] myModelName
-  inputs.push(document.getElementById("relatoin-input").value.trim());  // [1] relatoinInput
-  inputs.push(document.getElementById("fk").value.trim());  // [2] fk
-  inputs.push(document.getElementById("ref-model-name").value.trim());  // [3] refModelName
-  inputs.push(document.getElementById("pk").value.trim());  // [4] pk
+  var inputs = getInputs(mode);
+  /*******************************
+  *     b / h / t
+  * size 5 / 5 / 8
+  * [0] myModelName
+  * [1] relatoinInput
+  * [2] fk (b / m / b)
+  * [3] refModelName (b / m / b)
+  * [4] pk (b / m / b)
+  * [5] fk (- / - / b)
+  * [6] refModelName (- / - / b)
+  * [7] pk (- / - / m)
+  *******************************/
 
   var codingPan = document.getElementById("coding-pan");
 
   // return if model name is not correct
   if (!chkMyModelName(inputs[0], codingPan) && true) return;
-
+/*
   var map = chkRelationInput(inputs[1], codingPan, mode);
   if (!map.get("chk")) {
     // alert("有錯喔");
     console.log("有錯喔");
     return;
+  }*/
+  var lines = relatoinInput.split("\n");
+  if (!chkRelationLines(mode, lines, codingPan)) return;
+  var relationArray = [];
+  for (var i = 0; i < lines.length; i++) {
+    relationArray.push(lines[0].split(","));
+  } 
+  var arrForMap = [];
+  if (mode === "t") {
+    arrForMap.push(chkRelationSymbol(relationArray[0], codingPan, "b"));
+    arrForMap.push(chkRelationSymbol(relationArray[1], codingPan, "m"));
+  } else {
+    arrForMap.push(chkRelationSymbol(relationArray[0], codingPan, mode));
   }
   
   var relation = getRelationMap(map.get("relation"));
@@ -45,18 +65,90 @@ function check (){
       break;
   }
   if (chkDbSchemaInput(codingPan, inputs, relation, mode) && mode === "t") {
-    // chkSecondLine();
+    chkSecondLineInput();
   }
-  
-
-  // console.log("yooo");
 }
 
-function test() {
-  var relatoinInput = document.getElementById("relatoin-input").value.trim();
-  var str = relatoinInput.split("\n");
-  console.log(str[0]);
-  console.log(str[1]);
+function chkBtHm() {
+  var mode = getMode();
+  if (mode === "") {
+    console.log("WTF have you done?");
+    alert("WTF have you done?");
+    return;
+  }
+  
+  var inputs = getInputs(mode);
+  /*******************************
+  * [0] myModelName
+  * [1] relatoinInput
+  * [2] fk
+  * [3] refModelName
+  * [4] pk
+  *******************************/
+
+  var codingPan = document.getElementById("coding-pan");
+
+  // return if model name is not correct
+  if (!chkMyModelName(inputs[0], codingPan) && true) return;
+  if (!chkRelationLines(mode, inputs[1].split("\n"), codingPan)) return;
+  var relationArray = inputs[1].split(",");
+  var map = chkRelationSymbol(relationArray, codingPan, mode);
+  if (!map.get("chk")) {
+    // alert("有錯喔");
+    console.log("有錯喔");
+    return;
+  }
+  var relationMap = getRelationMap(map.get("relation"));
+  chkDbSchemaInput(codingPan, inputs, relationMap, mode);
+  resultInPan(codingPan, inputs[0], map.get("relation"), mode);
+  showRailsDefault(codingPan, inputs[0], relationMap.get(getTypeName(mode)), mode);
+}
+
+function chkHmTh() {
+  var mode = getMode();
+  if (mode === "") {
+    console.log("WTF have you done?");
+    alert("WTF have you done?");
+    return;
+  }
+  
+  var inputs = getInputs(mode);
+  /*******************************
+  * [0] myModelName
+  * [1] relatoinInput
+  * [2] bl-fk
+  * [3] bl-refModelName
+  * [4] bl-pk
+  * [5] hm-fk
+  * [6] hm-refModelName
+  * [7] hm-pk
+  *******************************/
+
+  var codingPan = document.getElementById("coding-pan");
+
+  // return if model name is not correct
+  if (!chkMyModelName(inputs[0], codingPan) && true) return;
+  var lines = inputs[1].split("\n");
+  if (!chkRelationLines(mode, lines, codingPan)) return;
+  var relationArrays = [];
+  for (var i = 0; i < lines.length; i++) {
+    relationArrays.push(lines[0].split(","));
+  } 
+  var arrForMap = [];
+  var arrForRelationMap = [];
+  // line1 belongs_to
+  arrForMap.push(chkRelationSymbol(relationArrays[0], codingPan, "b"));
+  arrForRelationMap.push(getRelationMap(arrForMap[0].get("relation")));
+  chkDbSchemaInput(codingPan, inputs, arrForRelationMap[0], "b");
+  // line2 has_many
+  arrForMap.push(chkRelationSymbol(relationArrays[1], codingPan, "m"));
+  arrForRelationMap.push(getRelationMap(arrForMap[1].get("relation")));
+  chkDbSchemaInput(codingPan, inputs, arrForRelationMap[1], "m");
+
+  
+  resultInPan(codingPan, inputs[0], map.get("relation"), mode);
+  showRailsDefault(codingPan, inputs[0], relationMap.get("belongs_to"), mode);
+
 }
 
 /*
@@ -100,40 +192,20 @@ function chkCapitalize(str, codingPan) {
 * return map {("chk", false)} if not pass
 * return map {("chk", true), ("relation", relation2), ("mode", mode = "b" or "m")} if pass ([has_many] or [belongs_to])
 * return map {("chk", true), ("relation", relation2), ("mode", "t"), ("line2", twoLine[1])} if pass ([has_many :through])
-*/ 
+*/ /*
 function chkRelationInput(relatoinInput, codingPan, mode) {
   // console.log("Checking relatoin...");
-  
+
   // set up map
   var map = new Map();
-/*
-  // check input has belongs_to or not
-  mode = chkRelationType(mode, relatoinInput, codingPan);
-  if (mode === "") {
-    map.set("chk", false);
-    return map;
-  }
-
-  var lines = [];
-  var relation;
-  if (mode === "t") { // [has_many :through] have two line
-    lines = relatoinInput.split("\n");
-    relation = lines[0].split(",");
-    if (!chkSecondHM(lines, codingPan)) return map;
-  } else {
-    relation = relatoinInput.split(",");
-  }*/
-
   var lines = relatoinInput.split("\n");
   // check input has belongs_to or not
-  mode = chkRelationType(mode, lines, codingPan);
-  if (mode === "") {
+  if (!chkRelationLines(mode, lines, codingPan)) {
     map.set("chk", false);
     return map;
   }
   var relation = lines[0].split(",");
-
-
+ 
   // check if input has right symbol
   var map2 = chkRelationSymbol(relation, codingPan, mode);
   if (!map2.get("chk")) {
@@ -155,55 +227,80 @@ function chkRelationInput(relatoinInput, codingPan, mode) {
     map.set("line2", lines[1]);
   }
   return map;
-}
+}*/ 
 
 /*
-* checking relation type
-* return "t" if it's [has_many :through]
-* return mode if it's [has_many] or [belongs_to]
-* else return ""
+* checking relation lines
 */
-function chkRelationType(mode, relatoinInput, codingPan) {
-  console.log(" chkRelationType...");
+function chkRelationLines(mode, relatoinInput, codingPan) {
+  console.log(" chkRelationLines...");
+
+  if (mode === "b" || mode === "m") {
+    if (relatoinInput.length == 1) {
+      return true;
+    }
+    printMsgLine(codingPan, "錯誤：輸入超過一行","red");
+    return false;
+  }
+  if (mode === "t") {
+    if (relatoinInput.length == 1) {
+      return true;
+    }
+    printMsgLine(codingPan, "錯誤：輸入超過一行","red");
+    return false;
+  }
+  printMsgLine(codingPan, "錯誤：chkRelationType有奇怪的Bug啊啊啊啊！","red");
+  return false;
+  /*
   switch (mode) {
     case "b":
       if (relatoinInput[0].includes("belongs_to")) {
         if (relatoinInput.length == 1) {
-          return mode;
+          return true;
         }
         printMsgLine(codingPan, "錯誤：輸入超過一行","red");
-        return "";
+        return false;
       }
       printMsgLine(codingPan, "錯誤：你的belongs_to咧?","red");
-      return "";
+      return false;
 
     case "m":
       if (relatoinInput[0].includes("has_many")) {
-        if (relatoinInput.length === 1) return mode;
-        if (relatoinInput.length === 2) {
-          if (relatoinInput[1].includes("has_many")) {
-            if (relatoinInput.includes(":through")) {
-              return "t";
-            }
-            if (relatoinInput.includes("through")) { //symbol error, lack of ":"
-              printMsgLine(codingPan, "錯誤：你第二行through前面的冒號咧?","red");
-              return "";
-            }
-            return mode;
-          }
-          printMsgLine(codingPan, "錯誤：你第二行的has_many咧?","red");
-          return "";
+        if (relatoinInput.length == 1) {
+          return true;
         }
-        printMsgLine(codingPan, "錯誤：你輸入行數應為兩行內","red");
-        return "";
+        printMsgLine(codingPan, "錯誤：輸入超過一行","red");
+        return false;
       }
-      printMsgLine(codingPan, "錯誤：你第二行的has_many咧?","red");
-      return "";
+      printMsgLine(codingPan, "錯誤：你的has_many咧?","red");
+      return false;
+
+    case "t":
+      if (relatoinInput.length !== 3) {
+        printMsgLine(codingPan, "錯誤：has_many :through行數應為三行","red");
+        return false;
+      }
+      if (relatoinInput[0].includes("belongs_to")) {
+        if (relatoinInput[1].includes("has_many")) {
+          if (relatoinInput.includes(":through")) {
+            return true;
+          }
+          if (relatoinInput.includes("through")) { //symbol error, lack of ":"
+            printMsgLine(codingPan, "錯誤：你第二行through前面的冒號咧?","red");
+            return false;
+          }
+          return true;
+        }
+        printMsgLine(codingPan, "錯誤：你第二行的has_many咧?","red");
+        return false;
+      }
+      printMsgLine(codingPan, "錯誤：你的belongs_to咧?","red");
+      return false;
 
     default:
       printMsgLine(codingPan, "錯誤：chkRelationType有奇怪的Bug啊啊啊啊！","red");
-      return "";
-  }
+      return false;
+  }*/
 }
 
 /*
@@ -273,22 +370,23 @@ function chkRelationArg(str) {
 }
 
 function chkRelationKeyword(keyword, mode, codingPan) {
-  if (mode === "b") {
-    if (keyword !== "belongs_to") {
-      printMsgLine(codingPan, "錯誤：你的"+keyword+"應為belongs_to","red");
+  switch (mode) {
+    case "b":
+      if (keyword !== "belongs_to") {
+        printMsgLine(codingPan, "錯誤：你的"+keyword+"應為belongs_to","red");
+        return false;
+      }
+      return true;
+    case "m":
+      if (keyword !== "has_many") {
+        printMsgLine(codingPan, "錯誤：你的"+keyword+"應為has_many","red");
+        return false;
+      }
+      return true;
+    default:
+      printMsgLine(codingPan, "錯誤：chkRelationSymbol有奇怪的Bug啊啊啊啊！","red");
       return false;
-    }
-    return true;
   }
-  if (mode === "m" || mode === "t") {
-    if (keyword !== "has_many") {
-      printMsgLine(codingPan, "錯誤：你的"+keyword+"應為has_many","red");
-      return false;
-    }
-    return true;
-  }
-  printMsgLine(codingPan, "錯誤：chkRelationSymbol有奇怪的Bug啊啊啊啊！","red");
-  return false;
 }
 
 /*
@@ -513,6 +611,10 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
   return true;
 }
 
+function chkSecondLineInput(relation, codingPan) {
+  var relation2 = relation.split(",");
+}
+
 /*
 * check given string start/end with letters
 */
@@ -543,13 +645,62 @@ function chkDoubleQuotes(str) {
   return (trimDQ(str) !== "" && (str === "\"" + trimDQ(str) + "\"")) ? true : false;
 }
 
+function getMode() {
+  for (var i = 1; i < 4; i++) {
+    if (document.getElementById("radio" + i).checked) {
+      switch (i) {
+        case 1:
+          return "b";
+        case 2:
+          return "m";
+        case 3:
+          return "t";
+        default:
+          return "";
+      }
+    }
+  }
+}
+
+function getInputs(mode) {
+  var prefixStr;
+  switch (mode) {
+    case "b":
+      prefixStr = ["bl"]
+      break;
+
+    case "m":
+      prefixStr = ["hm"]
+      break;
+
+    case "t":
+      prefixStr = ["bl", "hm"]
+      break;
+    default:
+      alert("getInputs ERROR!");
+      break;
+  } 
+  var inputs = [];
+  inputs.push(document.getElementById("my-model-name").value.trim());  // [0] myModelName
+  inputs.push(document.getElementById("relatoin-input").value.trim());  // [1] relatoinInput
+  for (var i = 0; i < prefixStr.length; i++) {
+    // [2] fk
+    inputs.push(document.getElementById(prefixStr[i] + "-fk").value.trim());  
+    // [3] refModelName
+    inputs.push(document.getElementById(prefixStr[i] + "-ref-model-name").value.trim());  
+    // [4] pk
+    inputs.push(document.getElementById(prefixStr[i] + "-pk").value.trim());  
+  }
+  return inputs;
+}
+
 /*
 * turn array into map
 */
 function getRelationMap(relation) {
   var map = new Map();
   for (var i = 0; i < relation.length; i++) {
-    map.set(relation[i][0], trimDQ(relation[i][1]));
+    map.set(relation[i][0].trim(), trimDQ(relation[i][1].trim()));
   }
 
   return map;
@@ -598,6 +749,51 @@ function getTypeForErrMsg(mode) {
       return "getTypeForErrMsg有奇怪的Bug啊啊啊啊！";
       break;
   }
+}
+
+function setDbPanel(mode) {
+  var bl_pk = document.getElementById("bl-pk");
+  var bl_ref_model_name = document.getElementById("bl-ref-model-name");
+  var bl_fk = document.getElementById("bl-fk");
+  var hm_pk = document.getElementById("hm-pk");
+  var hm_ref_model_name = document.getElementById("hm-ref-model-name");
+  var hm_fk = document.getElementById("hm-fk");
+  var chk_btn = document.getElementById("chk-btn");
+  var disabled;
+  var color;
+  switch (mode) {
+    case "b":
+      disabled = [false, true];
+      color = ["white", "gray"];
+      chk_btn.onclick = function() {chkBtHm();};
+      break;
+    case "m":
+      disabled = [true, false];
+      color = ["gray", "white"];
+      chk_btn.onclick = function() {chkBtHm();};
+      break;
+    case "t":
+      disabled = [false, false];
+      color = ["white", "white"];
+      chk_btn.onclick = function() {chkHmTh();};
+      break;
+    default:
+      alert("BUG!!!!!");
+      return;
+  }
+
+  bl_pk.disabled = disabled[0];
+  bl_pk.style.backgroundColor = color[0];
+  bl_ref_model_name.disabled = disabled[0];
+  bl_ref_model_name.style.backgroundColor = color[0];
+  bl_fk.disabled = disabled[0];
+  bl_fk.style.backgroundColor = color[0];
+  hm_pk.disabled = disabled[1];
+  hm_pk.style.backgroundColor = color[1];
+  hm_ref_model_name.disabled = disabled[1];
+  hm_ref_model_name.style.backgroundColor = color[1];
+  hm_fk.disabled = disabled[1];
+  hm_fk.style.backgroundColor = color[1];
 }
 
 /*
