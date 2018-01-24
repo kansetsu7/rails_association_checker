@@ -275,7 +275,6 @@ function chkRelationSymbol(relation, codingPan, mode) {
         return map;
       }
       if (!chkDoubleQuotes(relation2[i][1].trim())) {
-        // var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : relation2[i-1][0];
         printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+relation2[i][1]+"附近。","red");
         return map;
       }
@@ -381,7 +380,9 @@ function chkThroughRelation(bMap, mMap, tMap, bModelName, codingPan) {
 * check relation arguments
 */
 function chkRelationArg(str) {
-  if (str === "class_name" || str === "foreign_key" || str === "primary_key") {
+  legalArguments = ["class_name", "foreign_key", "primary_key"]
+  for (var i = 0; i < legalArguments.length; i++) {
+    str === legalArguments[i];
     return true;
   }
   return false;
