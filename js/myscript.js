@@ -161,9 +161,8 @@ function chkMyModelName(myModelName, resultPanel) {
   }
 
   // check if model name is singular
-  // DON'T USE TRIPLE EQUAL!!!
-  // plural string .plural() will return an array not a string
-  if (myModelName == myModelName.plural()) {
+  
+  if (isPlural(myModelName)) {
     printMsgLine(resultPanel, "錯誤：Model名須為單數！","red");    
     return false;
   }
@@ -447,13 +446,13 @@ function chkRelationMethodName(methodName, mode, resultPanel) {
   }
   switch (mode) {
     case "b":
-      if (methodName == methodName.plural()) {  // don't use === . plural_string.plural() return an object, not string
+      if (isPlural(methodName)) {  
         printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為單數"+methodName.plural(true),"red");
         return false;
       }
       return true;
     case "m":
-      if (methodName == methodName.plural(true)) {
+      if (isSingular(methodName)) {
         printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為複數"+methodName.plural(),"red");
         return false;
       }
@@ -1004,6 +1003,9 @@ function printMsgSpan(resultPanel, str, color) {
  * @return {Boolean}
  */
 function isSingular(str) {
+  // DON'T USE TRIPLE EQUAL!!! 
+  // they are not different type!
+  // singularize a singular string will return an array not a string
   return str == str.plural(true);
 }
 
@@ -1013,6 +1015,9 @@ function isSingular(str) {
  * @return {Boolean}
  */
 function isPlural(str) {
+  // DON'T USE TRIPLE EQUAL!!!
+  // they are not different type!
+  // pluralize a plural string will return an array not a string
   return str == str.plural();
 }
 
