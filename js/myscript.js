@@ -441,6 +441,10 @@ function chkRelationKeyword(keyword, mode, resultPanel) {
  * @return {Boolean}  ---           |follows or ont
  */
 function chkRelationMethodName(methodName, mode, resultPanel) {
+  if (firstLetterIsUpperCase(methodName)) {
+    printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為小寫開頭的"+lowFirstLetter(methodName),"red");
+    return false;
+  }
   switch (mode) {
     case "b":
       if (methodName == methodName.plural()) {  // don't use === . plural_string.plural() return an object, not string
