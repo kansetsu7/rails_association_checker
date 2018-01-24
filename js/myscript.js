@@ -170,12 +170,17 @@ function chkMyModelName(myModelName, resultPanel) {
   return true;
 }
 
-/*
-* checking relation lines
-*/
+/**
+ * Check if relation input is only one line
+ * Called by checkBase() and chkThrough()
+ * 
+ * @param  {{Number}  mode            |for indentifing checking mode
+ * @param  {Array}    relatoinInput   |user input relation from panel, split by \n
+ * @param  {Object}   resultPanel     |result panel(HTML) for printing result
+ * @return {Boolean}
+ */
 function chkRelationLines(mode, relatoinInput, resultPanel) {
   console.log(" chkRelationLines...");
-
   if (mode === "b" || mode === "m" || mode === "t") {
     if (relatoinInput.length == 1) {
       return true;
@@ -183,15 +188,22 @@ function chkRelationLines(mode, relatoinInput, resultPanel) {
     printMsgLine(resultPanel, "錯誤：輸入超過一行","red");
     return false;
   }
-  printMsgLine(resultPanel, "錯誤：chkRelationType有奇怪的Bug啊啊啊啊！","red");
+  printMsgLine(resultPanel, "錯誤：chkRelationLines有奇怪的Bug啊啊啊啊！","red");
   return false;
 }
 
-/*
-* checking relation symbol
-* return map {("chk", true), ("relation", relation2)} if pass
-* return map {("chk", false)} if not pass
-*/
+/**
+ * Checking relation symbol for [belongs_to] and [has_many]
+ * return map {("chk", false)} if not pass
+ * return map {("chk", true), ("relation", relation2)} if pass
+ * relation2 is user input relation split by colon :
+ * Called by checkBase()
+ * 
+ * @param  {Array}    relation      |user input relation from panel, split by comma ,
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {{Number}  mode          |for indentifing checking mode
+ * @return {Map}      map           |pass or ont
+ */
 function chkRelationSymbol(relation, resultPanel, mode) {
   var relation2 = [];
   for (var i = 0; i <= relation.length-1; i++) {
@@ -199,9 +211,13 @@ function chkRelationSymbol(relation, resultPanel, mode) {
   }
   var map = new Map();
   map.set("chk", false);
+
   if (!chkRelationKeyword(relation2[0][0].trim(), mode, resultPanel)) return map;
   if (!chkRelationMethodName(relation2[0][1].trim(), mode, resultPanel)) return map;
-  for (var i = 0; i <= relation2.length - 1; i++) {
+
+  // check arguments of relation. 
+  // if not pass, show location that might cause error and return
+  for (var i = 0; i < relation2.length; i++) {
     if (relation2[i].length < 2) {
       var place = relation2[i][0] === "" ? " [痾...這不好說] " : relation2[i][0];
       printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
@@ -241,6 +257,17 @@ function chkRelationSymbol(relation, resultPanel, mode) {
   return map;
 }
 
+/**
+ * Checking relation symbol for [has_many :through]
+ * return map {("chk", false)} if not pass
+ * return map {("chk", true), ("relation", relation2)} if pass
+ * relation2 is user input relation split by colon :
+ * Called by checkBase()
+ * 
+ * @param  {Array}    relation      |user input relation from panel, split by comma ,
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @return {Map}      map           |pass or ont
+ */
 function chkThroughSymbol(relation, resultPanel) {
   var relation2 = [];
   for (var i = 0; i <= relation.length-1; i++) {
@@ -249,9 +276,11 @@ function chkThroughSymbol(relation, resultPanel) {
   var map = new Map();
   map.set("chk", false);
 
-  // has_many
+  // check keyword = has_many
   if (!chkRelationKeyword(relation2[0][0].trim(), "m", resultPanel)) return map;
 
+  // check arguments of relation. 
+  // if not pass, show location that might cause error and return
   if (relation2[0].length < 2) {
     var place = relation2[0][0] === "" ? " [痾...這不好說] " : relation2[0][0];
     printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
@@ -291,7 +320,8 @@ function chkThroughSymbol(relation, resultPanel) {
       printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+relation2[1][2],"red");
       return map;
     } else {
-      relation2[i][1] = relation2[i][2]; // copy to [i][1] to fit getRelationMap rule. 
+      // copy to [i][1] to fit getRelationMap() rule, it only read array[0] and array[1].
+      relation2[i][1] = relation2[i][2];  
     }
   }
   map.set("relation", relation2);
@@ -299,6 +329,17 @@ function chkThroughSymbol(relation, resultPanel) {
   return map;
 }
 
+/**
+ * check [has_many :through] relation, print result on result panel
+ * Called by chkHmTh()
+ * 
+ * @param  {Map}      bMap          |map of [belongs_to] relation
+ * @param  {Map}      mMap          |map of [has_many] relation
+ * @param  {Map}      tMap          |map of [has_many :through] relation
+ * @param  {String}   bModelName    |model name of [belongs_to] relation
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @return {}         ----          |it don't return
+ */
 function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
   if (tMap.get("through") === mMap.get("has_many")) {
     printMsgLine(resultPanel, "(OK) [has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對得上。","white");
@@ -327,9 +368,14 @@ function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
   return;
 }
 
-/*
-* check relation arguments
-*/
+/**
+ * check relation arguments equals to following words
+ *    class_name, foreign_key, primary_key
+ *
+ * Called by chkRelationSymbol() 
+ * @param  {String}   str   |relation argument
+ * @return {Boolean}  --    |equals or not
+ */
 function chkRelationArg(str) {
   legalArguments = ["class_name", "foreign_key", "primary_key"]
   for (var i = 0; i < legalArguments.length; i++) {
