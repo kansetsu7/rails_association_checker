@@ -3,7 +3,7 @@
  * 
  * @param  {Number}     mode        |for indentifing checking mode
  * @param  {Array}      inputs      |user inputs from panel
- * @param  {Object}     resultPanel   |result panel for printing result
+ * @param  {Object}     resultPanel |result panel for printing result
  * 
  * @return {Map}        relationMap |if passed
  * @return {undefined}  undefined   |if error
@@ -28,9 +28,11 @@ function checkBase(mode, inputs, resultPanel) {
   var map = chkRelationSymbol(relationArray, resultPanel, mode);
   if (!map.get("chk")) return;
 
+  // turn relation Array into Map. Print user inputs and Rails convention
   var relationMap = getRelationMap(map.get("relation"));
   showUserInputs(resultPanel, inputs[0], map.get("relation"), mode); 
-  showRailsDefault(resultPanel, inputs[0], relationMap.get(getTypeName(mode)), mode);
+  showRailsConvention(resultPanel, inputs[0], relationMap.get(getTypeName(mode)), mode);
+
   var result = chkDbSchemaInput(resultPanel, inputs, relationMap, mode);
   if (result === null) return null;
   if (result) return relationMap;
@@ -365,8 +367,8 @@ function chkRelationMethodName(methodName, mode, resultPanel) {
 /*
 * write Rails convention setup on code panel
 */
-function showRailsDefault(resultPanel, modelName, methodName, mode) {
-  console.log("showRailsDefault");
+function showRailsConvention(resultPanel, modelName, methodName, mode) {
+  console.log("showRailsConvention");
   setResultElements(resultPanel, "Rails convention", modelName, methodName, mode);
   printMsgSpan(resultPanel, ", ", "code-white");
   printMsgSpan(resultPanel, "class_name: ", "code-purple");
