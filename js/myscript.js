@@ -508,15 +508,17 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
   // inputs[2] fk
   // inputs[3] refTableName
   // inputs[4] pk
+
   if (inputs[2] === "" && inputs[3] === "" && inputs[4] === "") {
-    return null;
+    return null;  // if DB schema not been set, return
   }
+
   var result = true;
   printMsgLine(resultPanel, "==== checking result ====<br>","code-white");
 
   if (mode === "m" || mode === "t") {
     for (var i = 2; i < inputs.length; i++) {
-      if (chkLetterBoth(inputs[i])) {
+      if (bothSidesAreLetter(inputs[i])) {
         if (!chkHasManyConvention(resultPanel, inputs[i], relation, i, inputs[0])) result = false;
       } else {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
@@ -525,7 +527,7 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
     }
   } else { // mode === "b"
     for (var i = 2; i < inputs.length; i++) {
-      if (chkLetterBoth(inputs[i])) {
+      if (bothSidesAreLetter(inputs[i])) {
         if (!chkBelongsToConvention(resultPanel, inputs[i], relation, i)) result = false;
       } else {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
@@ -701,11 +703,13 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
   return true;
 }
 
-/*
-* check given string start/end with letters
-*/
-function chkLetterBoth(str) {
-  // console.log("checking \'"+str+"\'");
+/**
+ * check given string is start/end with letters
+ * Called by chkDbSchemaInput()
+ * @param  {String}   str
+ * @return {Boolean}  ---   |is or not
+ */
+function bothSidesAreLetter(str) {
   var letters = /^[A-Za-z](.*[A-Za-z])?$/;
   return str.match(letters) ? true : false;
 }
