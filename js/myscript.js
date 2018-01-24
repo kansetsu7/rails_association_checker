@@ -1,9 +1,10 @@
 /**
- * basic function for checking [belongs_to] and [has_many] relation
+ * Basic function for checking [belongs_to] and [has_many] relation
+ * Called by chkBtHm() and chkHmTh()
  * 
  * @param  {Number}     mode        |for indentifing checking mode
  * @param  {Array}      inputs      |user inputs from panel
- * @param  {Object}     resultPanel |result panel for printing result
+ * @param  {Object}     resultPanel |result panel(HTML) for printing result
  * 
  * @return {Map}        relationMap |if passed
  * @return {undefined}  undefined   |if error
@@ -33,11 +34,20 @@ function checkBase(mode, inputs, resultPanel) {
   showUserInputs(resultPanel, inputs[0], map.get("relation"), mode); 
   showRailsConvention(resultPanel, inputs[0], relationMap.get(getTypeName(mode)), mode);
 
+  // check if relation follows rails convention
   var result = chkDbSchemaInput(resultPanel, inputs, relationMap, mode);
-  if (result === null) return null;
-  if (result) return relationMap;
+  if (result === null) return null; // if DB Schema field is not filled 
+  if (result) return relationMap;   // if passed
+  return undefined;                 // if error
 }
 
+/**
+ * Function for checking [belongs_to] and [has_many] 
+ * It gather params for checkBase(), and then call checkBase() 
+ * Called by input button
+ * 
+ * @return {undefine} |it don't return 
+ */
 function chkBtHm() {
   var resultPanel = document.getElementById("coding-pan");
   cleanPan(resultPanel);
@@ -51,6 +61,15 @@ function chkBtHm() {
   checkBase(mode, inputs, resultPanel);
 }
 
+/**
+ * Function for checking "whole" [has_many :through]
+ * It gather params for checkBase(), and then call checkBase() for checking
+ *    [belongs_to] and [has_many] first, then call chkThrough() and chkThroughRelation()
+ *    for checking "only" [has_many :through]
+ * Called by input button
+ * 
+ * @return {undefine} |it don't return 
+ */
 function chkHmTh() {
   var resultPanel = document.getElementById("coding-pan");
   cleanPan(resultPanel);
@@ -69,15 +88,23 @@ function chkHmTh() {
   * [3] refModelName
   * [4] pk
   **************************/
+
+  // check [belongs_to] and [has_many] by checkBase()
   var inputsBl = getInputs("b");
   var blMap = checkBase("b", inputsBl, resultPanel);
   var inputsHm = getInputs("m");
   var hmMap = checkBase("m", inputsHm, resultPanel);
+
+  // if DB Schema field is not filled, show error message and return
   if (blMap === null || hmMap === null) {
     printMsgH(resultPanel, 3, "大俠您把DB Schema的欄位填好再來吧....<br>","orange");
     return;
   }
+
+  // if both [belongs_to] and [has_many] relation setup are correct
+  // then check "only" [has_many :through], otherwise show error and return
   if (typeof blMap === 'object' && typeof hmMap === 'object') {
+    // check "only" [has_many :through]
     var hmthMap = chkThrough(resultPanel, inputsHm[0]);
     if (typeof hmthMap !== 'object') return;
     chkThroughRelation(blMap, hmMap, hmthMap, inputsBl[0], resultPanel);
@@ -86,17 +113,24 @@ function chkHmTh() {
   }
 }
 
+/**
+ * Function for checking "only" [has_many :through]
+ * Called by chkHmTh()
+ * 
+ * @param  {Object} resultPanel |result panel(HTML) for printing result
+ * @param  {String} hmModelName |model name of [has_many] relation
+ * @return {Map}    relationMap |map of user input relations 
+ */
 function chkThrough(resultPanel, hmModelName) {
-  var inputsTh = getThroughTextArea();
   printMsgH(resultPanel, 2, "************* has_many :through *************<br>","aqua");
-  // return if model name is not correct
+  var inputsTh = getThroughTextArea();
+
+  // check if model name or input lines is correct
   if (!chkRelationLines("t", inputsTh.split("\n"), resultPanel)) return;
   var relationArray = inputsTh.split(",");
   var map = chkThroughSymbol(relationArray, resultPanel);
-  if (!map.get("chk")) {
-    console.log("有錯喔");
-    return;
-  }
+  if (!map.get("chk")) return;
+
   showUserInputs2(resultPanel, hmModelName, map.get("relation"));
   printMsgLine(resultPanel, "==== checking result ====<br>","code-white");
   return getRelationMap(map.get("relation"));
@@ -107,8 +141,18 @@ function chkThrough(resultPanel, hmModelName) {
 * return false if model name didn't pass
 * return true if passed 
 */
+
+/**
+ * Check if model name follows Rails convention
+ * Called by checkBase()
+ * 
+ * @param  {String} myModelName |model name of
+ * @param  {Object} resultPanel |result panel(HTML) for printing result
+ * @return {Boolean} ----       |model name follows Rails convention or not
+ */
 function chkMyModelName(myModelName, resultPanel) {
-  // console.log("Checking model name...");
+  // check if model name is empty
+  // if not empty then call chkCapitalize() for checking first letter
   if (myModelName === "") {
     printMsgLine(resultPanel, "錯誤：Model名稱必填","red");
     return false;
@@ -777,6 +821,15 @@ function relation_log(relation_array){
   })
 
   console.log("]");
+}
+
+/**
+ * turn a string into singular and make it's first letter into uppercase
+ * @param  {String}   str   target string
+ * @return {String}
+ */
+function getUpperSingular(str) {
+  return upFirstLetter(str).plural(true);
 }
 
 /*
