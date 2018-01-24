@@ -49,7 +49,7 @@ function checkBase(mode, inputs, resultPanel) {
  * @return {undefine} |it don't return 
  */
 function chkBtHm() {
-  var resultPanel = document.getElementById("coding-pan");
+  var resultPanel = document.getElementById("result-panel");
   cleanPan(resultPanel);
   var mode = getMode();
   if (mode === "") {
@@ -71,7 +71,7 @@ function chkBtHm() {
  * @return {undefine} |it don't return 
  */
 function chkHmTh() {
-  var resultPanel = document.getElementById("coding-pan");
+  var resultPanel = document.getElementById("result-panel");
   cleanPan(resultPanel);
   var mode = getMode();
   if (mode === "") {
