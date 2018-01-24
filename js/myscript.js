@@ -897,22 +897,26 @@ function setDbPanel(mode) {
   var hmth_relatoin_input = document.getElementById("hmth-relatoin-input");
   var disabled;
   var display;
+  var cursor;
   var color;
   switch (mode) {
     case "b":
       disabled = [false, true];
+      cursor = ["default", "no-drop"];
       color = ["white", "gray"];
       display = ["block", "none", "none"];
       chk_btn.onclick = function() {chkBtHm();};
       break;
     case "m":
       disabled = [true, false];
+      cursor = ["no-drop", "default"];
       color = ["gray", "white"];
       display = ["none", "block", "none"];
       chk_btn.onclick = function() {chkBtHm();};
       break;
     case "t":
       disabled = [false, false];
+      cursor = ["default", "default"];
       color = ["white", "white"];
       display = ["block", "block", "block"];
       chk_btn.onclick = function() {chkHmTh();};
@@ -924,17 +928,30 @@ function setDbPanel(mode) {
 
   bl_pk.disabled = disabled[0];
   bl_pk.style.backgroundColor = color[0];
+  bl_pk.style.cursor = cursor[0];
+
   bl_ref_model_name.disabled = disabled[0];
   bl_ref_model_name.style.backgroundColor = color[0];
+  bl_ref_model_name.style.cursor = cursor[0];
+
   bl_fk.disabled = disabled[0];
   bl_fk.style.backgroundColor = color[0];
+  bl_fk.style.cursor = cursor[0];
+
   bl_row.style.display = display[0];
+
   hm_pk.disabled = disabled[1];
   hm_pk.style.backgroundColor = color[1];
+  hm_pk.style.cursor = cursor[1];
+
   hm_ref_model_name.disabled = disabled[1];
   hm_ref_model_name.style.backgroundColor = color[1];
+  hm_ref_model_name.style.cursor = cursor[1];
+
   hm_fk.disabled = disabled[1];
   hm_fk.style.backgroundColor = color[1];
+  hm_fk.style.cursor = cursor[1];
+
   hm_row.style.display = display[1];
   hmth_relatoin_input.style.display = display[2];
 }
