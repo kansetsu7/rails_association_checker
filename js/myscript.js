@@ -179,7 +179,6 @@ function chkMyModelName(myModelName, resultPanel) {
  * @return {Boolean}
  */
 function chkRelationLines(mode, relatoinInput, resultPanel) {
-  console.log(" chkRelationLines...");
   if (mode === "b" || mode === "m" || mode === "t") {
     if (relatoinInput.length == 1) {
       return true;
@@ -477,7 +476,6 @@ function chkRelationMethodName(methodName, mode, resultPanel) {
  * @param  {Number}   mode          |for indentifing checking mode
  */
 function showRailsConvention(resultPanel, modelName, methodName, mode) {
-  console.log("showRailsConvention");
   showResultBasics(resultPanel, "Rails convention", modelName, methodName, mode);
   printMsgSpan(resultPanel, ", ", "code-white");
   printMsgSpan(resultPanel, "class_name: ", "code-purple");
@@ -553,12 +551,10 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
  * @return {Boolean}  ---           |follows or not
  */
 function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModelName) {
-  console.log("chkHasManyConvention:"+inputIndex+" => "+chkVal);
   var has_many = relation.get("has_many");
 
   switch (inputIndex) {
     case 2:
-      console.log(relation.get("foreign_key")+", "+chkVal);
       if (firstLetterIsUpperCase(chkVal)) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
@@ -580,7 +576,6 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       break;
 
     case 3:
-      console.log(relation.get("class_name")+", "+chkVal);
       if (firstLetterIsLowerCase(chkVal)) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
@@ -589,7 +584,6 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       var convention = getUpperSingular(has_many); //different
       if (class_name === chkVal) {
         if (class_name === convention) {
-          console.log("[\'"+class_name+"\', \'"+chkVal+"\', \'"+convention+"\']");
           printMsgLine(resultPanel, "(OK) class_name: 符合慣例，可省略!","white");
         } else {
           printMsgLine(resultPanel, "(OK) class_name: 不符慣例，不可省略!","white");
@@ -603,7 +597,6 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       break;
 
     case 4:
-      console.log(relation.get("primary_key")+", "+chkVal);
       if (firstLetterIsUpperCase(chkVal)) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
@@ -611,9 +604,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       var primary_key = relation.get("primary_key");
       var convention = "id";
       if (primary_key === chkVal) {
-        console.log(primary_key+" === "+chkVal);
         if (primary_key === convention) {
-          console.log(primary_key+" === "+convention);
           printMsgLine(resultPanel, "(OK) primary_key: 符合慣例，可省略!","white");
         } else {
           printMsgLine(resultPanel, "(OK) primary_key: 不符慣例，不可省略!","white");
@@ -648,12 +639,10 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
  * @return {Boolean}  ---           |follows or not
  */
 function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
-  console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
   var belongs_to = relation.get("belongs_to");
 
   switch (inputIndex) {
     case 2:
-      console.log(relation.get("foreign_key")+", "+chkVal);
       if (firstLetterIsUpperCase(chkVal)) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
@@ -675,7 +664,6 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
       break;
 
     case 3:
-      console.log(relation.get("class_name")+", "+chkVal);
       if (firstLetterIsLowerCase(chkVal)) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
@@ -697,7 +685,6 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
       break;
 
     case 4:
-      console.log(relation.get("primary_key")+", "+chkVal);
       if (firstLetterIsUpperCase(chkVal)) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
