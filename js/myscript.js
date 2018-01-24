@@ -400,6 +400,14 @@ function chkHmThArg(str) {
   return false;
 }
 
+/**
+ * check if target keyword equals Rails relation type [belongs_to] or [has_many]
+ * Called by chkRelationSymbol() and chkThroughSymbol()
+ * @param  {String}   keyword       |target
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {{Number}  mode          |for indentifing checking mode
+ * @return {Boolean}  ---           |equals or ont
+ */
 function chkRelationKeyword(keyword, mode, resultPanel) {
   switch (mode) {
     case "b":
@@ -424,7 +432,14 @@ function chkRelationKeyword(keyword, mode, resultPanel) {
       return false;
   }
 }
-
+/**
+ * check if relation method follows Rails convention
+ * Called by chkRelationSymbol()
+ * @param  {[type]}
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {{Number}  mode          |for indentifing checking mode
+ * @return {Boolean}  ---           |follows or ont
+ */
 function chkRelationMethodName(methodName, mode, resultPanel) {
   switch (mode) {
     case "b":
