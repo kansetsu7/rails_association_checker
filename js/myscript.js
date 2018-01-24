@@ -7,22 +7,23 @@ function checkBase(mode, inputs, codingPan) {
   * inputs[4] pk
   **************************/
 
-  printMsgH2(codingPan, "************* " + getTypeName(mode) + " *************<br>","aqua");
-  var result = [false];
+  printMsgH(codingPan, 2, "************* " + getTypeName(mode) + " *************<br>","aqua");
   // return if model name is not correct
-  if (!chkMyModelName(inputs[0], codingPan) && true) return result;
-  if (!chkRelationLines(mode, inputs[1].split("\n"), codingPan)) return result;
+  if (!chkMyModelName(inputs[0], codingPan) && true) return;
+  if (!chkRelationLines(mode, inputs[1].split("\n"), codingPan)) return;
   var relationArray = inputs[1].split(",");
   var map = chkRelationSymbol(relationArray, codingPan, mode);
   if (!map.get("chk")) {
     // alert("有錯喔");
     console.log("有錯喔");
-    return result;
+    return;
   }
   var relationMap = getRelationMap(map.get("relation"));
   resultInPan(codingPan, inputs[0], map.get("relation"), mode);
   showRailsDefault(codingPan, inputs[0], relationMap.get(getTypeName(mode)), mode);
-  chkDbSchemaInput(codingPan, inputs, relationMap, mode);
+  var result = chkDbSchemaInput(codingPan, inputs, relationMap, mode);
+  if (result === null) return null;
+  if (result) return relationMap;
 }
 
 function chkBtHm() {
@@ -49,6 +50,7 @@ function chkHmTh() {
   }
 
   /**************************
+  * inputsBl / inputsHm
   * [0] myModelName
   * [1] relatoinInput
   * [2] fk
@@ -56,9 +58,37 @@ function chkHmTh() {
   * [4] pk
   **************************/
   var inputsBl = getInputs("b");
-  checkBase("b", inputsBl, codingPan);
+  var blMap = checkBase("b", inputsBl, codingPan);
   var inputsHm = getInputs("m");
-  checkBase("m", inputsHm, codingPan);
+  var hmMap = checkBase("m", inputsHm, codingPan);
+  if (blMap === null || hmMap === null) {
+    printMsgH(codingPan, 3, "大俠您把DB Schema的欄位填好再來吧....<br>","orange");
+    return;
+  }
+  if (typeof blMap === 'object' && typeof hmMap === 'object') {
+    var hmthMap = chkThrough(codingPan, inputsHm[0]);
+    if (typeof hmthMap !== 'object') return;
+    // 346 
+    chkThroughRelation(blMap, hmMap, hmthMap, inputsBl[0], codingPan);
+  } else {
+    printMsgH(codingPan, 3, "大俠您把上面的東西修好再來吧....<br>","orange");
+  }
+}
+
+function chkThrough(codingPan, hmModelName) {
+  var inputsTh = getThroughTextArea();
+  printMsgH(codingPan, 2, "************* has_many :through *************<br>","aqua");
+  // return if model name is not correct
+  if (!chkRelationLines("t", inputsTh.split("\n"), codingPan)) return;
+  var relationArray = inputsTh.split(",");
+  var map = chkThroughSymbol(relationArray, codingPan);
+  if (!map.get("chk")) {
+    console.log("有錯喔");
+    return;
+  }
+  resultInPan2(codingPan, hmModelName, map.get("relation"));
+  printMsgLine(codingPan, "==== checking result ====<br>","code-white");
+  return getRelationMap(map.get("relation"));
 }
 
 /*
@@ -218,6 +248,7 @@ function chkRelationSymbol(relation, codingPan, mode) {
   var map = new Map();
   map.set("chk", false);
   if (!chkRelationKeyword(relation2[0][0].trim(), mode, codingPan)) return map;
+  if (!chkRelationMethodName(relation2[0][1].trim(), mode, codingPan)) return map;
   for (var i = 0; i <= relation2.length - 1; i++) {
       // console.log("=====\'"+relation2[i][1]+"\'");
     if (relation2[i].length < 2) {
@@ -260,12 +291,114 @@ function chkRelationSymbol(relation, codingPan, mode) {
   return map;
 }
 
+function chkThroughSymbol(relation, codingPan) {
+  var relation2 = [];
+  for (var i = 0; i <= relation.length-1; i++) {
+    relation2.push(relation[i].split(":"));
+  }
+  var map = new Map();
+  map.set("chk", false);
+
+  // has_many
+  if (!chkRelationKeyword(relation2[0][0].trim(), "m", codingPan)) return map;
+
+  if (relation2[0].length < 2) {
+    var place = relation2[0][0] === "" ? " [痾...這不好說] " : relation2[0][0];
+    printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
+    return map;
+  }
+  if (relation2[0].length > 2) {
+    printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+relation2[0][1]+"附近。","red");
+    return map;
+  }
+  if (relation2[0][0] === "" || relation2[0][1] === "") {
+    printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位置嘛...痾...這不好說。","red");
+    return map;
+  }
+  // through & source
+  if (relation2.length < 2) {
+    printMsgLine(codingPan, "錯誤：你的through咧？","red");
+    return map;
+  }
+  for (var i = 1; i < relation2.length; i++) {
+    if (relation2[i].length !== 3) {
+      printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+relation2[i-1][relation2[i-1].length-1]+"的逗號以後。","red");
+      return map;
+    }
+    if (!chkHmThArg(relation2[i][0].trim(), i)) {
+      printMsgLine(codingPan, "錯誤：關鍵字應為\'through\', \'source\'其中之一。<br>位於"+relation2[i][0],"red");
+      return map;
+    }
+    if (chkRightSpace(relation2[i][0])) {
+      printMsgLine(codingPan, "錯誤：你的冒號要靠緊"+relation2[i][0],"red");
+      return map;
+    }
+    if (relation2[i][1].trim() !== "") {
+      printMsgLine(codingPan, "錯誤："+relation2[i][0]+"的兩個冒號中間有怪東西！","red");
+      return map;
+    }
+    if (chkLeftSpace(relation2[i][2])) {
+      printMsgLine(codingPan, "錯誤：你的冒號要靠緊"+relation2[1][2],"red");
+      return map;
+    } else {
+      relation2[i][1] = relation2[i][2]; // copy to [i][1] to fit getRelationMap rule. 
+    }
+  }
+  map.set("relation", relation2);
+  map.set("chk", true);
+  return map;
+}
+
+function chkThroughRelation(bMap, mMap, tMap, bModelName, codingPan) {
+  if (tMap.get("through") === mMap.get("has_many")) {
+    printMsgLine(codingPan, "(OK) [has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對得上。","white");
+    if (upFirstLetter(mMap.get("has_many").plural(true)) === bModelName) {
+      printMsgLine(codingPan, "(OK) [belongs_to]的"+bModelName+"跟[has_many]的"+mMap.get("has_many")+"對得上。","white");
+      if (tMap.get("source") === undefined) {
+        if (tMap.get("has_many") === bMap.get("belongs_to")) {
+          printMsgLine(codingPan, "(OK) [has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","white");
+          return;
+        }
+        printMsgLine(codingPan, "錯誤：[has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對不上，兩者應要相同，或者[has_many :through]要設定source。","red");
+        return;
+      } else {  // have [source] arg
+        if (tMap.get("source") === bMap.get("belongs_to")) {
+          printMsgLine(codingPan, "(OK) [has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","white");
+          return;
+        }
+        printMsgLine(codingPan, "錯誤：[has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對不上，兩者應要相同。","red");
+        return;
+      }
+    }
+    printMsgLine(codingPan, "錯誤：[belongs_to]的"+bModelName+"跟[has_many]的"+mMap.get("has_many")+"對不上。<br>兩者關係為"+bModelName+" -> 字首小寫x複數 = "+mMap.get("has_many"),"red");
+    return;
+  }
+  printMsgLine(codingPan, "錯誤：[has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對不上，兩者應要相同。","red");
+  return;
+}
+
 /*
 * check relation arguments
 */
 function chkRelationArg(str) {
   if (str === "class_name" || str === "foreign_key" || str === "primary_key") {
     return true;
+  }
+  return false;
+}
+
+function chkHmThArg(str, i) {
+  if (i === 1) {
+    if (str === "through") {
+      return true;
+    }
+    return false;
+  }
+  if (i === 2) {
+    if (str === "source") {
+      return true;
+    }
+    return false;
   }
   return false;
 }
@@ -278,14 +411,39 @@ function chkRelationKeyword(keyword, mode, codingPan) {
         return false;
       }
       return true;
+
     case "m":
       if (keyword !== "has_many") {
         printMsgLine(codingPan, "錯誤：你的"+keyword+"應為has_many","red");
         return false;
       }
       return true;
+
+    case "t": // bypass, check later if no [source] argument.
+      return true;
+
     default:
-      printMsgLine(codingPan, "錯誤：chkRelationSymbol有奇怪的Bug啊啊啊啊！","red");
+      printMsgLine(codingPan, "錯誤：chkRelationKeyword有奇怪的Bug啊啊啊啊！","red");
+      return false;
+  }
+}
+
+function chkRelationMethodName(methodName, mode, codingPan) {
+  switch (mode) {
+    case "b":
+      if (methodName == methodName.plural()) {  // don't use === . plural_string.plural() return an object, not string
+        printMsgLine(codingPan, "錯誤：你的"+methodName+"應為單數"+methodName.plural(true),"red");
+        return false;
+      }
+      return true;
+    case "m":
+      if (methodName == methodName.plural(true)) {
+        printMsgLine(codingPan, "錯誤：你的"+methodName+"應為複數"+methodName.plural(),"red");
+        return false;
+      }
+      return true;
+    default:
+      printMsgLine(codingPan, "錯誤：chkRelationMethodName有奇怪的Bug啊啊啊啊！","red");
       return false;
   }
 }
@@ -367,12 +525,12 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
       var convention = lowFirstLetter(myModelName) + "_id"; //different
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
-          printMsgLine(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) foreign_key: 符合慣例，可省略!","white");
         } else {
-          printMsgLine(codingPan, "(Ok)foreign_key: 不符慣例，不可省略!","white");
+          printMsgLine(codingPan, "(OK) foreign_key: 不符慣例，不可省略!","white");
         }
-      } else if (chkVal === undefined && chkVal === convention) {
-          printMsgLine(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
+      } else if (foreign_key === undefined && chkVal === convention) {
+          printMsgLine(codingPan, "(OK) foreign_key: 符合慣例，可省略!","white");
       } else {
         printMsgLine(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -389,12 +547,12 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
       if (class_name === chkVal) {
         if (class_name === convention) {
           console.log("[\'"+class_name+"\', \'"+chkVal+"\', \'"+convention+"\']");
-          printMsgLine(codingPan, "(OK)class_name: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) class_name: 符合慣例，可省略!","white");
         } else {
-          printMsgLine(codingPan, "(OK)class_name: 不符慣例，不可省略!","white");
+          printMsgLine(codingPan, "(OK) class_name: 不符慣例，不可省略!","white");
         }
       } else if (class_name === undefined && chkVal === convention) {
-          printMsgLine(codingPan, "(OK)class_name: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) class_name: 符合慣例，可省略!","white");
       } else {
         printMsgLine(codingPan, "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -412,12 +570,12 @@ function chkHasManyConvention(codingPan, chkVal, relation, inputIndex, myModelNa
         console.log(primary_key+" === "+chkVal);
         if (primary_key === convention) {
           console.log(primary_key+" === "+convention);
-          printMsgLine(codingPan, "(OK)primary_key: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) primary_key: 符合慣例，可省略!","white");
         } else {
-          printMsgLine(codingPan, "(OK)primary_key: 不符慣例，不可省略!","white");
+          printMsgLine(codingPan, "(OK) primary_key: 不符慣例，不可省略!","white");
         }
       } else if (primary_key === undefined && chkVal === convention) {
-          printMsgLine(codingPan, "(OK)primary_key: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) primary_key: 符合慣例，可省略!","white");
       } else {
         printMsgLine(codingPan, "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -451,12 +609,12 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = belongs_to + "_id";
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
-          printMsgLine(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) foreign_key: 符合慣例，可省略!","white");
         } else {
-          printMsgLine(codingPan, "(Ok)foreign_key: 不符慣例，不可省略!","white");
+          printMsgLine(codingPan, "(OK) foreign_key: 不符慣例，不可省略!","white");
         }
-      } else if (chkVal === undefined && chkVal === convention) {
-          printMsgLine(codingPan, "(OK)foreign_key: 符合慣例，可省略!","white");
+      } else if (foreign_key === undefined && chkVal === convention) {
+          printMsgLine(codingPan, "(OK) foreign_key: 符合慣例，可省略!","white");
       } else {
         printMsgLine(codingPan, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -472,12 +630,12 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = upFirstLetter(belongs_to);
       if (class_name === chkVal) {
         if (class_name === convention) {
-          printMsgLine(codingPan, "(OK)class_name: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) class_name: 符合慣例，可省略!","white");
         } else {
-          printMsgLine(codingPan, "(OK)class_name: 不符慣例，不可省略!","white");
+          printMsgLine(codingPan, "(OK) class_name: 不符慣例，不可省略!","white");
         }
       } else if (class_name === undefined && chkVal === convention) {
-          printMsgLine(codingPan, "(OK)class_name: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) class_name: 符合慣例，可省略!","white");
       } else {
         printMsgLine(codingPan, "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -493,12 +651,12 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
       var convention = "id";
       if (primary_key === chkVal) {
         if (primary_key === convention) {
-          printMsgLine(codingPan, "(OK)primary_key: 符合慣例，可省略!","white");
+          printMsgLine(codingPan, "(OK) primary_key: 符合慣例，可省略!","white");
         } else {
-          printMsgLine(codingPan, "(OK)primary_key: 不符慣例，不可省略!","white");
+          printMsgLine(codingPan, "(OK) primary_key: 不符慣例，不可省略!","white");
         }
-      } else if (chkVal === convention) {
-          printMsgLine(codingPan, "(OK)primary_key: 符合慣例，可省略!","white");
+      } else if (primary_key === undefined && chkVal === convention) {
+          printMsgLine(codingPan, "(OK) primary_key: 符合慣例，可省略!","white");
       } else {
         printMsgLine(codingPan, "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
@@ -588,6 +746,10 @@ function getInputs(mode) {
   return inputs;
 }
 
+function getThroughTextArea() {
+  return document.getElementById("hmth-relatoin-input").value.trim();
+}
+
 /*
 * turn array into map
 */
@@ -621,7 +783,7 @@ function getTypeName(mode) {
     case "m":
       return "has_many";
     case "t":
-      return "has_many";
+      return "has_many :through";
     default:
       return "getTypeName有奇怪的Bug啊啊啊啊！";
   }
@@ -760,6 +922,19 @@ function resultInPan(codingPan, myModelName, relation, mode) {
 }
 
 /*
+* write user input relation setup in code panel
+*/
+function resultInPan2(codingPan, myModelName, relation) {
+  setResultElements(codingPan, "your setup", myModelName, relation[0][1], "m");
+  for (var i = 1; i < relation.length; i++) {
+    printMsgSpan(codingPan, ", ", "code-white")
+    printMsgSpan(codingPan, relation[i][0]+ ": :", "code-purple")
+    printMsgSpan(codingPan, relation[i][1], "code-purple")
+  }
+  printMsgLine(codingPan, "end", "code-red");
+}
+
+/*
 * clean coding pan
 * remove all child inside it
 */
@@ -785,10 +960,10 @@ function printMsgLine(codingPan, str, color) {
 }
 
 /*
-* print message <h2> in particular color on coding panel
+* print message <hx> in particular color on coding panel
 */
-function printMsgH2(codingPan, str, color) {
-  var msg = document.createElement("h2");
+function printMsgH(codingPan, size, str, color) {
+  var msg = document.createElement("h" + size);
   if (color.includes("code")) {
     msg.classList.add(color);
   } else {
@@ -877,6 +1052,7 @@ String.prototype.plural = function(revert){
         'child'  : 'children',
         'man'    : 'men',
         'tooth'  : 'teeth',
+        'gas'    : 'gases',
         'person' : 'people'
     };
 
