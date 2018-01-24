@@ -2,7 +2,7 @@
  * Basic function for checking [belongs_to] and [has_many] relation
  * Called by chkBtHm() and chkHmTh()
  * 
- * @param  {Number}     mode        |for indentifing checking mode
+ * @param  {String}     mode        |for indentifing checking mode
  * @param  {Array}      inputs      |user inputs from panel
  * @param  {Object}     resultPanel |result panel(HTML) for printing result
  * 
@@ -173,7 +173,7 @@ function chkMyModelName(myModelName, resultPanel) {
  * Check if relation input is only one line
  * Called by checkBase() and chkThrough()
  * 
- * @param  {{Number}  mode            |for indentifing checking mode
+ * @param  {String}   mode            |for indentifing checking mode
  * @param  {Array}    relatoinInput   |user input relation from panel, split by \n
  * @param  {Object}   resultPanel     |result panel(HTML) for printing result
  * @return {Boolean}
@@ -200,7 +200,7 @@ function chkRelationLines(mode, relatoinInput, resultPanel) {
  * 
  * @param  {Array}    relation      |user input relation from panel, split by comma ,
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {{Number}  mode          |for indentifing checking mode
+ * @param  {String}   mode          |for indentifing checking mode
  * @return {Map}      map           |pass or ont
  */
 function chkRelationSymbol(relation, resultPanel, mode) {
@@ -404,7 +404,7 @@ function chkHmThArg(str) {
  * Called by chkRelationSymbol() and chkThroughSymbol()
  * @param  {String}   keyword       |target
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {Number}   mode          |for indentifing checking mode
+ * @param  {String}   mode          |for indentifing checking mode
  * @return {Boolean}  ---           |equals or ont
  */
 function chkRelationKeyword(keyword, mode, resultPanel) {
@@ -437,7 +437,7 @@ function chkRelationKeyword(keyword, mode, resultPanel) {
  * 
  * @param  {String}   methodName    |method name of relation
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {Number}   mode          |for indentifing checking mode
+ * @param  {String}   mode          |for indentifing checking mode
  * @return {Boolean}  ---           |follows or ont
  */
 function chkRelationMethodName(methodName, mode, resultPanel) {
@@ -498,7 +498,7 @@ function showRailsConvention(resultPanel, modelName, methodName, mode) {
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {Array}    inputs        |user inputs from panel
  * @param  {Map}      relation      |relation 
- * @param  {Number}   mode          |for indentifing checking mode
+ * @param  {String}   mode          |for indentifing checking mode
  * 
  * @return {Null}     null          |if DB schema not been set
  * @return {Boolean}  result        |follows or not
@@ -516,7 +516,7 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
   var result = true;
   printMsgLine(resultPanel, "==== checking result ====<br>","code-white");
 
-  // use different function to verify convention base on mode
+  // use different function to verify convention depends on mode
   if (mode === "m" || mode === "t") {
     for (var i = 2; i < inputs.length; i++) {
       if (bothSidesAreLetter(inputs[i])) {
@@ -574,7 +574,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       } else if (foreign_key === undefined && chkVal === convention) {
           printMsgLine(resultPanel, "(OK) foreign_key: 符合慣例，可省略!","white");
       } else {
-        printMsgLine(resultPanel, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgLine(resultPanel, "(NG) foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
       }
       break;
@@ -597,7 +597,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       } else if (class_name === undefined && chkVal === convention) {
           printMsgLine(resultPanel, "(OK) class_name: 符合慣例，可省略!","white");
       } else {
-        printMsgLine(resultPanel, "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgLine(resultPanel, "(NG) class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
       }
       break;
@@ -621,7 +621,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       } else if (primary_key === undefined && chkVal === convention) {
           printMsgLine(resultPanel, "(OK) primary_key: 符合慣例，可省略!","white");
       } else {
-        printMsgLine(resultPanel, "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgLine(resultPanel, "(NG) primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
       }
       break;
@@ -648,6 +648,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
  * @return {Boolean}  ---           |follows or not
  */
 function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
+  console.log("chkBelongsToConvention:"+inputIndex+" => "+chkVal);
   var belongs_to = relation.get("belongs_to");
 
   switch (inputIndex) {
@@ -668,10 +669,11 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
       } else if (foreign_key === undefined && chkVal === convention) {
           printMsgLine(resultPanel, "(OK) foreign_key: 符合慣例，可省略!","white");
       } else {
-        printMsgLine(resultPanel, "(NG)foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgLine(resultPanel, "(NG) foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
       }
       break;
+
     case 3:
       console.log(relation.get("class_name")+", "+chkVal);
       if (firstLetterIsLowerCase(chkVal)) {
@@ -689,10 +691,11 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
       } else if (class_name === undefined && chkVal === convention) {
           printMsgLine(resultPanel, "(OK) class_name: 符合慣例，可省略!","white");
       } else {
-        printMsgLine(resultPanel, "(NG)class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgLine(resultPanel, "(NG) class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
       }
       break;
+
     case 4:
       console.log(relation.get("primary_key")+", "+chkVal);
       if (firstLetterIsUpperCase(chkVal)) {
@@ -710,10 +713,11 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
       } else if (primary_key === undefined && chkVal === convention) {
           printMsgLine(resultPanel, "(OK) primary_key: 符合慣例，可省略!","white");
       } else {
-        printMsgLine(resultPanel, "(NG)primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgLine(resultPanel, "(NG) primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
         return false;
       }
       break;
+
     default:
       printMsgLine(resultPanel, "錯誤：chkBelongsToConvention有奇怪的Bug啊啊啊啊！","red");
       return false;
@@ -725,6 +729,7 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
 /**
  * check given string is start/end with letters
  * Called by chkDbSchemaInput()
+ * 
  * @param  {String}   str
  * @return {Boolean}  ---   |is or not
  */
@@ -733,44 +738,67 @@ function bothSidesAreLetter(str) {
   return str.match(letters) ? true : false;
 }
 
-/*
-* check if the string have white space on right side
-*/
+/**
+ * check if the string have white space on right side
+ * Called by chkRelationSymbol() and chkThroughSymbol()
+ * @param  {String}   str
+ * @return {Boolean}
+ */
 function chkRightSpace(str) {
   return str.charAt(str.length - 1) === " " ? true : false;
 }
 
-/*
-* check if the string have white space on left side
-*/
+/**
+ * check if the string have white space on left side
+ * Called by chkRelationSymbol() and chkThroughSymbol()
+ * 
+ * @param  {String}   str
+ * @return {Boolean}
+ */
 function chkLeftSpace(str) {
   return str.charAt(0) === " " ? true : false;
 }
 
-/*
-* check if the string have double quotes on both side and not just double quotes only
-*/
+/**
+ * check if the string have double quotes on both side and not just double quotes only
+ * Called by chkRelationSymbol()
+ * 
+ * @param  {String}   str
+ * @return {Boolean}
+ */
 function chkDoubleQuotes(str) {
   return (trimDQ(str) !== "" && (str === "\"" + trimDQ(str) + "\"")) ? true : false;
 }
 
+/**
+ * return mode depends on which radio input is selected
+ * Called by chkBtHm() and chkHmTh()
+ * @return {String} 
+ */
 function getMode() {
   for (var i = 1; i < 4; i++) {
     if (document.getElementById("radio" + i).checked) {
       switch (i) {
         case 1:
-          return "b";
+          return "b";  // belongs_to
         case 2:
-          return "m";
+          return "m";  // has_many
         case 3:
-          return "t";
+          return "t";  // has_many :through
         default:
-          return "";
+          return "";   // error!
       }
     }
   }
 }
 
+/**
+ * get input objects, depends on mode
+ * Called by chkBtHm() and chkHmTh()
+ * 
+ * @param  {String}  mode    |for indentifing checking mode
+ * @return {Array}   inputs  |user inputs from panels 
+ */
 function getInputs(mode) {
   var prefixStr;
   switch (mode) {
@@ -795,14 +823,23 @@ function getInputs(mode) {
 
   return inputs;
 }
-
+/**
+ * get textarea object of [has_many :through]
+ * Called by chkThrough()
+ * 
+ * @return {object}
+ */
 function getThroughTextArea() {
   return document.getElementById("hmth-relatoin-input").value.trim();
 }
 
-/*
-* turn array into map
-*/
+/**
+ * turn array into map
+ * Called by checkBase(), chkThrough(), chkThroughSymbol()
+ * 
+ * @param  {Array}  relation 
+ * @return {Map}    map
+ */
 function getRelationMap(relation) {
   var map = new Map();
   for (var i = 0; i < relation.length; i++) {
@@ -812,9 +849,13 @@ function getRelationMap(relation) {
   return map;
 }
 
-/*
-* get DB schema input column name
-*/
+/**
+ * get DB schema input column name
+ * Called by chkDbSchemaInput(), chkHasManyConvention(), chkBelongsToConvention()
+ * 
+ * @param  {Number}  index
+ * @return {String}
+ */
 function getInputName(index) {
   switch (index) {
     case 2:
@@ -826,6 +867,12 @@ function getInputName(index) {
   }
 }
 
+/**
+ * get type name of mode
+ * Called by checkBase(), setResultElements()
+ * @param  {String}  mode
+ * @return {String}
+ */
 function getTypeName(mode) {
   switch (mode) {
     case "b":
@@ -839,6 +886,12 @@ function getTypeName(mode) {
   }
 }
 
+/**
+ * set DB panel and inputs status depends on mode
+ * Called by radio input
+ * 
+ * @param {String}  mode
+ */
 function setDbPanel(mode) {
   var bl_pk = document.getElementById("bl-pk");
   var bl_ref_model_name = document.getElementById("bl-ref-model-name");
@@ -894,22 +947,31 @@ function setDbPanel(mode) {
   hmth_relatoin_input.style.display = display[2];
 }
 
-/*
-* capitalize first letter of the given string
-*/
+/**
+ * capitalize first letter of the given string
+ * Called by getUpperSingular(), showRailsConvention(), chkBelongsToConvention()
+ * 
+ * @param  {String}
+ * @return {String}
+ */
 function upFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-/*
-* turn first letter of the given string to lowercase
-*/
+/**
+ * turn first letter of the given string to lowercase
+ * Called by chkRelationMethodName(), chkHasManyConvention()
+ * 
+ * @param  {String}
+ * @return {String}
+ */
 function lowFirstLetter(str) {
     return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
 /**
  * check if given string's first letter is lower case
+ * Called by chkMyModelName(), chkHasManyConvention(), chkBelongsToConvention()
  * @param  {String}   str
  * @return {Boolean}
  */
@@ -919,6 +981,8 @@ function firstLetterIsLowerCase(str) {
 
 /**
  * check if given string's first letter is upper case
+ * Called by chkRelationMethodName(), chkHasManyConvention(), chkBelongsToConvention()
+ * 
  * @param  {String}   str
  * @return {Boolean}
  */
@@ -937,16 +1001,22 @@ function relation_log(relation_array){
 
 /**
  * turn a string into singular and make it's first letter into uppercase
- * @param  {String}   str   target string
+ * Called by chkThroughRelation(), chkHasManyConvention()
+ * 
+ * @param  {String}
  * @return {String}
  */
 function getUpperSingular(str) {
   return upFirstLetter(str).plural(true);
 }
 
-/*
-* trim the double quotes on both side in string 
-*/
+/**
+ * trim the double quotes on both side of the string 
+ * Called by chkDoubleQuotes(), getRelationMap()
+
+ * @param  {String}
+ * @return {String}
+ */
 function trimDQ(str) {
   return str.replace(/\"/gm, "");
 }
