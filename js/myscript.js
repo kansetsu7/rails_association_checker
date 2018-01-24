@@ -343,7 +343,7 @@ function chkThroughSymbol(relation, resultPanel) {
 function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
   if (tMap.get("through") === mMap.get("has_many")) {
     printMsgLine(resultPanel, "(OK) [has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對得上。","white");
-    if (upFirstLetter(mMap.get("has_many").plural(true)) === bModelName) {
+    if (getUpperSingular(mMap.get("has_many")) === bModelName) {
       printMsgLine(resultPanel, "(OK) [belongs_to]的"+bModelName+"跟[has_many]的"+mMap.get("has_many")+"對得上。","white");
       if (tMap.get("source") === undefined) {
         if (tMap.get("has_many") === bMap.get("belongs_to")) {
@@ -555,7 +555,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
         return false;
       }
       var class_name = relation.get("class_name");
-      var convention = upFirstLetter(has_many.plural(true)); //different
+      var convention = getUpperSingular(has_many); //different
       if (class_name === chkVal) {
         if (class_name === convention) {
           console.log("[\'"+class_name+"\', \'"+chkVal+"\', \'"+convention+"\']");
