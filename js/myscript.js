@@ -136,12 +136,6 @@ function chkThrough(resultPanel, hmModelName) {
   return getRelationMap(map.get("relation"));
 }
 
-/*
-* checking model name
-* return false if model name didn't pass
-* return true if passed 
-*/
-
 /**
  * Check if model name follows Rails convention
  * Called by checkBase()
@@ -156,26 +150,24 @@ function chkMyModelName(myModelName, resultPanel) {
   if (myModelName === "") {
     printMsgLine(resultPanel, "錯誤：Model名稱必填","red");
     return false;
-  }else {
-    return chkCapitalize(myModelName, resultPanel);
   }
-}
-
-/*
-* checking model name's first letter
-* return false if model name didn't pass
-* return true if passed 
-*/
-function chkCapitalize(str, resultPanel) {
-  if (!isNaN(str.charAt(0))) {   //first latter is a number
+  if (!isNaN(myModelName.charAt(0))) {   //first latter is a number
     printMsgLine(resultPanel, "錯誤：Model名開頭不能為數字！","red");
     return false;
-  }else if (upFirstLetter(str) === str) {
-    return true;
-  }else{
+  }
+  if (upFirstLetter(myModelName) !== myModelName) {
     printMsgLine(resultPanel, "錯誤：Model名開頭需大寫！","red");    
     return false;
   }
+
+  // check if model name is singular
+  // DON'T USE TRIPLE EQUAL!!!
+  // plural string .plural() will return an array not a string
+  if (myModelName == myModelName.plural()) {
+    printMsgLine(resultPanel, "錯誤：Model名須為單數！","red");    
+    return false;
+  }
+  return true;
 }
 
 /*
