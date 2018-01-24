@@ -516,6 +516,7 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
   var result = true;
   printMsgLine(resultPanel, "==== checking result ====<br>","code-white");
 
+  // use different function to verify convention base on mode
   if (mode === "m" || mode === "t") {
     for (var i = 2; i < inputs.length; i++) {
       if (bothSidesAreLetter(inputs[i])) {
@@ -539,10 +540,18 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
   return result;
 }
 
-/*
-* ONLY FOR [has_many]
-* check if given input follows Rails convention or not
-*/
+/**
+ * ONLY FOR [has_many]
+ * check if given input follows Rails convention or not
+ * Called by chkDbSchemaInput()
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {String}   chkVal        |DB Schema setup
+ * @param  {Map}      relation      |relation of [has_many]
+ * @param  {Number}   inputIndex    |index of inputs array from chkDbSchemaInput()
+ * @param  {String}   myModelName   |model name of [has_many]
+ * @return {Boolean}  ---           |follows or not
+ */
 function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModelName) {
   console.log("chkHasManyConvention:"+inputIndex+" => "+chkVal);
   var has_many = relation.get("has_many");
@@ -555,7 +564,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
         return false;
       }
       var foreign_key = relation.get("foreign_key");
-      var convention = lowFirstLetter(myModelName) + "_id"; //different
+      var convention = lowFirstLetter(myModelName) + "_id";
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
           printMsgLine(resultPanel, "(OK) foreign_key: 符合慣例，可省略!","white");
@@ -569,6 +578,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
         return false;
       }
       break;
+
     case 3:
       console.log(relation.get("class_name")+", "+chkVal);
       if (firstLetterIsLowerCase(chkVal)) {
@@ -591,6 +601,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
         return false;
       }
       break;
+
     case 4:
       console.log(relation.get("primary_key")+", "+chkVal);
       if (firstLetterIsUpperCase(chkVal)) {
@@ -614,6 +625,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
         return false;
       }
       break;
+
     default:
       printMsgLine(resultPanel, "錯誤：chkHasManyConvention有奇怪的Bug啊啊啊啊！","red");
       return false;
@@ -624,10 +636,17 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
 
 }
 
-/*
-* ONLY FOR [belongs_to]
-* check if given input follows Rails convention or not
-*/
+/**
+ * ONLY FOR [belongs_to]
+ * check if given input follows Rails convention or not
+ * Called by chkDbSchemaInput()
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {String}   chkVal        |DB Schema setup
+ * @param  {Map}      relation      |relation of [belongs_to]
+ * @param  {Number}   inputIndex    |index of inputs array from chkDbSchemaInput()
+ * @return {Boolean}  ---           |follows or not
+ */
 function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
   var belongs_to = relation.get("belongs_to");
 
