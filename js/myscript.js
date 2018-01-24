@@ -866,6 +866,24 @@ function lowFirstLetter(str) {
     return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
+/**
+ * check if given string's first letter is lower case
+ * @param  {String}   str
+ * @return {Boolean}
+ */
+function firstLetterIsLowerCase(str) {
+  return str.charAt(0).toLowerCase() === str.charAt(0);
+}
+
+/**
+ * check if given string's first letter is upper case
+ * @param  {String}   str
+ * @return {Boolean}
+ */
+function firstLetterIsUpperCase(str) {
+  return str.charAt(0).toUpperCase() === str.charAt(0);
+}
+
 function relation_log(relation_array){
   console.log("[");
   relation_array.forEach(function(arg, index){
