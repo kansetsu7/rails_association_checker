@@ -1172,6 +1172,26 @@ function isPlural(str) {
   return str == str.plural();
 }
 
+/**
+ * pluralize a string from input
+ * print it on <h2>
+ */
+function pluralize_test() {
+  var untransformed_text = document.getElementById("untransformed-text");
+  var transformed_text = document.getElementById("transformed-text");
+  transformed_text.innerHTML = "結果：" + untransformed_text.value.plural();
+}
+
+/**
+ * pluralize a string from input
+ * print it on <h2>
+ */
+function singularize_test() {
+  var untransformed_text = document.getElementById("untransformed-text");
+  var transformed_text = document.getElementById("transformed-text");
+  transformed_text.innerHTML = "結果：" + untransformed_text.value.plural(true);
+}
+
 
 /*
 * pluralize a string
