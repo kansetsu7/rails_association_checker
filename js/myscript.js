@@ -14,7 +14,6 @@ function checkBase(mode, inputs, codingPan) {
   var relationArray = inputs[1].split(",");
   var map = chkRelationSymbol(relationArray, codingPan, mode);
   if (!map.get("chk")) {
-    // alert("有錯喔");
     console.log("有錯喔");
     return;
   }
@@ -68,7 +67,6 @@ function chkHmTh() {
   if (typeof blMap === 'object' && typeof hmMap === 'object') {
     var hmthMap = chkThrough(codingPan, inputsHm[0]);
     if (typeof hmthMap !== 'object') return;
-    // 346 
     chkThroughRelation(blMap, hmMap, hmthMap, inputsBl[0], codingPan);
   } else {
     printMsgH(codingPan, 3, "大俠您把上面的東西修好再來吧....<br>","orange");
@@ -112,8 +110,6 @@ function chkMyModelName(myModelName, codingPan) {
 * return true if passed 
 */
 function chkCapitalize(str, codingPan) {
-  // console.log("Checking first letter...");
-
   if (!isNaN(str.charAt(0))) {   //first latter is a number
     printMsgLine(codingPan, "錯誤：Model名開頭不能為數字！","red");
     return false;
@@ -124,48 +120,6 @@ function chkCapitalize(str, codingPan) {
     return false;
   }
 }
-
-/*
-* checking relation input
-* return map {("chk", false)} if not pass
-* return map {("chk", true), ("relation", relation2), ("mode", mode = "b" or "m")} if pass ([has_many] or [belongs_to])
-* return map {("chk", true), ("relation", relation2), ("mode", "t"), ("line2", twoLine[1])} if pass ([has_many :through])
-*/ /*
-function chkRelationInput(relatoinInput, codingPan, mode) {
-  // console.log("Checking relatoin...");
-
-  // set up map
-  var map = new Map();
-  var lines = relatoinInput.split("\n");
-  // check input has belongs_to or not
-  if (!chkRelationLines(mode, lines, codingPan)) {
-    map.set("chk", false);
-    return map;
-  }
-  var relation = lines[0].split(",");
- 
-  // check if input has right symbol
-  var map2 = chkRelationSymbol(relation, codingPan, mode);
-  if (!map2.get("chk")) {
-    map.set("chk", false);
-    return map;
-  }
-
-  // trim space of relation arguments
-  var relation2 = map2.get("relation");
-  for (var i = 0; i < relation2.length; i++) {
-    relation2[i][0] = relation2[i][0].trim();
-    relation2[i][1] = relation2[i][1].trim();
-  }
-  relation_log(relation2);
-  map.set("chk", true);
-  map.set("relation", relation2);
-  map.set("mode", mode);
-  if (mode === "t") {
-    map.set("line2", lines[1]);
-  }
-  return map;
-}*/ 
 
 /*
 * checking relation lines
@@ -182,56 +136,6 @@ function chkRelationLines(mode, relatoinInput, codingPan) {
   }
   printMsgLine(codingPan, "錯誤：chkRelationType有奇怪的Bug啊啊啊啊！","red");
   return false;
-  /*
-  switch (mode) {
-    case "b":
-      if (relatoinInput[0].includes("belongs_to")) {
-        if (relatoinInput.length == 1) {
-          return true;
-        }
-        printMsgLine(codingPan, "錯誤：輸入超過一行","red");
-        return false;
-      }
-      printMsgLine(codingPan, "錯誤：你的belongs_to咧?","red");
-      return false;
-
-    case "m":
-      if (relatoinInput[0].includes("has_many")) {
-        if (relatoinInput.length == 1) {
-          return true;
-        }
-        printMsgLine(codingPan, "錯誤：輸入超過一行","red");
-        return false;
-      }
-      printMsgLine(codingPan, "錯誤：你的has_many咧?","red");
-      return false;
-
-    case "t":
-      if (relatoinInput.length !== 3) {
-        printMsgLine(codingPan, "錯誤：has_many :through行數應為三行","red");
-        return false;
-      }
-      if (relatoinInput[0].includes("belongs_to")) {
-        if (relatoinInput[1].includes("has_many")) {
-          if (relatoinInput.includes(":through")) {
-            return true;
-          }
-          if (relatoinInput.includes("through")) { //symbol error, lack of ":"
-            printMsgLine(codingPan, "錯誤：你第二行through前面的冒號咧?","red");
-            return false;
-          }
-          return true;
-        }
-        printMsgLine(codingPan, "錯誤：你第二行的has_many咧?","red");
-        return false;
-      }
-      printMsgLine(codingPan, "錯誤：你的belongs_to咧?","red");
-      return false;
-
-    default:
-      printMsgLine(codingPan, "錯誤：chkRelationType有奇怪的Bug啊啊啊啊！","red");
-      return false;
-  }*/
 }
 
 /*
@@ -240,7 +144,6 @@ function chkRelationLines(mode, relatoinInput, codingPan) {
 * return map {("chk", false)} if not pass
 */
 function chkRelationSymbol(relation, codingPan, mode) {
-  // console.log("Checking symbol...");
   var relation2 = [];
   for (var i = 0; i <= relation.length-1; i++) {
     relation2.push(relation[i].split(":"));
@@ -250,7 +153,6 @@ function chkRelationSymbol(relation, codingPan, mode) {
   if (!chkRelationKeyword(relation2[0][0].trim(), mode, codingPan)) return map;
   if (!chkRelationMethodName(relation2[0][1].trim(), mode, codingPan)) return map;
   for (var i = 0; i <= relation2.length - 1; i++) {
-      // console.log("=====\'"+relation2[i][1]+"\'");
     if (relation2[i].length < 2) {
       var place = relation2[i][0] === "" ? " [痾...這不好說] " : relation2[i][0];
       printMsgLine(codingPan, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
@@ -671,10 +573,6 @@ function chkBelongsToConvention(codingPan, chkVal, relation, inputIndex) {
   return true;
 }
 
-function chkSecondLineInput(relation, codingPan) {
-  var relation2 = relation.split(",");
-}
-
 /*
 * check given string start/end with letters
 */
@@ -790,24 +688,6 @@ function getTypeName(mode) {
   }
 }
 
-
-function getTypeForErrMsg(mode) {
-  switch (mode) {
-    case "b":
-      return "belongs_to";
-      break;
-    case "m":
-      return "has_many";
-      break;
-    case "t":
-      return "through前面的冒號";
-      break;
-    default:
-      return "getTypeForErrMsg有奇怪的Bug啊啊啊啊！";
-      break;
-  }
-}
-
 function setDbPanel(mode) {
   var bl_pk = document.getElementById("bl-pk");
   var bl_ref_model_name = document.getElementById("bl-ref-model-name");
@@ -890,12 +770,6 @@ function relation_log(relation_array){
 * trim the double quotes on both side in string 
 */
 function trimDQ(str) {
-  return str.replace(/\"/gm, "");
-}
-/*
-* trim the symbols in string  
-*/
-function trimSymbol(str) {
   return str.replace(/\"/gm, "");
 }
 
