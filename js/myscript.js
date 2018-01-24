@@ -1,4 +1,9 @@
 /**
+ * @author kansetsu7
+ * @version 1.0
+ */
+
+/**
  * Basic function for checking [belongs_to] and [has_many] relation
  * Called by chkBtHm() and chkHmTh()
  * 
