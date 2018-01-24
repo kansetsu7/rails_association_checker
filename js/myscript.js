@@ -478,7 +478,7 @@ function chkRelationMethodName(methodName, mode, resultPanel) {
  */
 function showRailsConvention(resultPanel, modelName, methodName, mode) {
   console.log("showRailsConvention");
-  setResultElements(resultPanel, "Rails convention", modelName, methodName, mode);
+  showResultElements(resultPanel, "Rails convention", modelName, methodName, mode);
   printMsgSpan(resultPanel, ", ", "code-white");
   printMsgSpan(resultPanel, "class_name: ", "code-purple");
   printMsgSpan(resultPanel, "\"" + upFirstLetter(methodName) + "\"", "code-yellow");
@@ -869,7 +869,7 @@ function getInputName(index) {
 
 /**
  * get type name of mode
- * Called by checkBase(), setResultElements()
+ * Called by checkBase(), showResultElements()
  * @param  {String}  mode
  * @return {String}
  */
@@ -1021,7 +1021,7 @@ function trimDQ(str) {
   return str.replace(/\"/gm, "");
 }
 
-function setResultElements(resultPanel, title, modelName, methodName, mode) {
+function showResultElements(resultPanel, title, modelName, methodName, mode) {
   printMsgLine(resultPanel, "==== " + title + " ====<br>", "code-white");
   printMsgSpan(resultPanel, "Class ", "code-red");
   printMsgSpan(resultPanel, modelName, "code-green");
@@ -1035,7 +1035,7 @@ function setResultElements(resultPanel, title, modelName, methodName, mode) {
 * write user input relation setup in code panel
 */
 function showUserInputs(resultPanel, myModelName, relation, mode) {
-  setResultElements(resultPanel, "your setup", myModelName, relation[0][1], mode);
+  showResultElements(resultPanel, "your setup", myModelName, relation[0][1], mode);
   for (var i = 1; i < relation.length; i++) {
     printMsgSpan(resultPanel, ", ", "code-white")
     printMsgSpan(resultPanel, relation[i][0]+ ": ", "code-purple")
@@ -1048,7 +1048,7 @@ function showUserInputs(resultPanel, myModelName, relation, mode) {
 * write user input relation setup in code panel
 */
 function showUserInputs2(resultPanel, myModelName, relation) {
-  setResultElements(resultPanel, "your setup", myModelName, relation[0][1], "m");
+  showResultElements(resultPanel, "your setup", myModelName, relation[0][1], "m");
   for (var i = 1; i < relation.length; i++) {
     printMsgSpan(resultPanel, ", ", "code-white")
     printMsgSpan(resultPanel, relation[i][0]+ ": :", "code-purple")
