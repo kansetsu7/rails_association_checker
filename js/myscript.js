@@ -998,6 +998,24 @@ function printMsgSpan(resultPanel, str, color) {
   resultPanel.appendChild(msg);
 }
 
+/**
+ * check if given string is singular or not
+ * @param  {str}
+ * @return {Boolean}
+ */
+function isSingular(str) {
+  return str == str.plural(true);
+}
+
+/**
+ * check if given string is plural or not
+ * @param  {str}
+ * @return {Boolean}
+ */
+function isPlural(str) {
+  return str == str.plural();
+}
+
 
 /*
 * pluralize a string
