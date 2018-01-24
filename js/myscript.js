@@ -404,7 +404,7 @@ function chkHmThArg(str) {
  * Called by chkRelationSymbol() and chkThroughSymbol()
  * @param  {String}   keyword       |target
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {{Number}  mode          |for indentifing checking mode
+ * @param  {Number}   mode          |for indentifing checking mode
  * @return {Boolean}  ---           |equals or ont
  */
 function chkRelationKeyword(keyword, mode, resultPanel) {
@@ -434,9 +434,10 @@ function chkRelationKeyword(keyword, mode, resultPanel) {
 /**
  * check if relation method follows Rails convention
  * Called by chkRelationSymbol()
- * @param  {[type]}
+ * 
+ * @param  {String}   methodName    |method name of relation
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {{Number}  mode          |for indentifing checking mode
+ * @param  {Number}   mode          |for indentifing checking mode
  * @return {Boolean}  ---           |follows or ont
  */
 function chkRelationMethodName(methodName, mode, resultPanel) {
@@ -444,6 +445,7 @@ function chkRelationMethodName(methodName, mode, resultPanel) {
     printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為小寫開頭的"+lowFirstLetter(methodName),"red");
     return false;
   }
+
   switch (mode) {
     case "b":
       if (isPlural(methodName)) {  
@@ -451,21 +453,29 @@ function chkRelationMethodName(methodName, mode, resultPanel) {
         return false;
       }
       return true;
+
     case "m":
       if (isSingular(methodName)) {
         printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為複數"+methodName.plural(),"red");
         return false;
       }
       return true;
+
     default:
       printMsgLine(resultPanel, "錯誤：chkRelationMethodName有奇怪的Bug啊啊啊啊！","red");
       return false;
   }
 }
 
-/*
-* write Rails convention setup on code panel
-*/
+/**
+ * write Rails convention setup on result panel
+ * Called by checkBase()
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {String}   modelName     |modelName name of relation
+ * @param  {String}   methodName    |method name of relation
+ * @param  {Number}   mode          |for indentifing checking mode
+ */
 function showRailsConvention(resultPanel, modelName, methodName, mode) {
   console.log("showRailsConvention");
   setResultElements(resultPanel, "Rails convention", modelName, methodName, mode);
@@ -481,12 +491,18 @@ function showRailsConvention(resultPanel, modelName, methodName, mode) {
   printMsgLine(resultPanel, "end", "code-red");
 }
 
-/*
-* check given DB schema follows Rails convention or not
-* return null and skip checking if DB schema not been set.  
-* return true if passed
-* return false if not
-*/
+/**
+ * check given DB schema follows Rails convention or not
+ * Called by checkBase()
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {Array}    inputs        |user inputs from panel
+ * @param  {Map}      relation      |relation 
+ * @param  {Number}   mode          |for indentifing checking mode
+ * 
+ * @return {Null}     null          |if DB schema not been set
+ * @return {Boolean}  result        |follows or not
+ */
 function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
   // inputs[0] myModelName
   // inputs[2] fk
