@@ -1,3 +1,14 @@
+/**
+ * basic function for checking [belongs_to] and [has_many] relation
+ * 
+ * @param  {Number}     mode        |for indentifing checking mode
+ * @param  {Array}      inputs      |user inputs from panel
+ * @param  {Object}     codingPan   |result panel for printing result
+ * 
+ * @return {Map}        relationMap |if passed
+ * @return {undefined}  undefined   |if error
+ * @return {null}       null        |if DB Schema field is not filled
+ */
 function checkBase(mode, inputs, codingPan) {
   /**************************
   * inputs[0] myModelName
@@ -8,17 +19,17 @@ function checkBase(mode, inputs, codingPan) {
   **************************/
 
   printMsgH(codingPan, 2, "************* " + getTypeName(mode) + " *************<br>","aqua");
-  // return if model name is not correct
-  if (!chkMyModelName(inputs[0], codingPan) && true) return;
+  // check if model name or input lines is correct
+  if (!chkMyModelName(inputs[0], codingPan)) return;
   if (!chkRelationLines(mode, inputs[1].split("\n"), codingPan)) return;
+
+  // check if relation symbol is correct
   var relationArray = inputs[1].split(",");
   var map = chkRelationSymbol(relationArray, codingPan, mode);
-  if (!map.get("chk")) {
-    console.log("有錯喔");
-    return;
-  }
+  if (!map.get("chk")) return;
+
   var relationMap = getRelationMap(map.get("relation"));
-  resultInPan(codingPan, inputs[0], map.get("relation"), mode);
+  resultInPan(codingPan, inputs[0], map.get("relation"), mode); 
   showRailsDefault(codingPan, inputs[0], relationMap.get(getTypeName(mode)), mode);
   var result = chkDbSchemaInput(codingPan, inputs, relationMap, mode);
   if (result === null) return null;
