@@ -304,7 +304,7 @@ function chkThroughSymbol(relation, resultPanel) {
       printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+relation2[i-1][relation2[i-1].length-1]+"的逗號以後。","red");
       return map;
     }
-    if (!chkHmThArg(relation2[i][0].trim(), i)) {
+    if (!chkHmThArg(relation2[i][0].trim())) {
       printMsgLine(resultPanel, "錯誤：關鍵字應為\'through\', \'source\'其中之一。<br>位於"+relation2[i][0],"red");
       return map;
     }
@@ -369,7 +369,7 @@ function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
 }
 
 /**
- * check relation arguments equals to following words
+ * check [belongs_to] [has_many] relation arguments equals to following words
  *    class_name, foreign_key, primary_key
  *
  * Called by chkRelationSymbol() 
@@ -385,18 +385,17 @@ function chkRelationArg(str) {
   return false;
 }
 
-function chkHmThArg(str, i) {
-  if (i === 1) {
-    if (str === "through") {
-      return true;
-    }
-    return false;
-  }
-  if (i === 2) {
-    if (str === "source") {
-      return true;
-    }
-    return false;
+/**
+ * check [has_many :through] relation arguments equals to following words
+ *    through, source
+ *
+ * Called by chkRelationSymbol() 
+ * @param  {String}   str   |relation argument
+ * @return {Boolean}  --    |equals or not
+ */
+function chkHmThArg(str) {
+  if (str === "through" || str === "source") {
+    return true;
   }
   return false;
 }
