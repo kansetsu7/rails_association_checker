@@ -29,7 +29,7 @@ function checkBase(mode, inputs, codingPan) {
   if (!map.get("chk")) return;
 
   var relationMap = getRelationMap(map.get("relation"));
-  resultInPan(codingPan, inputs[0], map.get("relation"), mode); 
+  showUserInputs(codingPan, inputs[0], map.get("relation"), mode); 
   showRailsDefault(codingPan, inputs[0], relationMap.get(getTypeName(mode)), mode);
   var result = chkDbSchemaInput(codingPan, inputs, relationMap, mode);
   if (result === null) return null;
@@ -95,7 +95,7 @@ function chkThrough(codingPan, hmModelName) {
     console.log("有錯喔");
     return;
   }
-  resultInPan2(codingPan, hmModelName, map.get("relation"));
+  showUserInputs2(codingPan, hmModelName, map.get("relation"));
   printMsgLine(codingPan, "==== checking result ====<br>","code-white");
   return getRelationMap(map.get("relation"));
 }
@@ -797,7 +797,7 @@ function setResultElements(codingPan, title, modelName, methodName, mode) {
 /*
 * write user input relation setup in code panel
 */
-function resultInPan(codingPan, myModelName, relation, mode) {
+function showUserInputs(codingPan, myModelName, relation, mode) {
   setResultElements(codingPan, "your setup", myModelName, relation[0][1], mode);
   for (var i = 1; i < relation.length; i++) {
     printMsgSpan(codingPan, ", ", "code-white")
@@ -810,7 +810,7 @@ function resultInPan(codingPan, myModelName, relation, mode) {
 /*
 * write user input relation setup in code panel
 */
-function resultInPan2(codingPan, myModelName, relation) {
+function showUserInputs2(codingPan, myModelName, relation) {
   setResultElements(codingPan, "your setup", myModelName, relation[0][1], "m");
   for (var i = 1; i < relation.length; i++) {
     printMsgSpan(codingPan, ", ", "code-white")
