@@ -1022,11 +1022,11 @@ function trimDQ(str) {
 }
 
 /**
- * show 
+ * show basic elements on result panel
  * Called by showUserInputs(), showUserInputs2(), showRailsConvention()
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {String}   title
+ * @param  {String}   title         |just title...
  * @param  {String}   modelName     |modelName name of relation
  * @param  {String}   methodName    |method name of relation
  * @param  {Number}   mode          |for indentifing checking mode
@@ -1041,9 +1041,16 @@ function showResultBasics(resultPanel, title, modelName, methodName, mode) {
   printMsgSpan(resultPanel, ":" + methodName, "code-purple");
 }
 
-/*
-* write user input relation setup in code panel
-*/
+/**
+ * show user input relation setup in reuslt panel
+ * ONLY for [has_many] [belongs_to]
+ * Called by checkBase()
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {String}   myModelName   |modelName name of relation
+ * @param  {Array}    relation      |relation
+ * @param  {Number}   mode          |for indentifing checking mode
+ */
 function showUserInputs(resultPanel, myModelName, relation, mode) {
   showResultBasics(resultPanel, "your setup", myModelName, relation[0][1], mode);
   for (var i = 1; i < relation.length; i++) {
@@ -1054,9 +1061,15 @@ function showUserInputs(resultPanel, myModelName, relation, mode) {
   printMsgLine(resultPanel, "end", "code-red");
 }
 
-/*
-* write user input relation setup in code panel
-*/
+/**
+ * show user input relation setup in reuslt panel
+ * ONLY for [has_many :through]
+ * Called by chkThrough()
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {String}   myModelName   |modelName name of relation
+ * @param  {Array}    relation      |relation
+ */
 function showUserInputs2(resultPanel, myModelName, relation) {
   showResultBasics(resultPanel, "your setup", myModelName, relation[0][1], "m");
   for (var i = 1; i < relation.length; i++) {
@@ -1067,20 +1080,26 @@ function showUserInputs2(resultPanel, myModelName, relation) {
   printMsgLine(resultPanel, "end", "code-red");
 }
 
-/*
-* clean coding pan
-* remove all child inside it
-*/
+/**
+ * clean result panel, remove all child inside it
+ * Called by chkBtHm() and chkHmTh()
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ */
 function cleanPan(resultPanel) {
   while (resultPanel.lastChild != null) {
     resultPanel.removeChild(resultPanel.lastChild);
   }
-  // console.log("Cleared!");
 }
 
-/*
-* print message <p> in particular color on coding panel
-*/
+/**
+ * print message <p> in particular color on coding panel
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {String}   str           |string you want to show
+ * @param  {String}   color         |a CSS color name or CSS id that set up 
+ *                                   same color with sublime color scheme
+ */
 function printMsgLine(resultPanel, str, color) {
   var msg = document.createElement("p");
   if (color.includes("code")) {
@@ -1092,9 +1111,16 @@ function printMsgLine(resultPanel, str, color) {
   resultPanel.appendChild(msg);
 }
 
-/*
-* print message <hx> in particular color on coding panel
-*/
+
+/**
+ * print message <h> with different size in particular color on coding panel
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {Number}   size          |size of h, size = 1 => h1
+ * @param  {String}   str           |string you want to show
+ * @param  {String}   color         |a CSS color name or CSS id that set up 
+ *                                   same color with sublime color scheme
+ */
 function printMsgH(resultPanel, size, str, color) {
   var msg = document.createElement("h" + size);
   if (color.includes("code")) {
@@ -1106,9 +1132,13 @@ function printMsgH(resultPanel, size, str, color) {
   resultPanel.appendChild(msg);
 }
 
-/*
-* print messages <span> in particular color on coding panel
-*/
+/**
+ * print message <span> in particular color on coding panel
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {String}   str           |string you want to show
+ * @param  {String}   color         |a CSS color name 
+ */
 function printMsgSpan(resultPanel, str, color) {
   var msg = document.createElement("span");
   msg.classList.add(color);
@@ -1118,6 +1148,7 @@ function printMsgSpan(resultPanel, str, color) {
 
 /**
  * check if given string is singular or not
+ * 
  * @param  {str}
  * @return {Boolean}
  */
@@ -1130,6 +1161,7 @@ function isSingular(str) {
 
 /**
  * check if given string is plural or not
+ * 
  * @param  {str}
  * @return {Boolean}
  */
