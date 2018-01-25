@@ -349,7 +349,7 @@ function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
     if (getUpperSingular(mMap.get("has_many")) === bModelName) {
       printMsgWithIcon(resultPanel, "[belongs_to]的"+bModelName+"跟[has_many]的"+mMap.get("has_many")+"對得上。","lawnGreen", true);
       if (tMap.get("source") === undefined) {
-        if (tMap.get("has_many") === bMap.get("belongs_to")) {
+        if (tMap.get("has_many") === bMap.get("belongs_to").plural()) {
           printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","lawnGreen", true);
           return;
         }
