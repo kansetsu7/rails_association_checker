@@ -735,6 +735,16 @@ function bothSidesAreLetter(str) {
 }
 
 /**
+ * tell given string is letter or not
+ * @param  {String}  str [description]
+ * @return {Boolean}     [description]
+ */
+function isLetter(str) {
+  var letters = /^[A-Za-z]+$/;
+  return str.match(letters) ? true : false;
+}
+
+/**
  * check if the string have white space on right side
  * Called by chkAssociationSymbol() and chkThroughSymbol()
  * @param  {String}   str
@@ -1223,7 +1233,11 @@ function isPlural(str) {
 function pluralize_test() {
   var untransformed_text = document.getElementById("untransformed-text");
   var transformed_text = document.getElementById("transformed-text");
-  transformed_text.innerHTML = "結果：" + untransformed_text.value.plural();
+  if (isLetter(untransformed_text.value)) {
+    transformed_text.innerHTML = "結果：" + untransformed_text.value.plural();
+  } else {
+    transformed_text.innerHTML = "ENGLISH PLEASE!";
+  }
 }
 
 /**
@@ -1233,7 +1247,11 @@ function pluralize_test() {
 function singularize_test() {
   var untransformed_text = document.getElementById("untransformed-text");
   var transformed_text = document.getElementById("transformed-text");
-  transformed_text.innerHTML = "結果：" + untransformed_text.value.plural(true);
+  if (isLetter(untransformed_text.value)) {
+    transformed_text.innerHTML = "結果：" + untransformed_text.value.plural(true);
+  } else {
+    transformed_text.innerHTML = "ENGLISH PLEASE!";
+  }
 }
 
 /**
