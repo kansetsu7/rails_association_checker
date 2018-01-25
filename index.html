@@ -69,8 +69,8 @@
             </div>
             <div class="panel-body">
               <form action="">
-                Class <input type="text" id="bl-my-model-name" placeholder="Model名稱" value="Favorite"> < ActiveRecord <br><br>
-                <textarea rows="2" class="form-control" id="bl-relatoin-input"  placeholder="belongs_to" >belongs_to :restaurant</textarea><br> 
+                Class <input type="text" id="bl-my-model-name" placeholder="Model名稱" value="Appointment"> < ActiveRecord <br><br>
+                <textarea rows="2" class="form-control" id="bl-relatoin-input"  placeholder="belongs_to" >belongs_to :patient</textarea><br> 
                 end <br>
               </form>
             </div>
@@ -85,9 +85,9 @@
             </div>
             <div class="panel-body">
               <form action="">
-                Class <input type="text" id="hm-my-model-name" placeholder="Model名稱" value="User"> < ActiveRecord <br><br>
-                <textarea rows="2" class="form-control" id="hm-relatoin-input" placeholder="has_many">has_many :favorites</textarea> 
-                <textarea rows="2" class="form-control" id="hmth-relatoin-input" placeholder="has_many :through">has_many :favorited_restaurants, through: :favorites, source: :restaurant</textarea><br> 
+                Class <input type="text" id="hm-my-model-name" placeholder="Model名稱" value="Doctor"> < ActiveRecord <br><br>
+                <textarea rows="2" class="form-control" id="hm-relatoin-input" placeholder="has_many">has_many :appointments</textarea> 
+                <textarea rows="2" class="form-control" id="hmth-relatoin-input" placeholder="has_many :through">has_many :patients, through: :appointments, source: :patient</textarea><br> 
                 end <br>
               </form>
             </div>
@@ -104,8 +104,8 @@
               <div class="col-xs-6" id="db-bt">
                 <h4>belongs_to設定</h4>
                 <form action="">
-                  自己的外鍵: <input type="text" id="bl-fk" value="restaurant_id"><br><br>
-                  對方的model name: <input type="text" id="bl-ref-model-name" value="Restaurant"><br><br>
+                  自己的外鍵: <input type="text" id="bl-fk" value="patient_id"><br><br>
+                  對方的model name: <input type="text" id="bl-ref-model-name" value="Patient"><br><br>
                   對方的主鍵: <input type="text" id="bl-pk" value="id">
                 </form>
               </div>
@@ -113,8 +113,8 @@
                 <h4>has_many / has_many :through設定</h4>
                 <form action="">
                   自己的主鍵: <input type="text" id="hm-pk" value="id" style="cursor:no-drop;" disabled><br><br>
-                  對方的model name: <input type="text" id="hm-ref-model-name" value="Favorite" style="cursor:no-drop;" disabled><br><br>
-                  對方的外鍵: <input type="text" id="hm-fk" value="user_id" style="cursor:no-drop;" disabled>
+                  對方的model name: <input type="text" id="hm-ref-model-name" value="Appointment" style="cursor:no-drop;" disabled><br><br>
+                  對方的外鍵: <input type="text" id="hm-fk" value="doctor_id" style="cursor:no-drop;" disabled>
                 </form>
               </div>
             </div>

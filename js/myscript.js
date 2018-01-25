@@ -358,7 +358,7 @@ function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
       } else {  // have [source] arg
         if (tMap.get("source") === bMap.get("belongs_to")) {
           if (tMap.get("has_many") === bMap.get("belongs_to").plural()) {
-            printMsgWithIcon(resultPanel, "has_many 的source: :"+tMap.get("source")+"跟belongs_to:"+bMap.get("belongs_to")+"跟has_many :"+bMap.get("has_many")+"都對得上，source可省略。","lawnGreen", true);
+            printMsgWithIcon(resultPanel, "has_many 的source: :"+tMap.get("source")+"跟belongs_to:"+bMap.get("belongs_to")+"跟has_many :"+tMap.get("has_many")+"都對得上，source可省略。","lawnGreen", true);
             return;
           }
           printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上，但跟[has_many :through]的方法名稱對不上，source不可省略。","orange", true);
