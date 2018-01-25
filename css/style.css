@@ -1,3 +1,28 @@
+#page-title{
+  display: inline-block;
+  text-align: left;
+  margin: 0;
+}
+
+#github-link:hover{
+  color: black;
+  text-decoration: none;
+}
+
+#github-link{
+  color: black;
+}
+
+.fa-github:hover{
+  box-shadow: 0 4px 8px 5px rgba(0, 0, 0, 0.2);
+  transition-duration: .5s;
+}
+
+.fa-github{
+  margin-top: 15px;
+  padding: 5px;
+}
+
 textarea{
   resize: none;
 }

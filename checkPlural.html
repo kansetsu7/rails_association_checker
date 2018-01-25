@@ -7,12 +7,18 @@
     <title>check plural</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
   </head>
   <body>
     <div class="container">
       <div class="row">
         <div class="col-xs-12">
-          <h1>Plural / Singular checker</h1>
+          <div>
+            <h1 id="page-title">Plural / Singular checker</h1>
+            <a href="https://github.com/kansetsu7/rails_relation_checker" target="_blank" id="github-link">
+              <i class="fa fa-github fa-lg fa-pull-right" aria-hidden="true">Source Code</i>
+            </a>
+          </div>
           <hr>
           <input type="text" id="untransformed-text" placeholder="要確認的字">
           <input type="button" value="單數化" id="pluralize-btn" onclick="singularize_test();">
