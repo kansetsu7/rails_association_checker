@@ -22,6 +22,10 @@
   margin-top: 15px;
   padding: 5px;
 }
+/*
+.fa-check-circle{
+  color: lime;
+}*/
 
 textarea{
   resize: none;

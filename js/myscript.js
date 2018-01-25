@@ -345,19 +345,19 @@ function chkThroughSymbol(relation, resultPanel) {
  */
 function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
   if (tMap.get("through") === mMap.get("has_many")) {
-    printMsgLine(resultPanel, "(OK) [has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對得上。","white");
+    printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對得上。","lime", true);
     if (getUpperSingular(mMap.get("has_many")) === bModelName) {
-      printMsgLine(resultPanel, "(OK) [belongs_to]的"+bModelName+"跟[has_many]的"+mMap.get("has_many")+"對得上。","white");
+      printMsgWithIcon(resultPanel, "[belongs_to]的"+bModelName+"跟[has_many]的"+mMap.get("has_many")+"對得上。","lime", true);
       if (tMap.get("source") === undefined) {
         if (tMap.get("has_many") === bMap.get("belongs_to")) {
-          printMsgLine(resultPanel, "(OK) [has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","white");
+          printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","lime", true);
           return;
         }
         printMsgLine(resultPanel, "錯誤：[has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對不上，兩者應要相同，或者[has_many :through]要設定source。","red");
         return;
       } else {  // have [source] arg
         if (tMap.get("source") === bMap.get("belongs_to")) {
-          printMsgLine(resultPanel, "(OK) [has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","white");
+          printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","lime", true);
           return;
         }
         printMsgLine(resultPanel, "錯誤：[has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對不上，兩者應要相同。","red");
@@ -568,14 +568,14 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       var convention = lowFirstLetter(myModelName) + "_id";
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
-          printMsgLine(resultPanel, "(OK) foreign_key: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lime", true);
         } else {
-          printMsgLine(resultPanel, "(OK) foreign_key: 不符慣例，不可省略!","white");
+          printMsgWithIcon(resultPanel, "foreign_key: 不符慣例，不可省略!","orange", true);
         }
       } else if (foreign_key === undefined && chkVal === convention) {
-          printMsgLine(resultPanel, "(OK) foreign_key: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lime", true);
       } else {
-        printMsgLine(resultPanel, "(NG) foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgWithIcon(resultPanel, "foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
         return false;
       }
       break;
@@ -589,14 +589,14 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       var convention = getUpperSingular(has_many); //different
       if (class_name === chkVal) {
         if (class_name === convention) {
-          printMsgLine(resultPanel, "(OK) class_name: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lime", true);
         } else {
-          printMsgLine(resultPanel, "(OK) class_name: 不符慣例，不可省略!","white");
+          printMsgWithIcon(resultPanel, "class_name: 不符慣例，不可省略!","orange", true);
         }
       } else if (class_name === undefined && chkVal === convention) {
-          printMsgLine(resultPanel, "(OK) class_name: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lime", true);
       } else {
-        printMsgLine(resultPanel, "(NG) class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgWithIcon(resultPanel, "class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
         return false;
       }
       break;
@@ -610,14 +610,14 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
       var convention = "id";
       if (primary_key === chkVal) {
         if (primary_key === convention) {
-          printMsgLine(resultPanel, "(OK) primary_key: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lime", true);
         } else {
-          printMsgLine(resultPanel, "(OK) primary_key: 不符慣例，不可省略!","white");
+          printMsgWithIcon(resultPanel, "primary_key: 不符慣例，不可省略!","orange", true);
         }
       } else if (primary_key === undefined && chkVal === convention) {
-          printMsgLine(resultPanel, "(OK) primary_key: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lime", true);
       } else {
-        printMsgLine(resultPanel, "(NG) primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgWithIcon(resultPanel, "primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
         return false;
       }
       break;
@@ -656,14 +656,14 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
       var convention = belongs_to + "_id";
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
-          printMsgLine(resultPanel, "(OK) foreign_key: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lime", true);
         } else {
-          printMsgLine(resultPanel, "(OK) foreign_key: 不符慣例，不可省略!","white");
+          printMsgWithIcon(resultPanel, "foreign_key: 不符慣例，不可省略!","orange", true);
         }
       } else if (foreign_key === undefined && chkVal === convention) {
-          printMsgLine(resultPanel, "(OK) foreign_key: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lime", true);
       } else {
-        printMsgLine(resultPanel, "(NG) foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgWithIcon(resultPanel, "foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
         return false;
       }
       break;
@@ -677,14 +677,15 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
       var convention = upFirstLetter(belongs_to);
       if (class_name === chkVal) {
         if (class_name === convention) {
-          printMsgLine(resultPanel, "(OK) class_name: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lime", true);
         } else {
-          printMsgLine(resultPanel, "(OK) class_name: 不符慣例，不可省略!","white");
+          printMsgLine(resultPanel, "(OK) ","white");
+          printMsgWithIcon(resultPanel, "class_name: 不符慣例，不可省略!","orange", true);
         }
       } else if (class_name === undefined && chkVal === convention) {
-          printMsgLine(resultPanel, "(OK) class_name: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lime", true);
       } else {
-        printMsgLine(resultPanel, "(NG) class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgWithIcon(resultPanel, "class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
         return false;
       }
       break;
@@ -698,14 +699,14 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
       var convention = "id";
       if (primary_key === chkVal) {
         if (primary_key === convention) {
-          printMsgLine(resultPanel, "(OK) primary_key: 符合慣例，可省略!","white");
+          printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lime", true);
         } else {
-          printMsgLine(resultPanel, "(OK) primary_key: 不符慣例，不可省略!","white");
+          printMsgWithIcon(resultPanel, "primary_key: 不符慣例，不可省略!","orange", true);
         }
       } else if (primary_key === undefined && chkVal === convention) {
-          printMsgLine(resultPanel, "(OK) primary_key: 符合慣例，可省略!","white");
+        printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lime", true);
       } else {
-        printMsgLine(resultPanel, "(NG) primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red");
+        printMsgWithIcon(resultPanel, "primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
         return false;
       }
       break;
@@ -1102,7 +1103,7 @@ function cleanPan(resultPanel) {
 }
 
 /**
- * print message <p> in particular color on coding panel
+ * print message <p> in particular color on result panel
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   str           |string you want to show
@@ -1122,7 +1123,7 @@ function printMsgLine(resultPanel, str, color) {
 
 
 /**
- * print message <h> with different size in particular color on coding panel
+ * print message <h> with different size in particular color on result panel
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {Number}   size          |size of h, size = 1 => h1
@@ -1142,16 +1143,48 @@ function printMsgH(resultPanel, size, str, color) {
 }
 
 /**
- * print message <span> in particular color on coding panel
+ * print message <span> in particular color on result panel
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   str           |string you want to show
- * @param  {String}   color         |a CSS color name 
+ * @param  {String}   color         |a CSS id that set up same color with sublime color scheme
  */
 function printMsgSpan(resultPanel, str, color) {
   var msg = document.createElement("span");
   msg.classList.add(color);
   msg.innerHTML = str;
+  resultPanel.appendChild(msg);
+}
+
+/**
+ * print message line with icon in particular color on result panel
+ * 
+ * @param  {Object}   resultPanel   |result panel(HTML) for printing result
+ * @param  {String}   str           |string you want to show
+ * @param  {String}   color         |a CSS color name or CSS id that set up 
+ *                                   same color with sublime color scheme
+ * @param  {Boolean} isOK        |print ok icon or not
+ */
+function printMsgWithIcon(resultPanel, str, color, isOK) {
+  // icon
+  var icon = document.createElement("i");
+  if (isOK) {
+    icon.className = "fa fa-check-circle";
+  } else {
+    icon.className = "fa fa-times-circle";
+  }
+  icon.style.color = color;
+  icon.setAttribute("aria-hidden", "true");
+  resultPanel.appendChild(icon);
+
+  // message
+  var msg = document.createElement("span");
+  if (color.includes("code")) {
+    msg.classList.add(color);
+  } else {
+    msg.style.color = color;
+  }
+  msg.innerHTML = "  " + str + "<br>";
   resultPanel.appendChild(msg);
 }
 
