@@ -4,14 +4,14 @@
  */
 
 /**
- * Basic function for checking [belongs_to] and [has_many] relation
+ * Basic function for checking [belongs_to] and [has_many] association
  * Called by chkBtHm() and chkHmTh()
  * 
  * @param  {String}     mode        |for indentifing checking mode
  * @param  {Array}      inputs      |user inputs from panel
  * @param  {Object}     resultPanel |result panel(HTML) for printing result
  * 
- * @return {Map}        relationMap |if passed
+ * @return {Map}        associationMap |if passed
  * @return {undefined}  undefined   |if error
  * @return {null}       null        |if DB Schema field is not filled
  */
@@ -27,22 +27,22 @@ function checkBase(mode, inputs, resultPanel) {
   printMsgH(resultPanel, 2, "************* " + getTypeName(mode) + " *************<br>","aqua");
   // check if model name or input lines is correct
   if (!chkMyModelName(inputs[0], resultPanel)) return;
-  if (!chkRelationLines(mode, inputs[1].split("\n"), resultPanel)) return;
+  if (!chkAssociationLines(mode, inputs[1].split("\n"), resultPanel)) return;
 
-  // check if relation symbol is correct
-  var relationArray = inputs[1].split(",");
-  var map = chkRelationSymbol(relationArray, resultPanel, mode);
+  // check if association symbol is correct
+  var associationArray = inputs[1].split(",");
+  var map = chkAssociationSymbol(associationArray, resultPanel, mode);
   if (!map.get("chk")) return;
 
-  // turn relation Array into Map. Print user inputs and Rails convention
-  var relationMap = getRelationMap(map.get("relation"));
-  showUserInputs(resultPanel, inputs[0], map.get("relation"), mode); 
-  showRailsConvention(resultPanel, inputs[0], relationMap.get(getTypeName(mode)), mode);
+  // turn association Array into Map. Print user inputs and Rails convention
+  var associationMap = getAssociationMap(map.get("association"));
+  showUserInputs(resultPanel, inputs[0], map.get("association"), mode); 
+  showRailsConvention(resultPanel, inputs[0], associationMap.get(getTypeName(mode)), mode);
 
-  // check if relation follows rails convention
-  var result = chkDbSchemaInput(resultPanel, inputs, relationMap, mode);
+  // check if association follows rails convention
+  var result = chkDbSchemaInput(resultPanel, inputs, associationMap, mode);
   if (result === null) return null; // if DB Schema field is not filled 
-  if (result) return relationMap;   // if passed
+  if (result) return associationMap;   // if passed
   return undefined;                 // if error
 }
 
@@ -69,7 +69,7 @@ function chkBtHm() {
 /**
  * Function for checking "whole" [has_many :through]
  * It gather params for checkBase(), and then call checkBase() for checking
- *    [belongs_to] and [has_many] first, then call chkThrough() and chkThroughRelation()
+ *    [belongs_to] and [has_many] first, then call chkThrough() and chkThroughAssociation()
  *    for checking "only" [has_many :through]
  * Called by input button
  * 
@@ -106,13 +106,13 @@ function chkHmTh() {
     return;
   }
 
-  // if both [belongs_to] and [has_many] relation setup are correct
+  // if both [belongs_to] and [has_many] association setup are correct
   // then check "only" [has_many :through], otherwise show error and return
   if (typeof blMap === 'object' && typeof hmMap === 'object') {
     // check "only" [has_many :through]
     var hmthMap = chkThrough(resultPanel, inputsHm[0]);
     if (typeof hmthMap !== 'object') return;
-    chkThroughRelation(blMap, hmMap, hmthMap, inputsBl[0], resultPanel);
+    chkThroughAssociation(blMap, hmMap, hmthMap, inputsBl[0], resultPanel);
   } else {
     printMsgH(resultPanel, 3, "大俠您把上面的東西修好再來吧....<br>","orange");
   }
@@ -123,22 +123,22 @@ function chkHmTh() {
  * Called by chkHmTh()
  * 
  * @param  {Object} resultPanel |result panel(HTML) for printing result
- * @param  {String} hmModelName |model name of [has_many] relation
- * @return {Map}    relationMap |map of user input relations 
+ * @param  {String} hmModelName |model name of [has_many] association
+ * @return {Map}    associationMap |map of user input associations 
  */
 function chkThrough(resultPanel, hmModelName) {
   printMsgH(resultPanel, 2, "************* has_many :through *************<br>","aqua");
   var inputsTh = getThroughTextArea();
 
   // check if model name or input lines is correct
-  if (!chkRelationLines("t", inputsTh.split("\n"), resultPanel)) return;
-  var relationArray = inputsTh.split(",");
-  var map = chkThroughSymbol(relationArray, resultPanel);
+  if (!chkAssociationLines("t", inputsTh.split("\n"), resultPanel)) return;
+  var associationArray = inputsTh.split(",");
+  var map = chkThroughSymbol(associationArray, resultPanel);
   if (!map.get("chk")) return;
 
-  showUserInputs2(resultPanel, hmModelName, map.get("relation"));
+  showUserInputs2(resultPanel, hmModelName, map.get("association"));
   printMsgLine(resultPanel, "==== checking result ====<br>","code-white");
-  return getRelationMap(map.get("relation"));
+  return getAssociationMap(map.get("association"));
 }
 
 /**
@@ -175,15 +175,15 @@ function chkMyModelName(myModelName, resultPanel) {
 }
 
 /**
- * Check if relation input is only one line
+ * Check if association input is only one line
  * Called by checkBase() and chkThrough()
  * 
  * @param  {String}   mode            |for indentifing checking mode
- * @param  {Array}    relatoinInput   |user input relation from panel, split by \n
+ * @param  {Array}    relatoinInput   |user input association from panel, split by \n
  * @param  {Object}   resultPanel     |result panel(HTML) for printing result
  * @return {Boolean}
  */
-function chkRelationLines(mode, relatoinInput, resultPanel) {
+function chkAssociationLines(mode, relatoinInput, resultPanel) {
   if (mode === "b" || mode === "m" || mode === "t") {
     if (relatoinInput.length == 1) {
       return true;
@@ -191,159 +191,159 @@ function chkRelationLines(mode, relatoinInput, resultPanel) {
     printMsgLine(resultPanel, "錯誤：輸入超過一行","red");
     return false;
   }
-  printMsgLine(resultPanel, "錯誤：chkRelationLines有奇怪的Bug啊啊啊啊！","red");
+  printMsgLine(resultPanel, "錯誤：chkAssociationLines有奇怪的Bug啊啊啊啊！","red");
   return false;
 }
 
 /**
- * Checking relation symbol for [belongs_to] and [has_many]
+ * Checking association symbol for [belongs_to] and [has_many]
  * return map {("chk", false)} if not pass
- * return map {("chk", true), ("relation", relation2)} if pass
- * relation2 is user input relation split by colon :
+ * return map {("chk", true), ("association", association2)} if pass
+ * association2 is user input association split by colon :
  * Called by checkBase()
  * 
- * @param  {Array}    relation      |user input relation from panel, split by comma ,
+ * @param  {Array}    association      |user input association from panel, split by comma ,
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   mode          |for indentifing checking mode
  * @return {Map}      map           |pass or ont
  */
-function chkRelationSymbol(relation, resultPanel, mode) {
-  var relation2 = [];
-  for (var i = 0; i <= relation.length-1; i++) {
-    relation2.push(relation[i].split(":"));
+function chkAssociationSymbol(association, resultPanel, mode) {
+  var association2 = [];
+  for (var i = 0; i <= association.length-1; i++) {
+    association2.push(association[i].split(":"));
   }
   var map = new Map();
   map.set("chk", false);
 
-  if (!chkRelationKeyword(relation2[0][0].trim(), mode, resultPanel)) return map;
-  if (!chkRelationMethodName(relation2[0][1].trim(), mode, resultPanel)) return map;
+  if (!chkAssociationKeyword(association2[0][0].trim(), mode, resultPanel)) return map;
+  if (!chkAssociationMethodName(association2[0][1].trim(), mode, resultPanel)) return map;
 
-  // check arguments of relation. 
+  // check arguments of association. 
   // if not pass, show location that might cause error and return
-  for (var i = 0; i < relation2.length; i++) {
-    if (relation2[i].length < 2) {
-      var place = relation2[i][0] === "" ? " [痾...這不好說] " : relation2[i][0];
+  for (var i = 0; i < association2.length; i++) {
+    if (association2[i].length < 2) {
+      var place = association2[i][0] === "" ? " [痾...這不好說] " : association2[i][0];
       printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
       return map;
     }
-    if (relation2[i].length > 2) {
-      printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+relation2[i][1]+"附近。","red");
+    if (association2[i].length > 2) {
+      printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+association2[i][1]+"附近。","red");
       return map;
     }
-    if (relation2[i][0] === "" || relation2[i][1] === "") {
-      var place = relation2[i-1][0] === "" ? " [痾...這不好說] " : relation2[i-1][0];
+    if (association2[i][0] === "" || association2[i][1] === "") {
+      var place = association2[i-1][0] === "" ? " [痾...這不好說] " : association2[i-1][0];
       printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
       return map;
     }
     if (i > 0) {
-      if (!chkRelationArg(relation2[i][0].trim())) { 
-        printMsgLine(resultPanel, "錯誤：關鍵字應為\'class_name\', \'foreign_key\', \'primary_key\'其中之一。<br>位於"+relation2[i][0],"red");
+      if (!chkAssociationArg(association2[i][0].trim())) { 
+        printMsgLine(resultPanel, "錯誤：關鍵字應為\'class_name\', \'foreign_key\', \'primary_key\'其中之一。<br>位於"+association2[i][0],"red");
         return map;
       }
-      if (chkRightSpace(relation2[i][0])) {
-        printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+relation2[i][0],"red");
+      if (chkRightSpace(association2[i][0])) {
+        printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+association2[i][0],"red");
         return map;
       }
-      if (!chkDoubleQuotes(relation2[i][1].trim())) {
-        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+relation2[i][1]+"附近。","red");
+      if (!chkDoubleQuotes(association2[i][1].trim())) {
+        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+association2[i][1]+"附近。","red");
         return map;
       }
     } else {
-      if (chkLeftSpace(relation2[0][1])) {
-        printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+relation2[0][1],"red");
+      if (chkLeftSpace(association2[0][1])) {
+        printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+association2[0][1],"red");
         return map;
       }
     }
   }
-  map.set("relation", relation2);
+  map.set("association", association2);
   map.set("chk", true);
   return map;
 }
 
 /**
- * Checking relation symbol for [has_many :through]
+ * Checking association symbol for [has_many :through]
  * return map {("chk", false)} if not pass
- * return map {("chk", true), ("relation", relation2)} if pass
- * relation2 is user input relation split by colon :
+ * return map {("chk", true), ("association", association2)} if pass
+ * association2 is user input association split by colon :
  * Called by checkBase()
  * 
- * @param  {Array}    relation      |user input relation from panel, split by comma ,
+ * @param  {Array}    association      |user input association from panel, split by comma ,
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @return {Map}      map           |pass or ont
  */
-function chkThroughSymbol(relation, resultPanel) {
-  var relation2 = [];
-  for (var i = 0; i <= relation.length-1; i++) {
-    relation2.push(relation[i].split(":"));
+function chkThroughSymbol(association, resultPanel) {
+  var association2 = [];
+  for (var i = 0; i <= association.length-1; i++) {
+    association2.push(association[i].split(":"));
   }
   var map = new Map();
   map.set("chk", false);
 
   // check keyword = has_many
-  if (!chkRelationKeyword(relation2[0][0].trim(), "m", resultPanel)) return map;
+  if (!chkAssociationKeyword(association2[0][0].trim(), "m", resultPanel)) return map;
 
-  // check arguments of relation. 
+  // check arguments of association. 
   // if not pass, show location that might cause error and return
-  if (relation2[0].length < 2) {
-    var place = relation2[0][0] === "" ? " [痾...這不好說] " : relation2[0][0];
+  if (association2[0].length < 2) {
+    var place = association2[0][0] === "" ? " [痾...這不好說] " : association2[0][0];
     printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
     return map;
   }
-  if (relation2[0].length > 2) {
-    printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+relation2[0][1]+"附近。","red");
+  if (association2[0].length > 2) {
+    printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+association2[0][1]+"附近。","red");
     return map;
   }
-  if (relation2[0][0] === "" || relation2[0][1] === "") {
+  if (association2[0][0] === "" || association2[0][1] === "") {
     printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位置嘛...痾...這不好說。","red");
     return map;
   }
   // through & source
-  if (relation2.length < 2) {
+  if (association2.length < 2) {
     printMsgLine(resultPanel, "錯誤：你的through咧？","red");
     return map;
   }
-  for (var i = 1; i < relation2.length; i++) {
-    if (relation2[i].length !== 3) {
-      printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+relation2[i-1][relation2[i-1].length-1]+"的逗號以後。","red");
+  for (var i = 1; i < association2.length; i++) {
+    if (association2[i].length !== 3) {
+      printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+association2[i-1][association2[i-1].length-1]+"的逗號以後。","red");
       return map;
     }
-    if (!chkHmThArg(relation2[i][0].trim())) {
-      printMsgLine(resultPanel, "錯誤：關鍵字應為\'through\', \'source\'其中之一。<br>位於"+relation2[i][0],"red");
+    if (!chkHmThArg(association2[i][0].trim())) {
+      printMsgLine(resultPanel, "錯誤：關鍵字應為\'through\', \'source\'其中之一。<br>位於"+association2[i][0],"red");
       return map;
     }
-    if (chkRightSpace(relation2[i][0])) {
-      printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+relation2[i][0],"red");
+    if (chkRightSpace(association2[i][0])) {
+      printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+association2[i][0],"red");
       return map;
     }
-    if (relation2[i][1].trim() !== "") {
-      printMsgLine(resultPanel, "錯誤："+relation2[i][0]+"的兩個冒號中間有怪東西！","red");
+    if (association2[i][1].trim() !== "") {
+      printMsgLine(resultPanel, "錯誤："+association2[i][0]+"的兩個冒號中間有怪東西！","red");
       return map;
     }
-    if (chkLeftSpace(relation2[i][2])) {
-      printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+relation2[1][2],"red");
+    if (chkLeftSpace(association2[i][2])) {
+      printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+association2[1][2],"red");
       return map;
     } else {
-      // copy to [i][1] to fit getRelationMap() rule, it only read array[0] and array[1].
-      relation2[i][1] = relation2[i][2];  
+      // copy to [i][1] to fit getAssociationMap() rule, it only read array[0] and array[1].
+      association2[i][1] = association2[i][2];  
     }
   }
-  map.set("relation", relation2);
+  map.set("association", association2);
   map.set("chk", true);
   return map;
 }
 
 /**
- * check [has_many :through] relation, print result on result panel
+ * check [has_many :through] association, print result on result panel
  * Called by chkHmTh()
  * 
- * @param  {Map}      bMap          |map of [belongs_to] relation
- * @param  {Map}      mMap          |map of [has_many] relation
- * @param  {Map}      tMap          |map of [has_many :through] relation
- * @param  {String}   bModelName    |model name of [belongs_to] relation
+ * @param  {Map}      bMap          |map of [belongs_to] association
+ * @param  {Map}      mMap          |map of [has_many] association
+ * @param  {Map}      tMap          |map of [has_many :through] association
+ * @param  {String}   bModelName    |model name of [belongs_to] association
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @return {}         ----          |it don't return
  */
-function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
+function chkThroughAssociation(bMap, mMap, tMap, bModelName, resultPanel) {
   if (tMap.get("through") === mMap.get("has_many")) {
     printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對得上。","lawnGreen", true);
     if (getUpperSingular(mMap.get("has_many")) === bModelName) {
@@ -376,14 +376,14 @@ function chkThroughRelation(bMap, mMap, tMap, bModelName, resultPanel) {
 }
 
 /**
- * check [belongs_to] [has_many] relation arguments equals to following words
+ * check [belongs_to] [has_many] association arguments equals to following words
  *    class_name, foreign_key, primary_key
  *
- * Called by chkRelationSymbol() 
- * @param  {String}   str   |relation argument
+ * Called by chkAssociationSymbol() 
+ * @param  {String}   str   |association argument
  * @return {Boolean}  --    |equals or not
  */
-function chkRelationArg(str) {
+function chkAssociationArg(str) {
   legalArguments = ["class_name", "foreign_key", "primary_key"]
   for (var i = 0; i < legalArguments.length; i++) {
     str === legalArguments[i];
@@ -393,11 +393,11 @@ function chkRelationArg(str) {
 }
 
 /**
- * check [has_many :through] relation arguments equals to following words
+ * check [has_many :through] association arguments equals to following words
  *    through, source
  *
- * Called by chkRelationSymbol() 
- * @param  {String}   str   |relation argument
+ * Called by chkAssociationSymbol() 
+ * @param  {String}   str   |association argument
  * @return {Boolean}  --    |equals or not
  */
 function chkHmThArg(str) {
@@ -408,14 +408,14 @@ function chkHmThArg(str) {
 }
 
 /**
- * check if target keyword equals Rails relation type [belongs_to] or [has_many]
- * Called by chkRelationSymbol() and chkThroughSymbol()
+ * check if target keyword equals Rails association type [belongs_to] or [has_many]
+ * Called by chkAssociationSymbol() and chkThroughSymbol()
  * @param  {String}   keyword       |target
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   mode          |for indentifing checking mode
  * @return {Boolean}  ---           |equals or ont
  */
-function chkRelationKeyword(keyword, mode, resultPanel) {
+function chkAssociationKeyword(keyword, mode, resultPanel) {
   switch (mode) {
     case "b":
       if (keyword !== "belongs_to") {
@@ -435,20 +435,20 @@ function chkRelationKeyword(keyword, mode, resultPanel) {
       return true;
 
     default:
-      printMsgLine(resultPanel, "錯誤：chkRelationKeyword有奇怪的Bug啊啊啊啊！","red");
+      printMsgLine(resultPanel, "錯誤：chkAssociationKeyword有奇怪的Bug啊啊啊啊！","red");
       return false;
   }
 }
 /**
- * check if relation method follows Rails convention
- * Called by chkRelationSymbol()
+ * check if association method follows Rails convention
+ * Called by chkAssociationSymbol()
  * 
- * @param  {String}   methodName    |method name of relation
+ * @param  {String}   methodName    |method name of association
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   mode          |for indentifing checking mode
  * @return {Boolean}  ---           |follows or ont
  */
-function chkRelationMethodName(methodName, mode, resultPanel) {
+function chkAssociationMethodName(methodName, mode, resultPanel) {
   if (firstLetterIsUpperCase(methodName)) {
     printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為小寫開頭的"+lowFirstLetter(methodName),"red");
     return false;
@@ -470,7 +470,7 @@ function chkRelationMethodName(methodName, mode, resultPanel) {
       return true;
 
     default:
-      printMsgLine(resultPanel, "錯誤：chkRelationMethodName有奇怪的Bug啊啊啊啊！","red");
+      printMsgLine(resultPanel, "錯誤：chkAssociationMethodName有奇怪的Bug啊啊啊啊！","red");
       return false;
   }
 }
@@ -480,8 +480,8 @@ function chkRelationMethodName(methodName, mode, resultPanel) {
  * Called by checkBase()
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {String}   modelName     |modelName name of relation
- * @param  {String}   methodName    |method name of relation
+ * @param  {String}   modelName     |modelName name of association
+ * @param  {String}   methodName    |method name of association
  * @param  {Number}   mode          |for indentifing checking mode
  */
 function showRailsConvention(resultPanel, modelName, methodName, mode) {
@@ -504,13 +504,13 @@ function showRailsConvention(resultPanel, modelName, methodName, mode) {
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {Array}    inputs        |user inputs from panel
- * @param  {Map}      relation      |relation 
+ * @param  {Map}      association      |association 
  * @param  {String}   mode          |for indentifing checking mode
  * 
  * @return {Null}     null          |if DB schema not been set
  * @return {Boolean}  result        |follows or not
  */
-function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
+function chkDbSchemaInput(resultPanel, inputs, association, mode) {
   // inputs[0] myModelName
   // inputs[2] fk
   // inputs[3] refTableName
@@ -527,7 +527,7 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
   if (mode === "m" || mode === "t") {
     for (var i = 2; i < inputs.length; i++) {
       if (bothSidesAreLetter(inputs[i])) {
-        if (!chkHasManyConvention(resultPanel, inputs[i], relation, i, inputs[0])) result = false;
+        if (!chkHasManyConvention(resultPanel, inputs[i], association, i, inputs[0])) result = false;
       } else {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
         result = false;
@@ -536,7 +536,7 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
   } else { // mode === "b"
     for (var i = 2; i < inputs.length; i++) {
       if (bothSidesAreLetter(inputs[i])) {
-        if (!chkBelongsToConvention(resultPanel, inputs[i], relation, i)) result = false;
+        if (!chkBelongsToConvention(resultPanel, inputs[i], association, i)) result = false;
       } else {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
         result = false;
@@ -554,13 +554,13 @@ function chkDbSchemaInput(resultPanel, inputs, relation, mode) {
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   chkVal        |DB Schema setup
- * @param  {Map}      relation      |relation of [has_many]
+ * @param  {Map}      association      |association of [has_many]
  * @param  {Number}   inputIndex    |index of inputs array from chkDbSchemaInput()
  * @param  {String}   myModelName   |model name of [has_many]
  * @return {Boolean}  ---           |follows or not
  */
-function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModelName) {
-  var has_many = relation.get("has_many");
+function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myModelName) {
+  var has_many = association.get("has_many");
 
   switch (inputIndex) {
     case 2:
@@ -568,7 +568,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
       }
-      var foreign_key = relation.get("foreign_key");
+      var foreign_key = association.get("foreign_key");
       var convention = lowFirstLetter(myModelName) + "_id";
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
@@ -589,7 +589,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
       }
-      var class_name = relation.get("class_name");
+      var class_name = association.get("class_name");
       var convention = getUpperSingular(has_many); //different
       if (class_name === chkVal) {
         if (class_name === convention) {
@@ -610,7 +610,7 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
       }
-      var primary_key = relation.get("primary_key");
+      var primary_key = association.get("primary_key");
       var convention = "id";
       if (primary_key === chkVal) {
         if (primary_key === convention) {
@@ -643,12 +643,12 @@ function chkHasManyConvention(resultPanel, chkVal, relation, inputIndex, myModel
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   chkVal        |DB Schema setup
- * @param  {Map}      relation      |relation of [belongs_to]
+ * @param  {Map}      association      |association of [belongs_to]
  * @param  {Number}   inputIndex    |index of inputs array from chkDbSchemaInput()
  * @return {Boolean}  ---           |follows or not
  */
-function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
-  var belongs_to = relation.get("belongs_to");
+function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
+  var belongs_to = association.get("belongs_to");
 
   switch (inputIndex) {
     case 2:
@@ -656,7 +656,7 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
       }
-      var foreign_key = relation.get("foreign_key");
+      var foreign_key = association.get("foreign_key");
       var convention = belongs_to + "_id";
       if (foreign_key === chkVal) {
         if (foreign_key === convention) {
@@ -677,7 +677,7 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
       }
-      var class_name = relation.get("class_name");
+      var class_name = association.get("class_name");
       var convention = upFirstLetter(belongs_to);
       if (class_name === chkVal) {
         if (class_name === convention) {
@@ -698,7 +698,7 @@ function chkBelongsToConvention(resultPanel, chkVal, relation, inputIndex) {
         printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
         return false;
       }
-      var primary_key = relation.get("primary_key");
+      var primary_key = association.get("primary_key");
       var convention = "id";
       if (primary_key === chkVal) {
         if (primary_key === convention) {
@@ -736,7 +736,7 @@ function bothSidesAreLetter(str) {
 
 /**
  * check if the string have white space on right side
- * Called by chkRelationSymbol() and chkThroughSymbol()
+ * Called by chkAssociationSymbol() and chkThroughSymbol()
  * @param  {String}   str
  * @return {Boolean}
  */
@@ -746,7 +746,7 @@ function chkRightSpace(str) {
 
 /**
  * check if the string have white space on left side
- * Called by chkRelationSymbol() and chkThroughSymbol()
+ * Called by chkAssociationSymbol() and chkThroughSymbol()
  * 
  * @param  {String}   str
  * @return {Boolean}
@@ -757,7 +757,7 @@ function chkLeftSpace(str) {
 
 /**
  * check if the string have double quotes on both side and not just double quotes only
- * Called by chkRelationSymbol()
+ * Called by chkAssociationSymbol()
  * 
  * @param  {String}   str
  * @return {Boolean}
@@ -833,13 +833,13 @@ function getThroughTextArea() {
  * turn array into map
  * Called by checkBase(), chkThrough(), chkThroughSymbol()
  * 
- * @param  {Array}  relation 
+ * @param  {Array}  association 
  * @return {Map}    map
  */
-function getRelationMap(relation) {
+function getAssociationMap(association) {
   var map = new Map();
-  for (var i = 0; i < relation.length; i++) {
-    map.set(relation[i][0].trim(), trimDQ(relation[i][1].trim()));
+  for (var i = 0; i < association.length; i++) {
+    map.set(association[i][0].trim(), trimDQ(association[i][1].trim()));
   }
   return map;
 }
@@ -972,7 +972,7 @@ function upFirstLetter(str) {
 
 /**
  * turn first letter of the given string to lowercase
- * Called by chkRelationMethodName(), chkHasManyConvention()
+ * Called by chkAssociationMethodName(), chkHasManyConvention()
  * 
  * @param  {String}
  * @return {String}
@@ -993,7 +993,7 @@ function firstLetterIsLowerCase(str) {
 
 /**
  * check if given string's first letter is upper case
- * Called by chkRelationMethodName(), chkHasManyConvention(), chkBelongsToConvention()
+ * Called by chkAssociationMethodName(), chkHasManyConvention(), chkBelongsToConvention()
  * 
  * @param  {String}   str
  * @return {Boolean}
@@ -1002,9 +1002,9 @@ function firstLetterIsUpperCase(str) {
   return str.charAt(0).toUpperCase() === str.charAt(0);
 }
 
-function relation_log(relation_array){
+function association_log(association_array){
   console.log("[");
-  relation_array.forEach(function(arg, index){
+  association_array.forEach(function(arg, index){
     console.log("[" + arg[0] + "," + arg[1] + "]");
   })
 
@@ -1013,7 +1013,7 @@ function relation_log(relation_array){
 
 /**
  * turn a string into singular and make it's first letter into uppercase
- * Called by chkThroughRelation(), chkHasManyConvention()
+ * Called by chkThroughAssociation(), chkHasManyConvention()
  * 
  * @param  {String}
  * @return {String}
@@ -1024,7 +1024,7 @@ function getUpperSingular(str) {
 
 /**
  * trim the double quotes on both side of the string 
- * Called by chkDoubleQuotes(), getRelationMap()
+ * Called by chkDoubleQuotes(), getAssociationMap()
 
  * @param  {String}
  * @return {String}
@@ -1039,8 +1039,8 @@ function trimDQ(str) {
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   title         |just title...
- * @param  {String}   modelName     |modelName name of relation
- * @param  {String}   methodName    |method name of relation
+ * @param  {String}   modelName     |modelName name of association
+ * @param  {String}   methodName    |method name of association
  * @param  {Number}   mode          |for indentifing checking mode
  */
 function showResultBasics(resultPanel, title, modelName, methodName, mode) {
@@ -1054,40 +1054,40 @@ function showResultBasics(resultPanel, title, modelName, methodName, mode) {
 }
 
 /**
- * show user input relation setup in reuslt panel
+ * show user input association setup in reuslt panel
  * ONLY for [has_many] [belongs_to]
  * Called by checkBase()
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {String}   myModelName   |modelName name of relation
- * @param  {Array}    relation      |relation
+ * @param  {String}   myModelName   |modelName name of association
+ * @param  {Array}    association      |association
  * @param  {Number}   mode          |for indentifing checking mode
  */
-function showUserInputs(resultPanel, myModelName, relation, mode) {
-  showResultBasics(resultPanel, "your setup", myModelName, relation[0][1], mode);
-  for (var i = 1; i < relation.length; i++) {
+function showUserInputs(resultPanel, myModelName, association, mode) {
+  showResultBasics(resultPanel, "your setup", myModelName, association[0][1], mode);
+  for (var i = 1; i < association.length; i++) {
     printMsgSpan(resultPanel, ", ", "code-white")
-    printMsgSpan(resultPanel, relation[i][0]+ ": ", "code-purple")
-    printMsgSpan(resultPanel, relation[i][1], "code-yellow")
+    printMsgSpan(resultPanel, association[i][0]+ ": ", "code-purple")
+    printMsgSpan(resultPanel, association[i][1], "code-yellow")
   }
   printMsgLine(resultPanel, "end", "code-red");
 }
 
 /**
- * show user input relation setup in reuslt panel
+ * show user input association setup in reuslt panel
  * ONLY for [has_many :through]
  * Called by chkThrough()
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {String}   myModelName   |modelName name of relation
- * @param  {Array}    relation      |relation
+ * @param  {String}   myModelName   |modelName name of association
+ * @param  {Array}    association      |association
  */
-function showUserInputs2(resultPanel, myModelName, relation) {
-  showResultBasics(resultPanel, "your setup", myModelName, relation[0][1], "m");
-  for (var i = 1; i < relation.length; i++) {
+function showUserInputs2(resultPanel, myModelName, association) {
+  showResultBasics(resultPanel, "your setup", myModelName, association[0][1], "m");
+  for (var i = 1; i < association.length; i++) {
     printMsgSpan(resultPanel, ", ", "code-white")
-    printMsgSpan(resultPanel, relation[i][0]+ ": :", "code-purple")
-    printMsgSpan(resultPanel, relation[i][1], "code-purple")
+    printMsgSpan(resultPanel, association[i][0]+ ": :", "code-purple")
+    printMsgSpan(resultPanel, association[i][1], "code-purple")
   }
   printMsgLine(resultPanel, "end", "code-red");
 }
