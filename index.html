@@ -35,18 +35,19 @@
           <a href="https://github.com/kansetsu7/rails_association_checker" target="_blank" id="github-link">
               <i class="fa fa-github fa-lg fa-pull-right" aria-hidden="true">Source Code</i>
           </a>
-          <h4>使用說明：</h4>
-          <p>目前提供belongs_to、has_many、has_many :through三種關聯類型驗證，可於下方選擇類型。</p>
-          <p>belongs_to、has_many允許使用關鍵字為：class_name、foreign_key、primary_key，其他的可能會報錯。
-          <br>has_many :through允許使用關鍵字為through、source，其他的可能會報錯。</p>
+          <h4>How to use</h4>
+          <p>Supported association types: provide "belongs_to", "has_many", "has_many :through". You can choose type below</p>
+          <p>Supported options of "belongs_to" and "has_many" are: class_name, foreign_key, primary_key, others might cause error.
+          <br>Supported options of "has_many :through" are: through, source, others might cause error.</p>
           <p>
-            驗證方式有兩種選項：<br>
-            1. 輸入Model內設定，DB schema留空。按下確認鍵後會依照Rails慣例提供對應的資料(has_many :through不適用)<br>
-            2. 輸入所有資料，按下確認鍵後會依照Rails慣例，標示出符合慣例的、需要修改的
+            There are two kinds of checking method:<br>
+            1. Fill out "Model setup", leave "DB schema" empty. After "Check" button clicked, Rails conventions of your setup will show on the result panel.(This funtion is not apply to has_many :through)<br>
+            2. Fill out all setup.  After "Check" button clicked, the program will tell which part is OK or should be modify according to Rails conventions.
           </p>
           <p>
-            註1：單複數轉換的程式碼是抄來的，不一定能全部都對。可以前往<a href="./checkPlural.html" target="_blank">這個頁面</a>事先確認。<br>
-            註2：做了點關於Rails關聯慣例的筆記，可參考<a href="https://medium.com/@kansetsu7/rails-association-conventions-78d15efeafbe" target="_blank">連結</a>
+            PS:<br>
+            1. Code of singular/plural translation is copy form <a href="https://stackoverflow.com/questions/27194359/javascript-pluralize-a-string">Stackoverflow</a>. It might not cover all words, you can check it on <a href="./checkPlural.html" target="_blank">this page</a> beforehand.<br>
+            2. Notes about Rails conventions on <a href="https://medium.com/@kansetsu7/rails-association-conventions-78d15efeafbe" target="_blank">Medium</a>
           </p>
           <hr>
         </div>
@@ -55,7 +56,7 @@
         <div class="col-xs-12">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">請選擇關聯類型</h3>
+              <h3 class="panel-title">Association type</h3>
             </div>
             <div class="panel-body">
               <div class="radio">
@@ -81,7 +82,7 @@
         <div class="col-xs-12">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Model內設定(belongs_to)</h3>
+              <h3 class="panel-title">Model setup(belongs_to)</h3>
             </div>
             <div class="panel-body">
               <form action="">
@@ -97,7 +98,7 @@
         <div class="col-xs-12">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Model內設定(has_many / has_many :through)</h3>
+              <h3 class="panel-title">Model setup(has_many / has_many :through)</h3>
             </div>
             <div class="panel-body">
               <form action="">
@@ -120,17 +121,17 @@
               <div class="col-xs-12 col-sm-6" id="db-bt">
                 <h4>belongs_to設定</h4>
                 <form action="">
-                  自己的外鍵: <input type="text" id="bl-fk" value="patient_id"><br><br>
-                  對方的model name: <input type="text" id="bl-ref-model-name" value="Patient"><br><br>
-                  對方的主鍵: <input type="text" id="bl-pk" value="id">
+                  Your foreign key: <input type="text" id="bl-fk" value="patient_id"><br><br>
+                  Target model name: <input type="text" id="bl-ref-model-name" value="Patient"><br><br>
+                  Target primary key: <input type="text" id="bl-pk" value="id">
                 </form>
               </div>
               <div class="col-xs-12 col-sm-6" id="db-hm">
                 <h4>has_many / has_many :through設定</h4>
                 <form action="">
-                  自己的主鍵: <input type="text" id="hm-pk" value="id" style="cursor:no-drop;" disabled><br><br>
-                  對方的model name: <input type="text" id="hm-ref-model-name" value="Appointment" style="cursor:no-drop;" disabled><br><br>
-                  對方的外鍵: <input type="text" id="hm-fk" value="doctor_id" style="cursor:no-drop;" disabled>
+                  Your primary key: <input type="text" id="hm-pk" value="id" style="cursor:no-drop;" disabled><br><br>
+                  Target model name: <input type="text" id="hm-ref-model-name" value="Appointment" style="cursor:no-drop;" disabled><br><br>
+                  Target foreign key: <input type="text" id="hm-fk" value="doctor_id" style="cursor:no-drop;" disabled>
                 </form>
               </div>
             </div>
@@ -142,7 +143,7 @@
         <div class="col-xs-12">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">結果</h3>
+              <h3 class="panel-title">Result</h3>
             </div>
             <div class="panel-body" id="result-panel">
               
