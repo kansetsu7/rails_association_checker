@@ -424,14 +424,22 @@ function chkAssociationKeyword(keyword, mode, resultPanel) {
   switch (mode) {
     case "b":
       if (keyword !== "belongs_to") {
-        printMsgLine(resultPanel, "錯誤：你的"+keyword+"應為belongs_to","red");
+        if (getLanguage() === "en") {
+          printMsgLine(resultPanel, "Error: \'"+keyword+"\' should be \'belongs_to\'","red");
+        } else {
+          printMsgLine(resultPanel, "錯誤：你的"+keyword+"應為belongs_to","red");
+        }
         return false;
       }
       return true;
 
     case "m":
       if (keyword !== "has_many") {
-        printMsgLine(resultPanel, "錯誤：你的"+keyword+"應為has_many","red");
+        if (getLanguage() === "en") {
+          printMsgLine(resultPanel, "Error: \'"+keyword+"\' should be \'has_many\'","red");
+        } else {
+          printMsgLine(resultPanel, "錯誤：你的"+keyword+"應為has_many","red");
+        }
         return false;
       }
       return true;
