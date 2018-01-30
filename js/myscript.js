@@ -153,22 +153,21 @@ function chkMyModelName(myModelName, resultPanel) {
   // check if model name is empty
   // if not empty then call chkCapitalize() for checking first letter
   if (myModelName === "") {
-    printMsgLine(resultPanel, "錯誤：Model名稱必填","red");
+    printMyModelNameErrors(1, resultPanel);  //can't be blank
     return false;
   }
   if (!isNaN(myModelName.charAt(0))) {   //first latter is a number
-    printMsgLine(resultPanel, "錯誤：Model名開頭不能為數字！","red");
+    printMyModelNameErrors(2, resultPanel);  //can't start with numbers
     return false;
   }
   if (firstLetterIsLowerCase(myModelName)) {
-    printMsgLine(resultPanel, "錯誤：Model名開頭需大寫！","red");    
+    printMyModelNameErrors(3, resultPanel);  //First letter should in uppercase
     return false;
   }
 
   // check if model name is singular
-  
   if (isPlural(myModelName)) {
-    printMsgLine(resultPanel, "錯誤：Model名須為單數！","red");    
+    printMyModelNameErrors(4, resultPanel);  //should in singular term
     return false;
   }
   return true;
@@ -1121,6 +1120,52 @@ function cleanPan(resultPanel) {
   while (resultPanel.lastChild != null) {
     resultPanel.removeChild(resultPanel.lastChild);
   }
+}
+
+/**
+ * print errors of chkMyModelName
+ * Called by chkMyModelName()
+ * @param  {Number} errorId     |error id
+ * @param  {Object} resultPanel |result panel(HTML) for printing result
+ */
+function printMyModelNameErrors(errorId, resultPanel) {
+  if (getLanguage() === "en") {
+    switch (errorId) {
+      case 1:
+        printMsgLine(resultPanel, "Error: Model name can't be blank!","red");
+        break;
+      case 2:
+        printMsgLine(resultPanel, "Error: Model name can't start with numbers!","red");
+        break;
+      case 3:
+        printMsgLine(resultPanel, "Error: First letter of Model name should in uppercase!","red");
+        break;
+      case 4:
+        printMsgLine(resultPanel, "Error: Model name should in singular term!","red");
+        break;
+      default:
+        alert("Oops! There's error in printMyModelNameErrors");
+        break;
+    }
+  } else {
+    switch (errorId) {
+      case 1:
+        printMsgLine(resultPanel, "錯誤：Model名稱必填！","red");
+        break;
+      case 2:
+        printMsgLine(resultPanel, "錯誤：Model名開頭不能為數字！","red");
+        break;
+      case 3:
+        printMsgLine(resultPanel, "錯誤：Model名開頭需大寫！","red");
+        break;
+      case 4:
+        printMsgLine(resultPanel, "錯誤：Model名須為單數！","red");
+        break;
+      default:
+        alert("Oops! There's error in printMyModelNameErrors");
+        break;
+    }
+  }  
 }
 
 /**
