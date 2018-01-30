@@ -543,7 +543,7 @@ function chkDbSchemaInput(resultPanel, inputs, association, mode) {
       if (bothSidesAreLetter(inputs[i])) {
         if (!chkHasManyConvention(resultPanel, inputs[i], association, i, inputs[0])) result = false;
       } else {
-        printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
+        printDbSchemaInputError(i, resultPanel);
         result = false;
       }
     }
@@ -552,7 +552,7 @@ function chkDbSchemaInput(resultPanel, inputs, association, mode) {
       if (bothSidesAreLetter(inputs[i])) {
         if (!chkBelongsToConvention(resultPanel, inputs[i], association, i)) result = false;
       } else {
-        printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(i) + "欄位輸入有誤。","red");
+        printDbSchemaInputError(i, resultPanel);
         result = false;
       }
     }
@@ -870,7 +870,7 @@ function getAssociationMap(association) {
 
 /**
  * get DB schema input column name
- * Called by chkDbSchemaInput(), chkHasManyConvention(), chkBelongsToConvention()
+ * Called by printDbSchemaInputError(), chkHasManyConvention(), chkBelongsToConvention()
  * 
  * @param  {Number}  index
  * @return {String}
@@ -878,11 +878,11 @@ function getAssociationMap(association) {
 function getInputName(index) {
   switch (index) {
     case 2:
-      return "外鍵";
+      return getLanguage() === "en" ? " foreign key" : "外鍵";
     case 3:
-      return "model name";
+      return " model name";
     case 4:
-      return "主鍵";
+      return getLanguage() === "en" ? " primary key" : "主鍵";
   }
 }
 
@@ -1224,6 +1224,7 @@ function printAssociationMethodNameError(errorId, methodName, resultPanel) {
 
 /**
  * print errors of chkAssociationSymbol
+ * Called by chkAssociationSymbol()
  * @param  {Number} errorId     |error id
  * @param  {String} keyword     |where error occured
  * @param  {Object} resultPanel |result panel(HTML) for printing result 
@@ -1268,6 +1269,20 @@ function printAssociationSymbolError(errorId, keyword, resultPanel) {
       printMsgLine(resultPanel, "錯誤：printAssociationSymbolError有奇怪的Bug啊啊啊啊！","red");
       break;
   }
+}
+
+/**
+ * print error of chkDbSchemaInput
+ * Called by chkDbSchemaInput()
+ * @param  {Number} inputId     |id of the input which cause error
+ * @param  {Object} resultPanel |result panel(HTML) for printing result 
+ */
+function printDbSchemaInputError(inputId, resultPanel) {
+  if (getLanguage() === "en") {
+    printMsgLine(resultPanel, "Error: Invalid input of DB schema" + getInputName(inputId) ,"red");
+  } else {
+    printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputId) + "欄位輸入有誤。","red");
+  }       
 }
 
 /**
