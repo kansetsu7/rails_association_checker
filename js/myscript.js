@@ -1033,6 +1033,15 @@ function getUpperSingular(str) {
 }
 
 /**
+ * get page language form html lang tag
+ * @return {String} "en" for English, "tw" for Chinese tranditional
+ */
+function getLanguage() {
+  var lang = document.documentElement.lang;
+  return lang === "en" ? "en" : "tw";
+}
+
+/**
  * trim the double quotes on both side of the string 
  * Called by chkDoubleQuotes(), getAssociationMap()
 
