@@ -463,21 +463,21 @@ function chkAssociationKeyword(keyword, mode, resultPanel) {
  */
 function chkAssociationMethodName(methodName, mode, resultPanel) {
   if (firstLetterIsUpperCase(methodName)) {
-    printAssociationMethodNameError(1, resultPanel);  //First letter should in lowercase
+    printAssociationMethodNameError(1, methodName, resultPanel);  //First letter should in lowercase
     return false;
   }
 
   switch (mode) {
     case "b":
       if (isPlural(methodName)) {
-        printAssociationMethodNameError(2, resultPanel);     
+        printAssociationMethodNameError(2, methodName, resultPanel);  //should in singular term   
         return false;
       }
       return true;
 
     case "m":
       if (isSingular(methodName)) {
-        printAssociationMethodNameError(3, resultPanel);
+        printAssociationMethodNameError(3, methodName, resultPanel);  //should in plural term
         return false;
       }
       return true;
@@ -1186,13 +1186,14 @@ function printMyModelNameErrors(errorId, resultPanel) {
  * print errors of chkAssociationMethodName
  * Called by chkAssociationMethodName()
  * @param  {Number} errorId     |error id
+ * @param {String}  methodName  |name of method
  * @param  {Object} resultPanel |result panel(HTML) for printing result
  */
-function printAssociationMethodNameError(errorId, resultPanel) {
+function printAssociationMethodNameError(errorId, methodName, resultPanel) {
   switch (errorId) {
     case 1:
       if (getLanguage() === "en") {
-        printMsgLine(resultPanel, "Error: First letter of \'"+methodName+"\'should in lowercase, "+lowFirstLetter(methodName),"red");
+        printMsgLine(resultPanel, "Error: First letter of \'"+methodName+"\' should in lowercase, \'"+lowFirstLetter(methodName)+"\'.","red");
       } else {
         printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為小寫開頭的"+lowFirstLetter(methodName),"red");
       }
@@ -1200,7 +1201,7 @@ function printAssociationMethodNameError(errorId, resultPanel) {
 
     case 2:
       if (getLanguage() === "en") {
-        printMsgLine(resultPanel, "Error: \'"+methodName+"\' should in singular term, "+methodName.plural(true),"red");
+        printMsgLine(resultPanel, "Error: \'"+methodName+"\' should in singular term, \'"+methodName.plural(true)+"\'.","red");
       } else {
         printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為單數"+methodName.plural(true),"red");    
       }
@@ -1208,7 +1209,7 @@ function printAssociationMethodNameError(errorId, resultPanel) {
 
     case 3:
       if (getLanguage() === "en") {
-        printMsgLine(resultPanel, "Error: \'"+methodName+"\' should in plural term, "+methodName.plural(),"red");
+        printMsgLine(resultPanel, "Error: \'"+methodName+"\' should in plural term, \'"+methodName.plural()+"\'.","red");
       } else {
         printMsgLine(resultPanel, "錯誤：你的"+methodName+"應為複數"+methodName.plural(),"red");
       }
