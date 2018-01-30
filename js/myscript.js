@@ -299,43 +299,47 @@ function chkThroughSymbol(association, resultPanel) {
 
   // check arguments of association. 
   // if not pass, show location that might cause error and return
-  if (association2[0].length < 2) {
-    var place = association2[0][0] === "" ? " [痾...這不好說] " : association2[0][0];
-    printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
+  if (association2[0].length < 2) {  //problem with comma or colon, place known
+    printThroughSymbolError(1, association2[0][0], resultPanel);
     return map;
   }
-  if (association2[0].length > 2) {
-    printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+association2[0][1]+"附近。","red");
+  if (association2[0].length > 2) {  //problem with comma or colon, place known
+    printThroughSymbolError(1, association2[0][1], resultPanel);
     return map;
   }
-  if (association2[0][0] === "" || association2[0][1] === "") {
-    printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位置嘛...痾...這不好說。","red");
+  if (association2[0][0] === "" || association2[0][1] === "") {  //problem with comma or colon, place unknown
+    printThroughSymbolError(2, "", resultPanel);
     return map;
   }
   // through & source
-  if (association2.length < 2) {
-    printMsgLine(resultPanel, "錯誤：你的through咧？","red");
+  if (association2.length < 2) {  //lack of through option
+    printThroughSymbolError(3, "", resultPanel);
     return map;
   }
   for (var i = 1; i < association2.length; i++) {
-    if (association2[i].length !== 3) {
-      printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+association2[i-1][association2[i-1].length-1]+"的逗號以後。","red");
+    if (association2[i].length === 1 && association2[i][0] === "") {  //user input additional comma
+      console.log(association2[i].length);
+      printThroughSymbolError(4, association2[i-1][association2[i-1].length-1], resultPanel);
+      return map;
+    }else if (association2[i].length !== 3) {  //problem with comma or colon, place after comma
+      console.log(association2[i][0]);
+      printThroughSymbolError(8, association[i], resultPanel);
       return map;
     }
-    if (!chkHmThArg(association2[i][0].trim())) {
-      printMsgLine(resultPanel, "錯誤：關鍵字應為\'through\', \'source\'其中之一。<br>位於"+association2[i][0],"red");
+    if (!chkHmThArg(association2[i][0].trim())) {  //Invalid options
+      printThroughSymbolError(5, association2[i][0], resultPanel);
       return map;
     }
-    if (chkRightSpace(association2[i][0])) {
-      printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+association2[i][0],"red");
+    if (chkRightSpace(association2[i][0])) {  //space between colon and keyword
+      printThroughSymbolError(6, association2[i][0], resultPanel);      
       return map;
     }
-    if (association2[i][1].trim() !== "") {
-      printMsgLine(resultPanel, "錯誤："+association2[i][0]+"的兩個冒號中間有怪東西！","red");
+    if (association2[i][1].trim() !== "") {  //space between colons
+      printThroughSymbolError(7, association2[i][0], resultPanel);
       return map;
     }
-    if (chkLeftSpace(association2[i][2])) {
-      printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+association2[1][2],"red");
+    if (chkLeftSpace(association2[i][2])) {  //space between colon and keyword
+      printThroughSymbolError(6, association2[1][2], resultPanel);
       return map;
     } else {
       // copy to [i][1] to fit getAssociationMap() rule, it only read array[0] and array[1].
@@ -1241,7 +1245,7 @@ function printAssociationSymbolError(errorId, keyword, resultPanel) {
   switch (errorId) {
     case 1:
       if (getLanguage() === "en") {
-        var place = keyword === "" ? " [Umm...somewhere] " : keyword;
+        var place = keyword === "" ? " [Umm...somewhere but I don't know] " : keyword;
         printMsgLine(resultPanel, "Error: Problem with symbol, please check your comma or colon.<br> - Error is near "+place,"red");
       } else {
         var place = keyword === "" ? " [痾...這不好說] " : keyword;
@@ -1259,7 +1263,7 @@ function printAssociationSymbolError(errorId, keyword, resultPanel) {
       
     case 3:
       if (getLanguage() === "en") {
-        printMsgLine(resultPanel, "Error: No space between colon and "+keyword,"red");
+        printMsgLine(resultPanel, "Error: There should be no space between colon and "+keyword,"red");
       } else {
         printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+keyword, "red");
       }
@@ -1291,6 +1295,88 @@ function printDbSchemaInputError(inputId, resultPanel) {
   } else {
     printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputId) + "欄位輸入有誤。","red");
   }       
+}
+
+/**
+ * print error of chkThroughSymbol
+ * Called by chkThroughSymbol()
+ * @param  {Number} errorId     |error id
+ * @param  {String} keyword     |where error occured
+ * @param  {Object} resultPanel |result panel(HTML) for printing result 
+ */
+function printThroughSymbolError(errorId, keyword, resultPanel) {
+  switch (errorId) {
+    case 1:
+      if (getLanguage() === "en") {
+        var place = keyword === "" ? " [Umm...somewhere but I don't know] " : keyword;
+        printMsgLine(resultPanel, "Error: Problem with symbol, please check your comma or colon.<br> - Error is near "+place,"red");
+      } else {
+        var place = keyword === "" ? " [痾...這不好說] " : keyword;
+        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
+      }
+      break;
+      
+    case 2:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: Problem with symbol, please check your comma or colon.<br> - Error is near [Umm...somewhere but I don't know]","red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位置嘛...痾...這不好說。","red");
+      }
+      break;
+      
+    case 3:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: Where's your through option?","red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：你的through咧？","red");
+      }
+      
+      break;
+      
+    case 4:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: Problem with symbol, please check your comma.<br> - Error cause by the comma after "+keyword,"red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，多了一個逗號！<br>位於"+keyword+"的逗號。","red");
+      }
+      break;
+      
+    case 5:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: Invalid options. Supported options are \'through\', \'source\'.<br> - Error cause by "+keyword,"red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：關鍵字應為\'through\', \'source\'其中之一。<br>位於"+keyword,"red");
+      }
+      break;
+      
+    case 6:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: There should be no space between colon and "+keyword,"red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+keyword,"red");
+      }
+      break;
+      
+    case 7:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: There should only have a white space between colons of "+keyword+" option","red");
+      } else {
+        printMsgLine(resultPanel, "錯誤："+keyword+"的兩個冒號中間有奇怪的東西混進來了！","red");
+      }
+      break;
+      
+    case 8:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: Problem with symbol, please check your comma or colon.<br> - Error is at"+keyword,"red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+keyword,"red");
+      }
+      break;
+
+    default:
+      printMsgLine(resultPanel, "錯誤：printThroughSymbolError有奇怪的Bug啊啊啊啊！","red");
+      break;
+  }
 }
 
 /**
