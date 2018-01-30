@@ -187,7 +187,13 @@ function chkAssociationLines(mode, relatoinInput, resultPanel) {
     if (relatoinInput.length == 1) {
       return true;
     }
-    printMsgLine(resultPanel, "錯誤：輸入超過一行","red");
+    // print error and return
+    if (getLanguage() === "en") {
+      printMsgLine(resultPanel, "Error: only allow one line input!","red");
+    } else {
+      printMsgLine(resultPanel, "錯誤：輸入超過一行","red");
+    }
+    
     return false;
   }
   printMsgLine(resultPanel, "錯誤：chkAssociationLines有奇怪的Bug啊啊啊啊！","red");
