@@ -102,7 +102,11 @@ function chkHmTh() {
 
   // if DB Schema field is not filled, show error message and return
   if (blMap === null || hmMap === null) {
-    printMsgH(resultPanel, 3, "大俠您把DB Schema的欄位填好再來吧....<br>","orange");
+    if (getLanguage() === "en") {
+      printMsgH(resultPanel, 3, "Please fill out DB Schema....<br>","orange");
+    } else {
+      printMsgH(resultPanel, 3, "大俠您把DB Schema的欄位填好再來吧....<br>","orange");
+    }    
     return;
   }
 
@@ -114,7 +118,11 @@ function chkHmTh() {
     if (typeof hmthMap !== 'object') return;
     chkThroughAssociation(blMap, hmMap, hmthMap, inputsBl[0], resultPanel);
   } else {
-    printMsgH(resultPanel, 3, "大俠您把上面的東西修好再來吧....<br>","orange");
+    if (getLanguage() === "en") {
+      printMsgH(resultPanel, 3, "Please fix the errors above and then check again....<br>","orange");
+    } else {
+      printMsgH(resultPanel, 3, "大俠您把上面的東西修好再來吧....<br>","orange");
+    }
   }
 }
 
