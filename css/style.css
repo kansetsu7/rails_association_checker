@@ -22,10 +22,6 @@
   margin-top: 15px;
   padding: 5px;
 }
-/*
-.fa-check-circle{
-  color: lime;
-}*/
 
 textarea{
   resize: none;
@@ -36,43 +32,45 @@ textarea{
 }
 
 .code-white{
-  /*color: rgb(248, 248, 242);*/
   color: #f8f8f2;
 }
 
 .code-red{
-  /*color: rgb(248, 34, 114);*/
   color: #f92672;
 }
 
 .code-green{
-  /*color: rgb(157, 214, 45);*/
   color: #a6e22e;
 }
 
 .code-purple{
-  /*color: rgb(174, 129, 255);*/
   color: #ae81ff;
 }
 
 .code-yellow{
-  /*color: rgb(230, 119, 216);*/
   color: #ffe792;
 }
 
 #db-bt{
   border-width: 0 1px 0 0;
-  /*border-width: 1px;*/
   border-color: black;
   border-style: solid;
+}
+
+#footer{
+  margin: 0;
+  background-color: rgb(38, 39, 33);
+}
+
+#contact-link{
+  color: white;
+  margin: 0 5px 0 5px;
+}
+
+#contact-row{
+  color: white;
 }
 
 #hm-pk, #hm-ref-model-name, #hm-fk{
   background-color: gray;
 }
-/*
-red: 248, 34, 114;
-green: 157,214,45
-purple: 174,129,255
-yellow: 230,119,216;
-*/

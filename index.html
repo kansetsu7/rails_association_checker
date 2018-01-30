@@ -8,7 +8,6 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="css/font-awesome.min.css">
-
   </head>
   <body>
     <div class="container">
@@ -104,7 +103,7 @@
               <h3 class="panel-title">DB schema</h3>
             </div>
             <div class="panel-body">
-              <div class="col-xs-6" id="db-bt">
+              <div class="col-xs-12 col-sm-6" id="db-bt">
                 <h4>belongs_to設定</h4>
                 <form action="">
                   自己的外鍵: <input type="text" id="bl-fk" value="patient_id"><br><br>
@@ -112,7 +111,7 @@
                   對方的主鍵: <input type="text" id="bl-pk" value="id">
                 </form>
               </div>
-              <div class="col-xs-6" id="db-hm">
+              <div class="col-xs-12 col-sm-6" id="db-hm">
                 <h4>has_many / has_many :through設定</h4>
                 <form action="">
                   自己的主鍵: <input type="text" id="hm-pk" value="id" style="cursor:no-drop;" disabled><br><br>
@@ -138,8 +137,19 @@
         </div>
       </div>
 
-      <input type="button" value="check" id="chk-btn" onclick="chkBtHm();">
+      <input type="button" value="check" id="chk-btn" onclick="chkBtHm();"><br><br>
     </div>
+
+    <div class="container" id="footer">
+      <div class="row">
+        <div class="col-xs-12 text-center" id="contact-row">
+          Contact me: 
+          <a href="www.linkedin.com/in/an-chieh-kuo-kansetsu7" id="contact-link" target="_blank"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+          <a href="https://www.instagram.com/kansetsu7/" id="contact-link" target="_blank"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
