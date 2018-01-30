@@ -226,36 +226,38 @@ function chkAssociationSymbol(association, resultPanel, mode) {
   // check arguments of association. 
   // if not pass, show location that might cause error and return
   for (var i = 0; i < association2.length; i++) {
-    if (association2[i].length < 2) {
-      var place = association2[i][0] === "" ? " [痾...這不好說] " : association2[i][0];
-      printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
+    if (association2[i].length < 2) {  //Problem with symbol: comma or colon
+      printAssociationSymbolError(1, association2[i][0], resultPanel);
       return map;
     }
-    if (association2[i].length > 2) {
-      printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+association2[i][1]+"附近。","red");
+    if (association2[i].length > 2) {  //Problem with symbol: comma or colon
+      printAssociationSymbolError(1, association2[i][1], resultPanel);
       return map;
     }
-    if (association2[i][0] === "" || association2[i][1] === "") {
-      var place = association2[i-1][0] === "" ? " [痾...這不好說] " : association2[i-1][0];
-      printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
+    if (association2[i][0].trim() === "") {  //Problem with symbol: comma or colon
+      printAssociationSymbolError(1, association2[i-1][1], resultPanel);
+      return map;
+    }
+    if (association2[i][1].trim() === "") {  //Problem with symbol: comma or colon
+      printAssociationSymbolError(1, association2[i][0], resultPanel);
       return map;
     }
     if (i > 0) {
-      if (!chkAssociationArg(association2[i][0].trim())) { 
-        printMsgLine(resultPanel, "錯誤：關鍵字應為\'class_name\', \'foreign_key\', \'primary_key\'其中之一。<br>位於"+association2[i][0],"red");
+      if (!chkAssociationArg(association2[i][0].trim())) {  //Invalid options
+        printAssociationSymbolError(2, association2[i][0], resultPanel);
         return map;
       }
-      if (chkRightSpace(association2[i][0])) {
-        printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+association2[i][0],"red");
+      if (chkRightSpace(association2[i][0])) {  //No space between colon
+        printAssociationSymbolError(3, association2[i][0], resultPanel);
         return map;
       }
-      if (!chkDoubleQuotes(association2[i][1].trim())) {
-        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+association2[i][1]+"附近。","red");
+      if (!chkDoubleQuotes(association2[i][1].trim())) {  //lack of double quotes
+        printAssociationSymbolError(4, association2[i][1], resultPanel);
         return map;
       }
     } else {
-      if (chkLeftSpace(association2[0][1])) {
-        printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+association2[0][1],"red");
+      if (chkLeftSpace(association2[0][1])) {  //No space between colon
+        printAssociationSymbolError(3, association2[0][1], resultPanel);
         return map;
       }
     }
@@ -391,8 +393,7 @@ function chkThroughAssociation(bMap, mMap, tMap, bModelName, resultPanel) {
 function chkAssociationArg(str) {
   legalArguments = ["class_name", "foreign_key", "primary_key"]
   for (var i = 0; i < legalArguments.length; i++) {
-    str === legalArguments[i];
-    return true;
+    if (str === legalArguments[i]) return true;    
   }
   return false;
 }
@@ -1186,7 +1187,7 @@ function printMyModelNameErrors(errorId, resultPanel) {
  * print errors of chkAssociationMethodName
  * Called by chkAssociationMethodName()
  * @param  {Number} errorId     |error id
- * @param {String}  methodName  |name of method
+ * @param  {String}  methodName  |name of method
  * @param  {Object} resultPanel |result panel(HTML) for printing result
  */
 function printAssociationMethodNameError(errorId, methodName, resultPanel) {
@@ -1216,7 +1217,55 @@ function printAssociationMethodNameError(errorId, methodName, resultPanel) {
       break;
 
     default:
-       printMsgLine(resultPanel, "錯誤：printAssociationMethodNameError有奇怪的Bug啊啊啊啊！","red");
+      printMsgLine(resultPanel, "錯誤：printAssociationMethodNameError有奇怪的Bug啊啊啊啊！","red");
+      break;
+  }
+}
+
+/**
+ * print errors of chkAssociationSymbol
+ * @param  {Number} errorId     |error id
+ * @param  {String} keyword     |where error occured
+ * @param  {Object} resultPanel |result panel(HTML) for printing result 
+ */
+function printAssociationSymbolError(errorId, keyword, resultPanel) {
+  switch (errorId) {
+    case 1:
+      if (getLanguage() === "en") {
+        var place = keyword === "" ? " [Umm...somewhere] " : keyword;
+        printMsgLine(resultPanel, "Error: Problem with symbol, please check your comma or colon.<br> - Error is near "+place,"red");
+      } else {
+        var place = keyword === "" ? " [痾...這不好說] " : keyword;
+        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的逗號或冒號！<br>位於"+place+"附近。","red");
+      }
+      break;
+      
+    case 2:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: Invalid options. Supported options are \'class_name\', \'foreign_key\', \'primary_key\'.<br> - Error cause by "+keyword,"red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：關鍵字應為\'class_name\', \'foreign_key\', \'primary_key\'其中之一。<br>位於"+keyword,"red");
+      }
+      break;
+      
+    case 3:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: No space between colon and "+keyword,"red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：你的冒號要靠緊"+keyword, "red");
+      }
+      break;
+      
+    case 4:
+      if (getLanguage() === "en") {
+        printMsgLine(resultPanel, "Error: Problem with symbol, please check your double quotes.<br> - Error is near "+keyword,"red");
+      } else {
+        printMsgLine(resultPanel, "錯誤：關聯設定符號有問題，請檢查你的引號！<br>位於"+keyword+"附近。","red");
+      }
+      break;
+
+    default:
+      printMsgLine(resultPanel, "錯誤：printAssociationSymbolError有奇怪的Bug啊啊啊啊！","red");
       break;
   }
 }
