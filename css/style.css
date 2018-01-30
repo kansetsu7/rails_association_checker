@@ -19,7 +19,6 @@
 }
 
 .fa-github{
-  margin-top: 15px;
   padding: 5px;
 }
 
@@ -69,6 +68,11 @@ textarea{
 
 #contact-row{
   color: white;
+}
+
+.lang-btn{
+  margin-top: 15px;
+  float: right;
 }
 
 #hm-pk, #hm-ref-model-name, #hm-fk{
