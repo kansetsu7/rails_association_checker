@@ -119,7 +119,7 @@ function chkHmTh() {
     chkThroughAssociation(blMap, hmMap, hmthMap, inputsBl[0], resultPanel);
   } else {
     if (getLanguage() === "en") {
-      printMsgH(resultPanel, 3, "Please fix the errors above and then check again....<br>","orange");
+      printMsgH(resultPanel, 3, "Please fix the errors above and then press 'Check' button again....<br>","orange");
     } else {
       printMsgH(resultPanel, 3, "大俠您把上面的東西修好再來吧....<br>","orange");
     }
@@ -280,7 +280,7 @@ function chkAssociationSymbol(association, resultPanel, mode) {
  * return map {("chk", false)} if not pass
  * return map {("chk", true), ("association", association2)} if pass
  * association2 is user input association split by colon :
- * Called by checkBase()
+ * Called by chkThrough()
  * 
  * @param  {Array}    association      |user input association from panel, split by comma ,
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
@@ -580,7 +580,7 @@ function chkDbSchemaInput(resultPanel, inputs, association, mode) {
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   chkVal        |DB Schema setup
- * @param  {Map}      association      |association of [has_many]
+ * @param  {Map}      association   |association of [has_many]
  * @param  {Number}   inputIndex    |index of inputs array from chkDbSchemaInput()
  * @param  {String}   myModelName   |model name of [has_many]
  * @return {Boolean}  ---           |follows or not
@@ -590,8 +590,8 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
 
   switch (inputIndex) {
     case 2:
-      if (firstLetterIsUpperCase(chkVal)) {
-        printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+      if (firstLetterIsUpperCase(chkVal)) {  //should in lowercase
+        printMsgLine(resultPanel, getChkConventionErrorMsg(1, getInputName(inputIndex)),"red");
         return false;
       }
       var foreign_key = association.get("foreign_key");
@@ -604,15 +604,15 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
         }
       } else if (foreign_key === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lawnGreen", true);
-      } else {
-        printMsgWithIcon(resultPanel, "foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
+      } else {  //Wrong option supplied - foreign_key
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal),"red", false);
         return false;
       }
       break;
 
     case 3:
-      if (firstLetterIsLowerCase(chkVal)) {
-        printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+      if (firstLetterIsLowerCase(chkVal)) {  //should in uppercase
+        printMsgLine(resultPanel, getChkConventionErrorMsg(2, getInputName(inputIndex)),"red");
         return false;
       }
       var class_name = association.get("class_name");
@@ -625,15 +625,15 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
         }
       } else if (class_name === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lawnGreen", true);
-      } else {
-        printMsgWithIcon(resultPanel, "class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
+      } else {  //Wrong option supplied - class_name
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(4, chkVal),"red", false);
         return false;
       }
       break;
 
     case 4:
-      if (firstLetterIsUpperCase(chkVal)) {
-        printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+      if (firstLetterIsUpperCase(chkVal)) {  //should in lowercase
+        printMsgLine(resultPanel, getChkConventionErrorMsg(1, getInputName(inputIndex)),"red");
         return false;
       }
       var primary_key = association.get("primary_key");
@@ -646,8 +646,8 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
         }
       } else if (primary_key === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lawnGreen", true);
-      } else {
-        printMsgWithIcon(resultPanel, "primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
+      } else {  //Wrong option supplied - primary_key
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(5, chkVal),"red", false);
         return false;
       }
       break;
@@ -678,8 +678,8 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
 
   switch (inputIndex) {
     case 2:
-      if (firstLetterIsUpperCase(chkVal)) {
-        printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+      if (firstLetterIsUpperCase(chkVal)) {  //should in lowercase
+        printMsgLine(resultPanel, getChkConventionErrorMsg(1, getInputName(inputIndex)),"red");
         return false;
       }
       var foreign_key = association.get("foreign_key");
@@ -692,15 +692,15 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
         }
       } else if (foreign_key === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lawnGreen", true);
-      } else {
-        printMsgWithIcon(resultPanel, "foreign_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
+      } else {  //Wrong option supplied - foreign_key
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal),"red", false);
         return false;
       }
       break;
 
     case 3:
-      if (firstLetterIsLowerCase(chkVal)) {
-        printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+      if (firstLetterIsLowerCase(chkVal)) {  //should in uppercase
+        printMsgLine(resultPanel, getChkConventionErrorMsg(2, getInputName(inputIndex)),"red");
         return false;
       }
       var class_name = association.get("class_name");
@@ -713,15 +713,15 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
         }
       } else if (class_name === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lawnGreen", true);
-      } else {
-        printMsgWithIcon(resultPanel, "class_name: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
+      } else {  //Wrong option supplied - class_name
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(4, chkVal),"red", false);
         return false;
       }
       break;
 
     case 4:
-      if (firstLetterIsUpperCase(chkVal)) {
-        printMsgLine(resultPanel, "錯誤：DB schema" + getInputName(inputIndex) + "欄位大小寫有誤。","red");
+      if (firstLetterIsUpperCase(chkVal)) {  //should in lowercase
+        printMsgLine(resultPanel, getChkConventionErrorMsg(1, getInputName(inputIndex)),"red");
         return false;
       }
       var primary_key = association.get("primary_key");
@@ -734,8 +734,8 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
         }
       } else if (primary_key === undefined && chkVal === convention) {
         printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lawnGreen", true);
-      } else {
-        printMsgWithIcon(resultPanel, "primary_key: 關聯設定錯誤，應為\"" + chkVal + "\"","red", false);
+      } else {  //Wrong option supplied - primary_key
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(5, chkVal),"red", false);
         return false;
       }
       break;
@@ -1375,6 +1375,60 @@ function printThroughSymbolError(errorId, keyword, resultPanel) {
 
     default:
       printMsgLine(resultPanel, "錯誤：printThroughSymbolError有奇怪的Bug啊啊啊啊！","red");
+      break;
+  }
+}
+
+/**
+ * return error message of chkHasManyConvention and chkBelongsToConvention
+ * Called by chkHasManyConvention() and chkBelongsToConvention()
+ * 
+ * @param  {Number} msgId       |error message id
+ * @param  {String} keyword     |where error occured or what it should be
+ * @return {String}             |error message
+ */
+function getChkConventionErrorMsg(msgId, keyword) {
+  switch (msgId) {
+    case 1:
+      if (getLanguage() === "en") {
+        return ("Error: First letter of \"" + keyword + "\" in DB schema field should in lowercase!");
+      } else {
+        return ("錯誤：DB schema" + keyword + "欄位字首要小寫。");
+      }
+      
+    case 2:
+      if (getLanguage() === "en") {
+        return ("Error: First letter of \"" + keyword + "\" in DB schema field should in uppercase!");
+      } else {
+        return ("錯誤：DB schema" + keyword + "欄位字首要大寫。");
+      }
+      
+    case 3:
+      if (getLanguage() === "en") {
+        return ("Error: Wrong foreign key has been supplied in model setup, it should be \"" + keyword + "\"");
+      } else {
+        return ("foreign_key: 關聯設定錯誤，應為\"" + keyword + "\"");
+      }
+      break;
+      
+    case 4:
+      if (getLanguage() === "en") {
+        return ("Error: Wrong class name has been supplied in model setup, it should be \"" + keyword + "\"");
+      } else {
+        return ("class_name: 關聯設定錯誤，應為\"" + keyword + "\"");
+      }
+      break;
+      
+    case 5:
+      if (getLanguage() === "en") {
+        return ("Error: Wrong primary key has been supplied in model setup, it should be \"" + keyword + "\"");
+      } else {
+        return ("primary_key: 關聯設定錯誤，應為\"" + keyword + "\"");
+      }
+      break;
+
+    default:
+      return "錯誤：getChkConventionErrorMsg有奇怪的Bug啊啊啊啊！";
       break;
   }
 }
