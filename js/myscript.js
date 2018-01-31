@@ -597,13 +597,13 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
       var foreign_key = association.get("foreign_key");
       var convention = lowFirstLetter(myModelName) + "_id";
       if (foreign_key === chkVal) {
-        if (foreign_key === convention) {
-          printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lawnGreen", true);
-        } else {
-          printMsgWithIcon(resultPanel, "foreign_key: 不符慣例，不可省略!","orange", true);
+        if (foreign_key === convention) {  //option may be omitted - foreign_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "foreign_key"),"lawnGreen", true);
+        } else {  //option may NOT be omitted - foreign_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(2, "foreign_key"),"orange", true);
         }
-      } else if (foreign_key === undefined && chkVal === convention) {
-          printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lawnGreen", true);
+      } else if (foreign_key === undefined && chkVal === convention) {  //option may be omitted - foreign_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "foreign_key"),"lawnGreen", true);
       } else {  //Wrong option supplied - foreign_key
         printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "foreign_key"),"red", false);
         return false;
@@ -618,13 +618,13 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
       var class_name = association.get("class_name");
       var convention = getUpperSingular(has_many); //different
       if (class_name === chkVal) {
-        if (class_name === convention) {
-          printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lawnGreen", true);
-        } else {
-          printMsgWithIcon(resultPanel, "class_name: 不符慣例，不可省略!","orange", true);
+        if (class_name === convention) {  //option may be omitted - class_name
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "class_name"),"lawnGreen", true);
+        } else {  //option may NOT be omitted - class_name
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(2, "class_name"),"orange", true);
         }
-      } else if (class_name === undefined && chkVal === convention) {
-          printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lawnGreen", true);
+      } else if (class_name === undefined && chkVal === convention) {  //option may be omitted - class_name
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "class_name"),"lawnGreen", true);
       } else {  //Wrong option supplied - class_name
         printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "class_name"),"red", false);
         return false;
@@ -639,13 +639,13 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
       var primary_key = association.get("primary_key");
       var convention = "id";
       if (primary_key === chkVal) {
-        if (primary_key === convention) {
-          printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lawnGreen", true);
-        } else {
-          printMsgWithIcon(resultPanel, "primary_key: 不符慣例，不可省略!","orange", true);
+        if (primary_key === convention) {  //option may be omitted - primary_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "primary_key"),"lawnGreen", true);
+        } else {  //option may NOT be omitted - primary_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(2, "primary_key"),"orange", true);
         }
-      } else if (primary_key === undefined && chkVal === convention) {
-          printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lawnGreen", true);
+      } else if (primary_key === undefined && chkVal === convention) {  //option may be omitted - primary_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "primary_key"),"lawnGreen", true);
       } else {  //Wrong option supplied - primary_key
         printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "primary_key"),"red", false);
         return false;
@@ -685,13 +685,13 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
       var foreign_key = association.get("foreign_key");
       var convention = belongs_to + "_id";
       if (foreign_key === chkVal) {
-        if (foreign_key === convention) {
-          printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lawnGreen", true);
-        } else {
-          printMsgWithIcon(resultPanel, "foreign_key: 不符慣例，不可省略!","orange", true);
+        if (foreign_key === convention) {  //option may be omitted - foreign_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "foreign_key"),"lawnGreen", true);
+        } else {  //option may NOT be omitted - foreign_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(2, "foreign_key"),"orange", true);
         }
-      } else if (foreign_key === undefined && chkVal === convention) {
-          printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lawnGreen", true);
+      } else if (foreign_key === undefined && chkVal === convention) {  //option may be omitted - foreign_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "foreign_key"),"lawnGreen", true);
       } else {  //Wrong option supplied - foreign_key
         printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "foreign_key"),"red", false);
         return false;
@@ -706,13 +706,13 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
       var class_name = association.get("class_name");
       var convention = upFirstLetter(belongs_to);
       if (class_name === chkVal) {
-        if (class_name === convention) {
-          printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lawnGreen", true);
-        } else {
-          printMsgWithIcon(resultPanel, "class_name: 不符慣例，不可省略!","orange", true);
+        if (class_name === convention) {  //option may be omitted - class_name
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "class_name"),"lawnGreen", true);
+        } else {  //option may NOT be omitted - class_name
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(2, "class_name"),"orange", true);
         }
-      } else if (class_name === undefined && chkVal === convention) {
-          printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lawnGreen", true);
+      } else if (class_name === undefined && chkVal === convention) {  //option may be omitted - class_name
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "class_name"),"lawnGreen", true);
       } else {  //Wrong option supplied - class_name
         printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "class_name"),"red", false);
         return false;
@@ -727,13 +727,13 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
       var primary_key = association.get("primary_key");
       var convention = "id";
       if (primary_key === chkVal) {
-        if (primary_key === convention) {
-          printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lawnGreen", true);
-        } else {
-          printMsgWithIcon(resultPanel, "primary_key: 不符慣例，不可省略!","orange", true);
+        if (primary_key === convention) {  //option may be omitted - primary_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "primary_key"),"lawnGreen", true);
+        } else {  //option may NOT be omitted - primary_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(2, "primary_key"),"orange", true);
         }
-      } else if (primary_key === undefined && chkVal === convention) {
-        printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lawnGreen", true);
+      } else if (primary_key === undefined && chkVal === convention) {  //option may be omitted - primary_key
+          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "primary_key"),"lawnGreen", true);
       } else {  //Wrong option supplied - primary_key
         printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "primary_key"),"red", false);
         return false;
@@ -1385,6 +1385,7 @@ function printThroughSymbolError(errorId, keyword, resultPanel) {
  * 
  * @param  {Number} msgId       |error message id
  * @param  {String} keyword     |where error occured or what it should be
+ * @param  {String} option      |option name: foreign_key, primary_key, class_name
  * @return {String}             |error message
  */
 function getChkConventionErrorMsg(msgId, keyword, option) {
@@ -1409,11 +1410,36 @@ function getChkConventionErrorMsg(msgId, keyword, option) {
       } else {
         return (option + ": 關聯設定錯誤，應為\"" + keyword + "\"");
       }
-      break;
 
     default:
       return "錯誤：getChkConventionErrorMsg有奇怪的Bug啊啊啊啊！";
-      break;
+  }
+}
+
+/**
+ * [getChkConventionOkMsg description]
+ * @param  {Number} msgId       |error message id
+ * @param  {String} option      |option name: foreign_key, primary_key, class_name
+ * @return {String}             |OK message
+ */
+function getChkConventionOkMsg(msgId, option) {
+  switch (msgId) {
+    case 1:
+      if (getLanguage() === "en") {
+        return (option + ": follows Rails convention, it may be omitted!");
+      } else {
+        return (option + ": 符合慣例，可省略!");
+      }
+      
+    case 2:
+      if (getLanguage() === "en") {
+        return (option + ": not follows Rails convention, it may NOT be omitted!");
+      } else {
+        return (option + ": 不符慣例，不可省略!");
+      }
+
+    default:
+      return "錯誤：getChkConventionOkMsg有奇怪的Bug啊啊啊啊！";
   }
 }
 
