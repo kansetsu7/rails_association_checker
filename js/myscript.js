@@ -372,7 +372,8 @@ function chkThroughAssociation(bMap, mMap, tMap, bModelName, resultPanel) {
           printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","lawnGreen", true);
           return;
         }
-        printMsgLine(resultPanel, "錯誤：[has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對不上，兩者應要相同，或者[has_many :through]要設定source。","red");
+        // has_many and belongs_to not match
+        printMsgLine(resultPanel, getThroughAssociationErrorMsg(1, tMap.get("has_many"), bMap.get("belongs_to")),"red");
         return;
       } else {  // have [source] arg
         if (tMap.get("source") === bMap.get("belongs_to")) {
@@ -383,14 +384,17 @@ function chkThroughAssociation(bMap, mMap, tMap, bModelName, resultPanel) {
           printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上，但跟[has_many :through]的方法名稱對不上，source不可省略。","orange", true);
           return;
         }
-        printMsgLine(resultPanel, "錯誤：[has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對不上，兩者應要相同。","red");
+        // source and belongs_to not match
+        printMsgLine(resultPanel, getThroughAssociationErrorMsg(2, tMap.get("source"), bMap.get("belongs_to")),"red");
         return;
       }
     }
-    printMsgLine(resultPanel, "錯誤：[belongs_to]的"+bModelName+"跟[has_many]的"+mMap.get("has_many")+"對不上。<br>兩者關係為"+bModelName+" -> 字首小寫x複數 = "+mMap.get("has_many"),"red");
+    // bModelName and has_many not match
+    printMsgLine(resultPanel, getThroughAssociationErrorMsg(3, bModelName, mMap.get("has_many")),"red");
     return;
   }
-  printMsgLine(resultPanel, "錯誤：[has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對不上，兩者應要相同。","red");
+    // through and has_many not match
+    printMsgLine(resultPanel, getThroughAssociationErrorMsg(4, tMap.get("through"), mMap.get("has_many")),"red");
   return;
 }
 
@@ -1417,7 +1421,9 @@ function getChkConventionErrorMsg(msgId, keyword, option) {
 }
 
 /**
- * [getChkConventionOkMsg description]
+ * return OK message of chkHasManyConvention and chkBelongsToConvention
+ * Called by chkHasManyConvention() and chkBelongsToConvention()
+ * 
  * @param  {Number} msgId       |error message id
  * @param  {String} option      |option name: foreign_key, primary_key, class_name
  * @return {String}             |OK message
@@ -1444,7 +1450,53 @@ function getChkConventionOkMsg(msgId, option) {
 }
 
 /**
- * print message <p> in particular color on result panel
+ * return error message of chkThroughAssociation
+ * Called by chkThroughAssociation()
+ * 
+ * @param  {Number} msgId       |error message id
+ * @param  {String} keyword1    |where error occured
+ * @param  {String} keyword2    |where error occured
+ * @param  {String} keyword3    |where error occured
+ * @return {String}             |error message
+ */
+function getThroughAssociationErrorMsg(errorId, keyword1, keyword2, keyword3) {
+  switch (errorId) {
+    case 1:
+      if (getLanguage() === "en") {
+        return ("Error: "+keyword1+" of [has_many :through] does not match "+keyword2+" of [belongs_to], they should be the same, or you can supply source option in [has_many :through].");
+      } else {
+        return ("錯誤：[has_many :through]的"+keyword1+"跟[belongs_to]的"+keyword2+"對不上，兩者應要相同，或者[has_many :through]要設定source。");
+      }
+      
+    case 2:
+      if (getLanguage() === "en") {
+        return ("Error: "+keyword1+" of [has_many :through] does not match "+keyword2+" of [belongs_to], they should be the same.");
+      } else {
+        return ("錯誤：[has_many :through]的"+keyword1+"跟[belongs_to]的"+keyword2+"對不上，兩者應要相同。");
+      }
+      
+    case 3:
+      if (getLanguage() === "en") {
+        return ("Error: "+keyword1+" of [belongs_to] does not match "+keyword2+" of [has_many].<br> - Their relationship is : "+keyword1+" in plural term and lowercase by first letter = "+keyword2);
+      } else {
+        return ("錯誤：[belongs_to]的"+keyword1+"跟[has_many]的"+keyword2+"對不上。<br>兩者關係為"+keyword1+" -> 字首小寫x複數 = "+keyword2);
+      }
+      
+    case 4:
+      if (getLanguage() === "en") {
+        return ("Error: "+keyword1+" of [has_many :through] does not match "+keyword2+" of [has_many], they should be the same.");
+      } else {
+        return ("錯誤：[has_many :through]的"+keyword1+"跟[has_many]的"+keyword2+"對不上，兩者應要相同。");
+      }
+
+    default:
+      return "錯誤：getThroughAssociationErrorMsg有奇怪的Bug啊啊啊啊！";
+  }
+}
+
+/**
+ * return OK message of chkHasManyConvention and chkBelongsToConvention
+ * Called by chkHasManyConvention() and chkBelongsToConvention()
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {String}   str           |string you want to show
