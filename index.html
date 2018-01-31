@@ -36,7 +36,7 @@
               <i class="fa fa-github fa-lg fa-pull-right" aria-hidden="true">Source Code</i>
           </a>
           <h4>How to use</h4>
-          <p>Supported association types: provide "belongs_to", "has_many", "has_many :through". You can choose type below</p>
+          <p>Supported association types: provide "belongs_to", "has_many", "has_many :through". You can choose type below.</p>
           <p>Supported options of "belongs_to" and "has_many" are: class_name, foreign_key, primary_key, others might cause error.
           <br>Supported options of "has_many :through" are: through, source, others might cause error.</p>
           <p>
@@ -86,7 +86,7 @@
             </div>
             <div class="panel-body">
               <form action="">
-                Class <input type="text" id="bl-my-model-name" placeholder="Model名稱" value="Appointment"> < ActiveRecord <br><br>
+                Class <input type="text" id="bl-my-model-name" placeholder="Model name" value="Appointment"> < ActiveRecord <br><br>
                 <textarea rows="2" class="form-control" id="bl-relatoin-input"  placeholder="belongs_to" >belongs_to :patient</textarea><br> 
                 end <br>
               </form>
@@ -102,7 +102,7 @@
             </div>
             <div class="panel-body">
               <form action="">
-                Class <input type="text" id="hm-my-model-name" placeholder="Model名稱" value="Doctor"> < ActiveRecord <br><br>
+                Class <input type="text" id="hm-my-model-name" placeholder="Model name" value="Doctor"> < ActiveRecord <br><br>
                 <textarea rows="2" class="form-control" id="hm-relatoin-input" placeholder="has_many">has_many :appointments</textarea> 
                 <textarea rows="2" class="form-control" id="hmth-relatoin-input" placeholder="has_many :through">has_many :patients, through: :appointments, source: :patient</textarea><br> 
                 end <br>
