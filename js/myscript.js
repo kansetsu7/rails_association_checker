@@ -363,13 +363,13 @@ function chkThroughSymbol(association, resultPanel) {
  * @return {}         ----          |it don't return
  */
 function chkThroughAssociation(bMap, mMap, tMap, bModelName, resultPanel) {
-  if (tMap.get("through") === mMap.get("has_many")) {
-    printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("through")+"跟[has_many]的"+mMap.get("has_many")+"對得上。","lawnGreen", true);
-    if (getUpperSingular(mMap.get("has_many")) === bModelName) {
-      printMsgWithIcon(resultPanel, "[belongs_to]的"+bModelName+"跟[has_many]的"+mMap.get("has_many")+"對得上。","lawnGreen", true);
+  if (tMap.get("through") === mMap.get("has_many")) {  //[has_many :through] matches [has_many]
+    printMsgWithIcon(resultPanel, getThroughAssociationOkMsg(1, tMap.get("through"), mMap.get("has_many"), ""),"lawnGreen", true);
+    if (getUpperSingular(mMap.get("has_many")) === bModelName) {  //bModelName matches [has_many]
+      printMsgWithIcon(resultPanel, getThroughAssociationOkMsg(2, bModelName, mMap.get("has_many"), ""),"lawnGreen", true);
       if (tMap.get("source") === undefined) {
-        if (tMap.get("has_many") === bMap.get("belongs_to").plural()) {
-          printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("has_many")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上。","lawnGreen", true);
+        if (tMap.get("has_many") === bMap.get("belongs_to").plural()) {  //[has_many :through] matches [belongs_to]
+          printMsgWithIcon(resultPanel, getThroughAssociationOkMsg(3, tMap.get("has_many"), bMap.get("belongs_to"), ""),"lawnGreen", true);
           return;
         }
         // has_many and belongs_to not match
@@ -377,11 +377,11 @@ function chkThroughAssociation(bMap, mMap, tMap, bModelName, resultPanel) {
         return;
       } else {  // have [source] arg
         if (tMap.get("source") === bMap.get("belongs_to")) {
-          if (tMap.get("has_many") === bMap.get("belongs_to").plural()) {
-            printMsgWithIcon(resultPanel, "has_many 的source: :"+tMap.get("source")+"跟belongs_to:"+bMap.get("belongs_to")+"跟has_many :"+tMap.get("has_many")+"都對得上，source可省略。","lawnGreen", true);
+          if (tMap.get("has_many") === bMap.get("belongs_to").plural()) {  // source , belongs_to and has_many matches
+            printMsgWithIcon(resultPanel, getThroughAssociationOkMsg(4, tMap.get("source"), bMap.get("belongs_to"), tMap.get("has_many")),"lawnGreen", true);
             return;
           }
-          printMsgWithIcon(resultPanel, "[has_many :through]的"+tMap.get("source")+"跟[belongs_to]的"+bMap.get("belongs_to")+"對得上，但跟[has_many :through]的方法名稱對不上，source不可省略。","orange", true);
+          printMsgWithIcon(resultPanel, getThroughAssociationOkMsg(5, tMap.get("source"), bMap.get("belongs_to"), tMap.get("has_many")),"orange", true);
           return;
         }
         // source and belongs_to not match
@@ -1424,7 +1424,7 @@ function getChkConventionErrorMsg(msgId, keyword, option) {
  * return OK message of chkHasManyConvention and chkBelongsToConvention
  * Called by chkHasManyConvention() and chkBelongsToConvention()
  * 
- * @param  {Number} msgId       |error message id
+ * @param  {Number} msgId       |OK message id
  * @param  {String} option      |option name: foreign_key, primary_key, class_name
  * @return {String}             |OK message
  */
@@ -1459,7 +1459,7 @@ function getChkConventionOkMsg(msgId, option) {
  * @param  {String} keyword3    |where error occured
  * @return {String}             |error message
  */
-function getThroughAssociationErrorMsg(errorId, keyword1, keyword2, keyword3) {
+function getThroughAssociationErrorMsg(errorId, keyword1, keyword2) {
   switch (errorId) {
     case 1:
       if (getLanguage() === "en") {
@@ -1491,6 +1491,57 @@ function getThroughAssociationErrorMsg(errorId, keyword1, keyword2, keyword3) {
 
     default:
       return "錯誤：getThroughAssociationErrorMsg有奇怪的Bug啊啊啊啊！";
+  }
+}
+
+/**
+ * return OK message of chkThroughAssociation
+ * Called by chkThroughAssociation()
+ * @param  {Number} msgId       |OK message id
+ * @param  {String} keyword1    |option of association that follows rails convention
+ * @param  {String} keyword2    |option of association that follows rails convention
+ * @param  {String} keyword3    |option of association that follows rails convention
+ * @return {String}             |OK message
+ */
+function getThroughAssociationOkMsg(msgId, keyword1, keyword2, keyword3) {
+  switch (msgId) {
+    case 1:
+      if (getLanguage() === "en") {
+        return (keyword1+" of [has_many :through] matches "+keyword2+" of [has_many].");
+      } else {
+        return ("[has_many :through]的"+keyword1+"跟[has_many]的"+keyword2+"對得上。")
+      }
+
+    case 2:
+      if (getLanguage() === "en") {
+        return (keyword1+" of [belongs_to] matches "+keyword2+" of [has_many].");
+      } else {
+        return ("[belongs_to]的"+keyword1+"跟[has_many]的"+keyword2+"對得上。");
+      }
+
+    case 3:
+      if (getLanguage() === "en") {
+        return (keyword1+" of [has_many :through] matches "+keyword2+" of [belongs_to].");
+      } else {
+        return ("[has_many :through]的"+keyword1+"跟[belongs_to]的"+keyword2+"對得上。");
+      }
+
+    case 4:
+      if (getLanguage() === "en") {
+        return ("source: :"+keyword1+" of [has_many] matches belongs_to :"+keyword2+" and has_many :"+keyword3+".<br> - source option may be omitted.");
+      } else {
+        return ("[has_many] 的source: :"+keyword1+"跟belongs_to:"+keyword2+"跟has_many :"+keyword3+"都對得上，source可省略。");
+      }
+
+    case 5:
+      if (getLanguage() === "en") {
+        return (keyword1+" of [has_many :through] matches "+keyword2+" of [belongs_to], but not matches :"+keyword3+" of [has_many :through].<br> - source option may NOT be omitted.");
+      } else {
+        return ("[has_many :through]的"+keyword1+"跟[belongs_to]的"+keyword2+"對得上，但跟[has_many :through]的方法名稱"+keyword3+"對不上，source不可省略。");
+      }
+
+    default:
+      return "錯誤：getThroughAssociationOkMsg有奇怪的Bug啊啊啊啊！";
   }
 }
 
