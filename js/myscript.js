@@ -605,7 +605,7 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
       } else if (foreign_key === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lawnGreen", true);
       } else {  //Wrong option supplied - foreign_key
-        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal),"red", false);
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "foreign_key"),"red", false);
         return false;
       }
       break;
@@ -626,7 +626,7 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
       } else if (class_name === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lawnGreen", true);
       } else {  //Wrong option supplied - class_name
-        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(4, chkVal),"red", false);
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "class_name"),"red", false);
         return false;
       }
       break;
@@ -647,7 +647,7 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
       } else if (primary_key === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lawnGreen", true);
       } else {  //Wrong option supplied - primary_key
-        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(5, chkVal),"red", false);
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "primary_key"),"red", false);
         return false;
       }
       break;
@@ -693,7 +693,7 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
       } else if (foreign_key === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "foreign_key: 符合慣例，可省略!","lawnGreen", true);
       } else {  //Wrong option supplied - foreign_key
-        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal),"red", false);
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "foreign_key"),"red", false);
         return false;
       }
       break;
@@ -714,7 +714,7 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
       } else if (class_name === undefined && chkVal === convention) {
           printMsgWithIcon(resultPanel, "class_name: 符合慣例，可省略!","lawnGreen", true);
       } else {  //Wrong option supplied - class_name
-        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(4, chkVal),"red", false);
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "class_name"),"red", false);
         return false;
       }
       break;
@@ -735,7 +735,7 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
       } else if (primary_key === undefined && chkVal === convention) {
         printMsgWithIcon(resultPanel, "primary_key: 符合慣例，可省略!","lawnGreen", true);
       } else {  //Wrong option supplied - primary_key
-        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(5, chkVal),"red", false);
+        printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "primary_key"),"red", false);
         return false;
       }
       break;
@@ -1387,7 +1387,7 @@ function printThroughSymbolError(errorId, keyword, resultPanel) {
  * @param  {String} keyword     |where error occured or what it should be
  * @return {String}             |error message
  */
-function getChkConventionErrorMsg(msgId, keyword) {
+function getChkConventionErrorMsg(msgId, keyword, option) {
   switch (msgId) {
     case 1:
       if (getLanguage() === "en") {
@@ -1405,25 +1405,9 @@ function getChkConventionErrorMsg(msgId, keyword) {
       
     case 3:
       if (getLanguage() === "en") {
-        return ("Error: Wrong foreign key has been supplied in model setup, it should be \"" + keyword + "\"");
+        return ("Error: Wrong " + option + " has been supplied in model setup, it should be \"" + keyword + "\"");
       } else {
-        return ("foreign_key: 關聯設定錯誤，應為\"" + keyword + "\"");
-      }
-      break;
-      
-    case 4:
-      if (getLanguage() === "en") {
-        return ("Error: Wrong class name has been supplied in model setup, it should be \"" + keyword + "\"");
-      } else {
-        return ("class_name: 關聯設定錯誤，應為\"" + keyword + "\"");
-      }
-      break;
-      
-    case 5:
-      if (getLanguage() === "en") {
-        return ("Error: Wrong primary key has been supplied in model setup, it should be \"" + keyword + "\"");
-      } else {
-        return ("primary_key: 關聯設定錯誤，應為\"" + keyword + "\"");
+        return (option + ": 關聯設定錯誤，應為\"" + keyword + "\"");
       }
       break;
 
