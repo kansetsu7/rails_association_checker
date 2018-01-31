@@ -1666,7 +1666,7 @@ function pluralize_test() {
   var untransformed_text = document.getElementById("untransformed-text");
   var transformed_text = document.getElementById("transformed-text");
   if (isLetter(untransformed_text.value)) {
-    transformed_text.innerHTML = "結果：" + untransformed_text.value.plural();
+    transformed_text.innerHTML = "\'" + untransformed_text.value + "\' in plural term is \'" + untransformed_text.value.plural() + "\'";
   } else {
     transformed_text.innerHTML = "ENGLISH PLEASE!";
   }
@@ -1680,7 +1680,7 @@ function singularize_test() {
   var untransformed_text = document.getElementById("untransformed-text");
   var transformed_text = document.getElementById("transformed-text");
   if (isLetter(untransformed_text.value)) {
-    transformed_text.innerHTML = "結果：" + untransformed_text.value.plural(true);
+    transformed_text.innerHTML = "\'" + untransformed_text.value + "\' in singular term is \'" + untransformed_text.value.plural(true) + "\'";
   } else {
     transformed_text.innerHTML = "ENGLISH PLEASE!";
   }
