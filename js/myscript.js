@@ -521,7 +521,11 @@ function showRailsConvention(resultPanel, modelName, methodName, mode) {
   printMsgSpan(resultPanel, "\"" + upFirstLetter(methodName) + "\"", "code-yellow");
   printMsgSpan(resultPanel, ", ", "code-white");
   printMsgSpan(resultPanel, "foreign_key: ", "code-purple");
-  printMsgSpan(resultPanel, "\"" + methodName + "_id\"", "code-yellow");
+  if (mode === 'm') {
+    printMsgSpan(resultPanel, "\"" + lowFirstLetter(modelName) + "_id\"", "code-yellow");
+  } else {
+    printMsgSpan(resultPanel, "\"" + methodName + "_id\"", "code-yellow");
+  }
   printMsgSpan(resultPanel, ", ", "code-white");
   printMsgSpan(resultPanel, "primary_key: ", "code-purple");
   printMsgSpan(resultPanel, "\"id\"", "code-yellow");
@@ -534,7 +538,7 @@ function showRailsConvention(resultPanel, modelName, methodName, mode) {
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
  * @param  {Array}    inputs        |user inputs from panel
- * @param  {Map}      association      |association 
+ * @param  {Map}      association   |association 
  * @param  {String}   mode          |for indentifing checking mode
  * 
  * @return {Null}     null          |if DB schema not been set
@@ -557,7 +561,7 @@ function chkDbSchemaInput(resultPanel, inputs, association, mode) {
   if (mode === "m" || mode === "t") {
     for (var i = 2; i < inputs.length; i++) {
       if (bothSidesAreLetter(inputs[i])) {
-        if (!chkHasManyConvention(resultPanel, inputs[i], association, i, inputs[0])) result = false;
+        if (!chkHasManyConvention(resultPanel, inputs, association, i, inputs[0])) result = false;
       } else {
         printDbSchemaInputError(i, resultPanel);
         result = false;
@@ -566,7 +570,7 @@ function chkDbSchemaInput(resultPanel, inputs, association, mode) {
   } else { // mode === "b"
     for (var i = 2; i < inputs.length; i++) {
       if (bothSidesAreLetter(inputs[i])) {
-        if (!chkBelongsToConvention(resultPanel, inputs[i], association, i)) result = false;
+        if (!chkBelongsToConvention(resultPanel, inputs, association, i)) result = false;
       } else {
         printDbSchemaInputError(i, resultPanel);
         result = false;
@@ -583,14 +587,15 @@ function chkDbSchemaInput(resultPanel, inputs, association, mode) {
  * Called by chkDbSchemaInput()
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {String}   chkVal        |DB Schema setup
+ * @param  {Array}    inputs        |user inputs from panel
  * @param  {Map}      association   |association of [has_many]
  * @param  {Number}   inputIndex    |index of inputs array from chkDbSchemaInput()
  * @param  {String}   myModelName   |model name of [has_many]
  * @return {Boolean}  ---           |follows or not
  */
-function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myModelName) {
+function chkHasManyConvention(resultPanel, inputs, association, inputIndex, myModelName) {
   var has_many = association.get("has_many");
+  var chkVal = inputs[inputIndex];
 
   switch (inputIndex) {
     case 2:
@@ -606,8 +611,10 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
         } else {  //option may NOT be omitted - foreign_key
           printMsgWithIcon(resultPanel, getChkConventionOkMsg(2, "foreign_key"),"orange", true);
         }
+      } else if (lowFirstLetter(association.get("class_name")) + "_id" === inputs[2]){
+        printMsgWithIcon(resultPanel, getChkConventionOkMsg(3, "foreign_key"),"orange", true);
       } else if (foreign_key === undefined && chkVal === convention) {  //option may be omitted - foreign_key
-          printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "foreign_key"),"lawnGreen", true);
+        printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "foreign_key"),"lawnGreen", true);
       } else {  //Wrong option supplied - foreign_key
         printMsgWithIcon(resultPanel, getChkConventionErrorMsg(3, chkVal, "foreign_key"),"red", false);
         return false;
@@ -672,13 +679,14 @@ function chkHasManyConvention(resultPanel, chkVal, association, inputIndex, myMo
  * Called by chkDbSchemaInput()
  * 
  * @param  {Object}   resultPanel   |result panel(HTML) for printing result
- * @param  {String}   chkVal        |DB Schema setup
- * @param  {Map}      association      |association of [belongs_to]
+ * @param  {Array}    inputs        |user inputs from panel
+ * @param  {Map}      association   |association of [belongs_to]
  * @param  {Number}   inputIndex    |index of inputs array from chkDbSchemaInput()
  * @return {Boolean}  ---           |follows or not
  */
-function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
+function chkBelongsToConvention(resultPanel, inputs, association, inputIndex) {
   var belongs_to = association.get("belongs_to");
+  var chkVal = inputs[inputIndex];
 
   switch (inputIndex) {
     case 2:
@@ -694,6 +702,8 @@ function chkBelongsToConvention(resultPanel, chkVal, association, inputIndex) {
         } else {  //option may NOT be omitted - foreign_key
           printMsgWithIcon(resultPanel, getChkConventionOkMsg(2, "foreign_key"),"orange", true);
         }
+      } else if (lowFirstLetter(association.get("class_name")) + "_id" === inputs[2]){
+        printMsgWithIcon(resultPanel, getChkConventionOkMsg(3, "foreign_key"),"orange", true);
       } else if (foreign_key === undefined && chkVal === convention) {  //option may be omitted - foreign_key
           printMsgWithIcon(resultPanel, getChkConventionOkMsg(1, "foreign_key"),"lawnGreen", true);
       } else {  //Wrong option supplied - foreign_key
@@ -1018,7 +1028,8 @@ function upFirstLetter(str) {
  * @return {String}
  */
 function lowFirstLetter(str) {
-    return str.charAt(0).toLowerCase() + str.slice(1);
+  if (str === undefined) return 'undefined';
+  return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
 /**
@@ -1442,6 +1453,13 @@ function getChkConventionOkMsg(msgId, option) {
         return (option + ": not follows Rails convention, it may NOT be omitted!");
       } else {
         return (option + ": 不符慣例，不可省略!");
+      }
+
+    case 3:
+      if (getLanguage() === "en") {
+        return (option + ": not follows Rails convention, it may be omitted if the \"class_name\" option is correct!");
+      } else {
+        return (option + ": 不符慣例，但在class_name設定正確時可省略!");
       }
 
     default:
